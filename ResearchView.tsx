@@ -47,6 +47,7 @@ const ResearchView = () => {
 
   // Handler functions
   const handleViewProject = (project: ResearchProject) => {
+    console.log('View project button clicked for project:', project.id);
     setSelectedProject(project);
     setShowProjectDetail(true);
     setActiveTab('overview');
@@ -338,6 +339,7 @@ const ResearchView = () => {
                   <Button 
                     size="sm" 
                     onClick={() => {
+                      console.log('Update progress button clicked for project:', proj.id);
                       setSelectedProject(proj);
                       setShowProgressModal(true);
                       setProgressForm({
@@ -365,6 +367,7 @@ const ResearchView = () => {
       )}
 
       {/* Progress Update Modal */}
+      {console.log('Progress modal render check - showProgressModal:', showProgressModal, 'selectedProject:', selectedProject?.id)}
       {showProgressModal && selectedProject && (
         <Modal isOpen={showProgressModal} onClose={() => setShowProgressModal(false)} title="Cập nhật tiến trình đề tài">
           <div className="space-y-4">
@@ -510,6 +513,7 @@ const ResearchView = () => {
       )}
 
       {/* File Upload Modal */}
+      {console.log('File upload modal render check - showFileUploadModal:', showFileUploadModal, 'selectedProject:', selectedProject?.id)}
       {showFileUploadModal && selectedProject && (
         <Modal isOpen={showFileUploadModal} onClose={() => setShowFileUploadModal(false)} title="Tải lên file nghiên cứu">
           <div className="space-y-4">
@@ -587,6 +591,7 @@ const ResearchView = () => {
       )}
 
       {/* Project Detail Modal */}
+      {console.log('Project detail modal render check - showProjectDetail:', showProjectDetail, 'selectedProject:', selectedProject?.id)}
       {showProjectDetail && selectedProject && (
         <Modal 
           isOpen={showProjectDetail} 
@@ -694,6 +699,7 @@ const ResearchView = () => {
                     <Button 
                       size="sm"
                       onClick={() => {
+                        console.log('Update progress button clicked in modal');
                         setShowProgressModal(true);
                         setProgressForm({
                           progressPercentage: selectedProject.progress,
@@ -773,7 +779,10 @@ const ResearchView = () => {
                     <h4 className="font-semibold text-gray-800">Tài liệu nghiên cứu</h4>
                     <Button 
                       size="sm"
-                      onClick={() => setShowFileUploadModal(true)}
+                      onClick={() => {
+                        console.log('Upload file button clicked');
+                        setShowFileUploadModal(true);
+                      }}
                     >
                       <Upload size={14} className="mr-1" /> Tải lên file
                     </Button>
@@ -827,6 +836,7 @@ const ResearchView = () => {
                     <Button 
                       size="sm"
                       onClick={() => {
+                        console.log('Add report button clicked');
                         setShowFileUploadModal(true);
                         setFileForm({...fileForm, fileType: 'report'});
                       }}
