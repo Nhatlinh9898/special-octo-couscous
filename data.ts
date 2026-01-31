@@ -21,6 +21,85 @@ export const MOCK_STUDENTS: Student[] = [
   { id: 1005, code: "HS005", fullName: "Do Minh Duc", classId: 3, dob: "2005-09-10", gender: "Male", status: "Active", email: "duc@st.edu.vn", phone: "0987654325" },
 ];
 
+// Student Activities and Achievements Data
+export const MOCK_STUDENT_ACTIVITIES = [
+  {
+    studentId: 1001,
+    activities: [
+      { name: "CLB STEM", type: "academic", role: "Thành viên", duration: "2022-2024", achievements: "Tham gia dự án robot" },
+      { name: "Đội tuyển Toán", type: "competition", role: "Thành viên", duration: "2023-2024", achievements: "Giải nhì cấp trường" },
+      { name: "Tình nguyện Mùa hè xanh", type: "volunteer", role: "Tình nguyện viên", duration: "2023", achievements: "Hoàn thành 40 giờ tình nguyện" }
+    ],
+    academicPerformance: {
+      gpa: 3.8,
+      strongSubjects: ["Toán", "Lý", "Anh"],
+      weakSubjects: ["Văn"],
+      rank: "Top 5%"
+    },
+    goals: ["Du học Mỹ ngành Computer Science", "Trở thành kỹ sư phần mềm"]
+  },
+  {
+    studentId: 1002,
+    activities: [
+      { name: "CLB Tiếng Anh", type: "academic", role: "Trưởng ban", duration: "2022-2024", achievements: "Tổ chức 5 sự kiện tiếng Anh" },
+      { name: "Đội tuyển Hùng biện", type: "competition", role: "Thành viên", duration: "2023-2024", achievements: "Giải nhất cấp quận" },
+      { name: "CLB Tình nguyện", type: "volunteer", role: "Thủ quỹ", duration: "2022-2024", achievements: "Quyên góp 10 triệu đồng" }
+    ],
+    academicPerformance: {
+      gpa: 3.9,
+      strongSubjects: ["Anh", "Văn", "Sử"],
+      weakSubjects: ["Lý"],
+      rank: "Top 3%"
+    },
+    goals: ["Du học Anh ngành International Relations", "Làm việc cho tổ chức UN"]
+  },
+  {
+    studentId: 1003,
+    activities: [
+      { name: "CLB Bóng rổ", type: "sports", role: "Đội trưởng", duration: "2022-2024", achievements: "Giải nhất thành phố" },
+      { name: "CLB Lãnh đạo", type: "leadership", role: "Thành viên", duration: "2023-2024", achievements: "Hoàn thành khóa lãnh đạo" },
+      { name: "Đội tuyển Khoa học", type: "academic", role: "Thành viên", duration: "2023-2024", achievements: "Dự án nghiên cứu môi trường" }
+    ],
+    academicPerformance: {
+      gpa: 3.6,
+      strongSubjects: ["Lý", "Hóa", "Sinh"],
+      weakSubjects: ["Văn"],
+      rank: "Top 10%"
+    },
+    goals: ["Du học Úc ngành Environmental Science", "Nghiên cứu năng lượng tái tạo"]
+  },
+  {
+    studentId: 1004,
+    activities: [
+      { name: "CLB Âm nhạc", type: "arts", role: "Phó chủ nhiệm", duration: "2022-2024", achievements: "Đạt giải nhất cuộc thi hát" },
+      { name: "CLB Sách", type: "academic", role: "Thành viên", duration: "2022-2024", achievements: "Đọc 50 cuốn sách/năm" },
+      { name: "Đội tuyển Văn học", type: "competition", role: "Thành viên", duration: "2023-2024", achievements: "Giải nhì thành phố" }
+    ],
+    academicPerformance: {
+      gpa: 3.7,
+      strongSubjects: ["Văn", "Anh", "Sử"],
+      weakSubjects: ["Toán"],
+      rank: "Top 7%"
+    },
+    goals: ["Du học Singapore ngành Literature", "Trở thành biên tập viên"]
+  },
+  {
+    studentId: 1005,
+    activities: [
+      { name: "CLB Doanh nhân trẻ", type: "business", role: "Chủ nhiệm", duration: "2022-2024", achievements: "Khởi nghiệp dự án EdTech" },
+      { name: "Đội tuyển Startup", type: "competition", role: "Thành viên", duration: "2023-2024", achievements: "Vào top 10 cuộc thi startup" },
+      { name: "CLB Kỹ năng mềm", type: "leadership", role: "Huấn luyện viên", duration: "2023-2024", achievements: "Đào tạo 50 sinh viên" }
+    ],
+    academicPerformance: {
+      gpa: 3.5,
+      strongSubjects: ["Toán", "Kinh tế"],
+      weakSubjects: ["Sử"],
+      rank: "Top 12%"
+    },
+    goals: ["Du học Canada ngành Business Administration", "Khởi nghiệp công nghệ giáo dục"]
+  }
+];
+
 export const MOCK_SUBJECTS: Subject[] = [
   { id: 1, code: "MATH", name: "Toán Học", credits: 4, color: "bg-blue-100 text-blue-700 border-blue-200" },
   { id: 2, code: "LIT", name: "Ngữ Văn", credits: 3, color: "bg-pink-100 text-pink-700 border-pink-200" },

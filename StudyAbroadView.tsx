@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Globe, Plane, GraduationCap, Clock, FileText, CheckCircle2, Loader2, Award } from 'lucide-react';
-import { api, MOCK_STUDENTS, MOCK_CLASSES } from './data';
+import { api, MOCK_STUDENTS, MOCK_CLASSES, MOCK_STUDENT_ACTIVITIES } from './data';
 import { PartnerUniversity, ExchangeProgram, AbroadApplication, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
@@ -41,13 +41,20 @@ const StudyAbroadView = () => {
   useEffect(() => {
     if (user) {
       const studentInfo = getStudentInfo(user.id);
+      const analyzedData = analyzeStudentData(user.id);
+      
       setApplicationForm(prev => ({
         ...prev,
         fullName: studentInfo.fullName,
         email: studentInfo.email,
         phone: studentInfo.phone,
         currentSchool: studentInfo.schoolName,
-        grade: studentInfo.grade
+        grade: studentInfo.grade,
+        gpa: analyzedData.gpa,
+        englishLevel: analyzedData.englishLevel,
+        motivation: analyzedData.motivation,
+        experience: analyzedData.experience,
+        achievements: analyzedData.achievements
       }));
     }
   }, [user]);
@@ -83,6 +90,9 @@ const StudyAbroadView = () => {
     // Get student information
     const studentInfo = getStudentInfo(user?.id || 1001);
     
+    // Analyze student data for auto-generated content
+    const analyzedData = analyzeStudentData(user?.id || 1001);
+    
     setApplicationForm(prev => ({
       ...prev,
       programId: program.id,
@@ -91,7 +101,12 @@ const StudyAbroadView = () => {
       email: studentInfo.email,
       phone: studentInfo.phone,
       currentSchool: studentInfo.schoolName,
-      grade: studentInfo.grade
+      grade: studentInfo.grade,
+      gpa: analyzedData.gpa,
+      englishLevel: analyzedData.englishLevel,
+      motivation: analyzedData.motivation,
+      experience: analyzedData.experience,
+      achievements: analyzedData.achievements
     }));
     setShowApplicationModal(true);
   };
@@ -187,6 +202,50 @@ const getStudentInfo = (userId: number) => {
     className: 'Unknown',
     schoolName: 'Unknown',
     grade: 'Unknown'
+  };
+};
+
+const analyzeStudentData = (userId: number) => {
+  // Get student activities data
+  const studentActivityData = MOCK_STUDENT_ACTIVITIES.find(s => s.studentId === userId);
+  
+  if (!studentActivityData) {
+    return {
+      motivation: '',
+      experience: '',
+      achievements: '',
+      gpa: '',
+      englishLevel: 'Basic'
+    };
+  }
+
+  // Generate motivation based on goals and strengths
+  const motivation = `Với thành tích học tập xuất sắc (GPA: ${studentActivityData.academicPerformance.gpa}/4.0, xếp hạng ${studentActivityData.academicPerformance.rank}), tôi mong muốn tham gia chương trình du học để hiện thực hóa mục tiêu "${studentActivityData.goals[0]}". Các môn học mạnh của tôi là ${studentActivityData.academicPerformance.strongSubjects.join(', ')} sẽ là nền tảng vững chắc cho việc học tập tại môi trường quốc tế.`;
+
+  // Generate experience from activities
+  const experience = studentActivityData.activities.map(activity => 
+    `- ${activity.name} (${activity.duration}): ${activity.role} - ${activity.achievements}`
+  ).join('\n');
+
+  // Generate achievements from activities and academic performance
+  const achievements = `Học tập: ${studentActivityData.academicPerformance.rank} với GPA ${studentActivityData.academicPerformance.gpa}/4.0\n\nHoạt động ngoại khóa:\n${experience}\n\nMục tiêu tương lai: ${studentActivityData.goals.join(' và ')}`;
+
+  // Determine English level based on activities and goals
+  let englishLevel = 'Basic';
+  if (studentActivityData.activities.some(a => a.name.includes('Tiếng Anh')) || 
+      studentActivityData.goals.some(g => g.includes('Anh') || g.includes('Mỹ') || g.includes('Singapore'))) {
+    englishLevel = 'IELTS 6.0-6.5';
+  }
+  if (studentActivityData.academicPerformance.strongSubjects.includes('Anh')) {
+    englishLevel = 'IELTS 6.5+';
+  }
+
+  return {
+    motivation,
+    experience,
+    achievements,
+    gpa: studentActivityData.academicPerformance.gpa.toString(),
+    englishLevel
   };
 };
 
@@ -452,25 +511,45 @@ const getStudentInfo = (userId: number) => {
               />
             </div>
 
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-bold text-blue-800 mb-2">Phân tích dữ liệu học sinh (tự động tạo)</h4>
+              <div className="text-sm text-gray-700">
+                <p className="mb-2">🤖 <strong>AI Analysis:</strong> Hệ thống đã phân tích dữ liệu học tập và hoạt động của học sinh để tự động tạo nội dung:</p>
+                <ul className="list-disc pl-5 space-y-1 text-xs">
+                  <li><strong>Động lực:</strong> Dựa trên mục tiêu du học và điểm mạnh học tập</li>
+                  <li><strong>Kinh nghiệm:</strong> Tổng hợp từ hoạt động ngoại khóa và vai trò</li>
+                  <li><strong>Thành tích:</strong> Kết hợp thành tích học tập và giải thưởng</li>
+                  <li><strong>GPA:</strong> Lấy từ dữ liệu học tập chính xác</li>
+                  <li><strong>Tiếng Anh:</strong> Phân tích dựa trên hoạt động và mục tiêu</li>
+                </ul>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">GPA *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  GPA * 
+                  <span className="text-xs text-blue-600 ml-2">(phân tích tự động)</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={applicationForm.gpa}
                   onChange={(e) => setApplicationForm({...applicationForm, gpa: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                   placeholder="3.5/4.0"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Trình độ tiếng Anh *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Trình độ tiếng Anh * 
+                  <span className="text-xs text-blue-600 ml-2">(phân tích tự động)</span>
+                </label>
                 <select
                   required
                   value={applicationForm.englishLevel}
                   onChange={(e) => setApplicationForm({...applicationForm, englishLevel: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                 >
                   <option value="">Chọn trình độ</option>
                   <option value="IELTS 6.5+">IELTS 6.5+</option>
@@ -484,34 +563,43 @@ const getStudentInfo = (userId: number) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Động lực ứng tuyển *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Động lực ứng tuyển * 
+                <span className="text-xs text-blue-600 ml-2">(phân tích tự động)</span>
+              </label>
               <textarea
                 required
                 value={applicationForm.motivation}
                 onChange={(e) => setApplicationForm({...applicationForm, motivation: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                 rows={4}
                 placeholder="Tại sao bạn muốn tham gia chương trình này? Mục tiêu của bạn là gì?"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kinh nghiệm và hoạt động ngoại khóa</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Kinh nghiệm và hoạt động ngoại khóa 
+                <span className="text-xs text-blue-600 ml-2">(phân tích tự động)</span>
+              </label>
               <textarea
                 value={applicationForm.experience}
                 onChange={(e) => setApplicationForm({...applicationForm, experience: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                 rows={3}
                 placeholder="Các hoạt động, cuộc thi, dự án bạn đã tham gia..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Thành tích và giải thưởng</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Thành tích và giải thưởng 
+                <span className="text-xs text-blue-600 ml-2">(phân tích tự động)</span>
+              </label>
               <textarea
                 value={applicationForm.achievements}
                 onChange={(e) => setApplicationForm({...applicationForm, achievements: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                 rows={3}
                 placeholder="Học sinh giỏi, giải thưởng các cuộc thi..."
               />
