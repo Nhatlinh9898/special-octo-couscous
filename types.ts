@@ -174,6 +174,30 @@ export interface CanteenItem {
   image: string;
   available: boolean;
   calories?: number;
+  description?: string;
+  ingredients?: string[];
+  preparationTime?: number; // in minutes
+}
+
+export interface MealSchedule {
+  id: number;
+  timeSlot: 'Sáng' | 'Ra chơi sáng' | 'Trưa' | 'Ra chơi chiều' | 'Tối';
+  startTime: string; // HH:mm format
+  endTime: string; // HH:mm format
+  items: CanteenItem[];
+  date: string; // YYYY-MM-DD format
+  isActive: boolean;
+}
+
+export interface MenuItemForm {
+  name: string;
+  price: string;
+  category: 'Food' | 'Drink' | 'Snack';
+  calories: string;
+  description: string;
+  ingredients: string;
+  preparationTime: string;
+  image: string;
 }
 
 export interface DormRoom {

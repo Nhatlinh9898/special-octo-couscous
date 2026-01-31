@@ -1,4 +1,4 @@
-import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage } from './types';
+import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage, MealSchedule } from './types';
 
 export const MOCK_TEACHERS: Teacher[] = [
   { id: 101, fullName: "Nguyen Van A", email: "anv@school.edu.vn", phone: "0901234567", major: "Toán Học", avatar: "https://ui-avatars.com/api/?name=Nguyen+Van+A&background=e0e7ff&color=4338ca" },
@@ -176,11 +176,111 @@ export const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
 ];
 
 export const MOCK_MENU: CanteenItem[] = [
-  { id: 1, name: "Cơm Rang Thập Cẩm", price: 35000, category: "Food", available: true, calories: 550, image: "https://placehold.co/200x200/ffedd5/c2410c?text=Com+Rang" },
-  { id: 2, name: "Phở Bò", price: 40000, category: "Food", available: true, calories: 450, image: "https://placehold.co/200x200/dcfce7/15803d?text=Pho+Bo" },
-  { id: 3, name: "Bánh Mì Pate", price: 20000, category: "Food", available: true, calories: 350, image: "https://placehold.co/200x200/fce7f3/db2777?text=Banh+Mi" },
-  { id: 4, name: "Nước Cam Ép", price: 25000, category: "Drink", available: true, calories: 120, image: "https://placehold.co/200x200/e0e7ff/4338ca?text=Nuoc+Cam" },
-  { id: 5, name: "Sữa Chua", price: 10000, category: "Snack", available: true, calories: 100, image: "https://placehold.co/200x200/f3f4f6/374151?text=Sua+Chua" },
+  // Món ăn chính
+  { id: 1, name: "Cơm Rang Thập Cẩm", price: 35000, category: "Food", available: true, calories: 550, image: "https://placehold.co/200x200/ffedd5/c2410c?text=Com+Rang", description: "Cơm rang với trứng, rau củ và thịt", ingredients: ["Cơm", "trứng", "cà rốt", "đậu que", "thịt heo"], preparationTime: 15 },
+  { id: 2, name: "Phở Bò", price: 40000, category: "Food", available: true, calories: 450, image: "https://placehold.co/200x200/dcfce7/15803d?text=Pho+Bo", description: "Phở bò tươi với bánh phở tự làm", ingredients: ["Bò tươi", "bánh phở", "hành", "rau thơm"], preparationTime: 20 },
+  { id: 3, name: "Bánh Mì Pate", price: 20000, category: "Food", available: true, calories: 350, image: "https://placehold.co/200x200/fce7f3/db2777?text=Banh+Mi", description: "Bánh mì nóng với pate, rau", ingredients: ["Bánh mì", "pate", "dưa leo", "cà rốt"], preparationTime: 5 },
+  { id: 6, name: "Bún Chả Giò", price: 30000, category: "Food", available: true, calories: 400, image: "https://placehold.co/200x200/fef3c7/f59e0b?text=Bun+Cha+Gio", description: "Bún tươi với chả giò giòn rụm", ingredients: ["Bún", "chả giò", "rau sống", "nước mắm"], preparationTime: 10 },
+  { id: 7, name: "Cơm Gà Nướng", price: 45000, category: "Food", available: true, calories: 600, image: "https://placehold.co/200x200/fecaca/dc2626?text=Com+Ga+Nuong", description: "Gà nướng mật ong với cơm trắng", ingredients: ["Gà", "mật ong", "gia vị", "cơm"], preparationTime: 25 },
+  { id: 8, name: "Mì Ý Sốt Bò Bằm", price: 38000, category: "Food", available: true, calories: 520, image: "https://placehold.co/200x200/e0e7ff/4338ca?text=Mi+Y", description: "Mì Ý al dente với sốt bò bằm", ingredients: ["Mì Ý", "thịt bò", "cà chua", "hành tây"], preparationTime: 18 },
+  { id: 9, name: "Salad Cá Ngừ", price: 32000, category: "Food", available: true, calories: 280, image: "https://placehold.co/200x200/d1fae5/10b981?text=Salad+Ca+Ngu", description: "Salad tươi ngon với cá ngừ", ingredients: ["Cá ngừ", "xà lách", "cà chua", "dưa leo"], preparationTime: 8 },
+  { id: 10, name: "Bún Thịt Nướng", price: 35000, category: "Food", available: true, calories: 480, image: "https://placehold.co/200x200/fed7aa/ea580c?text=Bun+Thit+Nuong", description: "Bún với thịt nướng thơm lừng", ingredients: ["Thịt heo", "bún", "rau sống", "nước mắm"], preparationTime: 15 },
+  
+  // Đồ uống
+  { id: 4, name: "Nước Cam Ép", price: 25000, category: "Drink", available: true, calories: 120, image: "https://placehold.co/200x200/e0e7ff/4338ca?text=Nuoc+Cam", description: "Nước cam ép tươi nguyên chất", ingredients: ["Cam tươi", "đường", "đá"], preparationTime: 3 },
+  { id: 11, name: "Trà Sữa", price: 30000, category: "Drink", available: true, calories: 200, image: "https://placehold.co/200x200/f3e8ff/9333ea?text=Tra+Sua", description: "Trà sữa với trân châu", ingredients: ["Trà", "sữa", "trân châu", "đường"], preparationTime: 5 },
+  { id: 12, name: "Cà Phê Sữa Đá", price: 22000, category: "Drink", available: true, calories: 80, image: "https://placehold.co/200x200/7f1d1d/991b1b?text=Ca+Phe", description: "Cà phê đậm đà với sữa đặc", ingredients: ["Cà phê", "sữa đặc", "đá"], preparationTime: 2 },
+  { id: 13, name: "Nước Ép Táo", price: 23000, category: "Drink", available: true, calories: 110, image: "https://placehold.co/200x200/dcfce7/15803d?text=Nuoc+Tao", description: "Nước táo ép tự nhiên", ingredients: ["Táo tươi", "đường", "đá"], preparationTime: 3 },
+  { id: 14, name: "Sinh Tố Xoài", price: 28000, category: "Drink", available: true, calories: 180, image: "https://placehold.co/200x200/fed7aa/f59e0b?text=Sinh+To+Xoai", description: "Sinh tố xoài thơm ngon", ingredients: ["Xoài chín", "sữa", "đá"], preparationTime: 4 },
+  { id: 15, name: "Trà Lạnh Chanh", price: 18000, category: "Drink", available: true, calories: 60, image: "https://placehold.co/200x200/fef3c7/fbbf24?text=Tra+Lanh", description: "Trà chanh mát lạnh", ingredients: ["Trà", "chanh", "đường", "đá"], preparationTime: 2 },
+  
+  // Đồ ăn vặt
+  { id: 5, name: "Sữa Chua", price: 10000, category: "Snack", available: true, calories: 100, image: "https://placehold.co/200x200/f3f4f6/374151?text=Sua+Chua", description: "Sữa chua trái cây", ingredients: ["Sữa chua", "trái cây", "đường"], preparationTime: 1 },
+  { id: 16, name: "Bánh Croissant", price: 15000, category: "Snack", available: true, calories: 220, image: "https://placehold.co/200x200/fef3c7/f59e0b?text=Croissant", description: "Bánh sừng bò bơ thơm ngon", ingredients: ["Bột mì", "bơ", "đường"], preparationTime: 1 },
+  { id: 17, name: "Khoai Tây Chiên", price: 18000, category: "Snack", available: true, calories: 300, image: "https://placehold.co/200x200/fecaca/dc2626?text=Khoai+Tay", description: "Khoai tây chiên giòn", ingredients: ["Khoai tây", "dầu ăn", "muối"], preparationTime: 8 },
+  { id: 18, name: "Bánh Ngọt", price: 12000, category: "Snack", available: true, calories: 180, image: "https://placehold.co/200x200/fce7f3/db2777?text=Banh+Ngot", description: "Bánh ngọt đa dạng hương vị", ingredients: ["Bột mì", "đường", "kem"], preparationTime: 1 },
+  { id: 19, name: "Trái Cắt", price: 20000, category: "Snack", available: true, calories: 150, image: "https://placehold.co/200x200/d1fae5/10b981?text=Trai+Cat", description: "Hộp trái cây tươi", ingredients: ["Táo", "cam", "nho", "dưa hấu"], preparationTime: 5 },
+  { id: 20, name: "Bánh Quy", price: 8000, category: "Snack", available: true, calories: 90, image: "https://placehold.co/200x200/f3f4f6/6b7280?text=Banh+Quy", description: "Bánh quy bơ giòn tan", ingredients: ["Bột mì", "bơ", "đường"], preparationTime: 1 }
+];
+
+// Thực đơn theo thời gian
+export const MOCK_MEAL_SCHEDULES: MealSchedule[] = [
+  {
+    id: 1,
+    timeSlot: "Sáng",
+    startTime: "06:30",
+    endTime: "07:30",
+    date: "2024-01-15",
+    isActive: true,
+    items: [
+      MOCK_MENU[0], // Cơm Rang Thập Cẩm
+      MOCK_MENU[1], // Phở Bò
+      MOCK_MENU[2], // Bánh Mì Pate
+      MOCK_MENU[3], // Nước Cam Ép
+      MOCK_MENU[4]  // Sữa Chua
+    ]
+  },
+  {
+    id: 2,
+    timeSlot: "Ra chơi sáng",
+    startTime: "09:30",
+    endTime: "10:00",
+    date: "2024-01-15",
+    isActive: true,
+    items: [
+      MOCK_MENU[15], // Bánh Croissant
+      MOCK_MENU[16], // Khoai Tây Chiên
+      MOCK_MENU[10], // Trà Sữa
+      MOCK_MENU[11], // Cà Phê Sữa Đá
+      MOCK_MENU[18]  // Trái Cắt
+    ]
+  },
+  {
+    id: 3,
+    timeSlot: "Trưa",
+    startTime: "11:30",
+    endTime: "13:30",
+    date: "2024-01-15",
+    isActive: true,
+    items: [
+      MOCK_MENU[5], // Cơm Gà Nướng
+      MOCK_MENU[6], // Mì Ý Sốt Bò Bằm
+      MOCK_MENU[7], // Salad Cá Ngừ
+      MOCK_MENU[8], // Bún Thịt Nướng
+      MOCK_MENU[12], // Nước Ép Táo
+      MOCK_MENU[13]  // Sinh Tố Xoài
+    ]
+  },
+  {
+    id: 4,
+    timeSlot: "Ra chơi chiều",
+    startTime: "15:30",
+    endTime: "16:00",
+    date: "2024-01-15",
+    isActive: true,
+    items: [
+      MOCK_MENU[17], // Bánh Ngọt
+      MOCK_MENU[18], // Trái Cắt
+      MOCK_MENU[14], // Trà Lạnh Chanh
+      MOCK_MENU[19]  // Bánh Quy
+    ]
+  },
+  {
+    id: 5,
+    timeSlot: "Tối",
+    startTime: "17:30",
+    endTime: "19:00",
+    date: "2024-01-15",
+    isActive: true,
+    items: [
+      MOCK_MENU[0], // Cơm Rang Thập Cẩm
+      MOCK_MENU[1], // Phở Bò
+      MOCK_MENU[5], // Cơm Gà Nướng
+      MOCK_MENU[6], // Mì Ý Sốt Bò Bằm
+      MOCK_MENU[3], // Nước Cam Ép
+      MOCK_MENU[10]  // Trà Sữa
+    ]
+  }
 ];
 
 export const MOCK_DORM_ROOMS: DormRoom[] = [
