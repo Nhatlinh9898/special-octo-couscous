@@ -16,6 +16,25 @@ const StudyAbroadView = () => {
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
   const [showAIModal, setShowAIModal] = useState(false);
 
+  // Application Modal
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<ExchangeProgram | null>(null);
+  const [applicationForm, setApplicationForm] = useState({
+    studentId: 1001, // Default student
+    programId: 0,
+    fullName: '',
+    email: '',
+    phone: '',
+    currentSchool: '',
+    grade: '',
+    gpa: '',
+    englishLevel: '',
+    motivation: '',
+    experience: '',
+    achievements: '',
+    additionalInfo: ''
+  });
+
   useEffect(() => {
     api.getPartners().then(setPartners);
     api.getPrograms().then(setPrograms);
@@ -29,6 +48,52 @@ const StudyAbroadView = () => {
       setAiResult(res);
       setShowAIModal(true);
     } catch (e) { console.error(e); } finally { setIsMatching(false); }
+  };
+
+  const handleApplyProgram = (program: ExchangeProgram) => {
+    setSelectedProgram(program);
+    setApplicationForm(prev => ({
+      ...prev,
+      programId: program.id
+    }));
+    setShowApplicationModal(true);
+  };
+
+  const handleApplicationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Create new application
+    const newApplication: AbroadApplication = {
+      id: applications.length + 1,
+      studentId: applicationForm.studentId,
+      programId: applicationForm.programId,
+      status: "Submitted",
+      submissionDate: new Date().toISOString().split('T')[0]
+    };
+    
+    // Add to applications list
+    setApplications([...applications, newApplication]);
+    
+    // Reset form and close modal
+    setApplicationForm({
+      studentId: 1001,
+      programId: 0,
+      fullName: '',
+      email: '',
+      phone: '',
+      currentSchool: '',
+      grade: '',
+      gpa: '',
+      englishLevel: '',
+      motivation: '',
+      experience: '',
+      achievements: '',
+      additionalInfo: ''
+    });
+    setShowApplicationModal(false);
+    setSelectedProgram(null);
+    
+    alert('Hồ sơ ứng tuyển đã được gửi thành công!');
   };
 
   const getStudentName = (id: number) => MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
@@ -103,7 +168,7 @@ const StudyAbroadView = () => {
                   </div>
                   <div className="text-right">
                      <div className="text-xs text-gray-500 mb-2">Hạn nộp: <span className="text-red-500 font-bold">{prog.deadline}</span></div>
-                     <Button>Ứng tuyển</Button>
+                     <Button onClick={() => handleApplyProgram(prog)}>Ứng tuyển</Button>
                   </div>
                </div>
             ))}
@@ -150,6 +215,193 @@ const StudyAbroadView = () => {
             </table>
          </div>
       )}
+
+      {/* Application Modal */}
+      <Modal 
+        isOpen={showApplicationModal} 
+        onClose={() => setShowApplicationModal(false)} 
+        title={`Ứng tuyển: ${selectedProgram?.title}`}
+        size="large"
+      >
+        {selectedProgram && (
+          <form onSubmit={handleApplicationSubmit} className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-bold text-blue-800 mb-2">Thông tin chương trình</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Đối tác:</span>
+                  <span className="ml-2 font-medium">{partners.find(p => p.id === selectedProgram.partnerId)?.name}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Loại:</span>
+                  <span className="ml-2 font-medium">{selectedProgram.type}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Thời gian:</span>
+                  <span className="ml-2 font-medium">{selectedProgram.duration}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Chi phí:</span>
+                  <span className="ml-2 font-medium text-blue-600">
+                    {selectedProgram.cost === 0 ? 'Miễn phí' : `$${selectedProgram.cost}`}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên *</label>
+                <input
+                  type="text"
+                  required
+                  value={applicationForm.fullName}
+                  onChange={(e) => setApplicationForm({...applicationForm, fullName: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Nguyễn Văn A"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={applicationForm.email}
+                  onChange={(e) => setApplicationForm({...applicationForm, email: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="email@example.com"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Điện thoại *</label>
+                <input
+                  type="tel"
+                  required
+                  value={applicationForm.phone}
+                  onChange={(e) => setApplicationForm({...applicationForm, phone: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="09xxxxxxxx"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Lớp *</label>
+                <input
+                  type="text"
+                  required
+                  value={applicationForm.grade}
+                  onChange={(e) => setApplicationForm({...applicationForm, grade: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Lớp 12"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Trường hiện tại *</label>
+              <input
+                type="text"
+                required
+                value={applicationForm.currentSchool}
+                onChange={(e) => setApplicationForm({...applicationForm, currentSchool: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Trường THPT ABC"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">GPA *</label>
+                <input
+                  type="text"
+                  required
+                  value={applicationForm.gpa}
+                  onChange={(e) => setApplicationForm({...applicationForm, gpa: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="3.5/4.0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Trình độ tiếng Anh *</label>
+                <select
+                  required
+                  value={applicationForm.englishLevel}
+                  onChange={(e) => setApplicationForm({...applicationForm, englishLevel: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Chọn trình độ</option>
+                  <option value="IELTS 6.5+">IELTS 6.5+</option>
+                  <option value="IELTS 6.0-6.5">IELTS 6.0-6.5</option>
+                  <option value="IELTS 5.5-6.0">IELTS 5.5-6.0</option>
+                  <option value="TOEFL 80+">TOEFL 80+</option>
+                  <option value="TOEFL 60-80">TOEFL 60-80</option>
+                  <option value="Basic">Basic</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Động lực ứng tuyển *</label>
+              <textarea
+                required
+                value={applicationForm.motivation}
+                onChange={(e) => setApplicationForm({...applicationForm, motivation: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={4}
+                placeholder="Tại sao bạn muốn tham gia chương trình này? Mục tiêu của bạn là gì?"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Kinh nghiệm và hoạt động ngoại khóa</label>
+              <textarea
+                value={applicationForm.experience}
+                onChange={(e) => setApplicationForm({...applicationForm, experience: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={3}
+                placeholder="Các hoạt động, cuộc thi, dự án bạn đã tham gia..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Thành tích và giải thưởng</label>
+              <textarea
+                value={applicationForm.achievements}
+                onChange={(e) => setApplicationForm({...applicationForm, achievements: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={3}
+                placeholder="Học sinh giỏi, giải thưởng các cuộc thi..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Thông tin bổ sung</label>
+              <textarea
+                value={applicationForm.additionalInfo}
+                onChange={(e) => setApplicationForm({...applicationForm, additionalInfo: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={2}
+                placeholder="Bất kỳ thông tin nào khác bạn muốn chia sẻ..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button 
+                type="button" 
+                variant="secondary" 
+                onClick={() => setShowApplicationModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button type="submit">
+                Gửi hồ sơ ứng tuyển
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
 
       {/* AI Modal */}
       <Modal isOpen={showAIModal} onClose={() => setShowAIModal(false)} title="AI Tìm kiếm Học bổng (Study Abroad AI)">
