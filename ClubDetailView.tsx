@@ -918,6 +918,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
                   </span>
                 </div>
               </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -942,8 +944,50 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
                 <MessageCircle size={48} className="mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-medium text-gray-600 mb-2">Chưa có bài viết nào</h3>
                 <p className="text-gray-500">Hãy là người đầu tiên chia sẻ điều thú vị!</p>
-        </div>
-      )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {posts.map(post => (
+                  <div key={post.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <img src={post.authorAvatar || '/default-avatar.jpg'} alt={post.author} className="w-10 h-10 rounded-full" />
+                        <div>
+                          <h4 className="font-semibold text-gray-800">{post.author}</h4>
+                          <p className="text-sm text-gray-500">{new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 text-xs rounded-full ${
+                        post.type === 'announcement' ? 'bg-blue-100 text-blue-800' :
+                        post.type === 'discussion' ? 'bg-green-100 text-green-800' :
+                        'bg-purple-100 text-purple-800'
+                      }`}>
+                        {post.type === 'announcement' ? 'Thông báo' :
+                         post.type === 'discussion' ? 'Thảo luận' : 'Sự kiện'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
+                    <p className="text-gray-600 mb-4">{post.content}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <button className="flex items-center gap-1 hover:text-red-500">
+                        <Heart size={16} />
+                        <span>{post.likes || 0}</span>
+                      </button>
+                      <button className="flex items-center gap-1 hover:text-blue-500">
+                        <MessageSquare size={16} />
+                        <span>{post.comments || 0}</span>
+                      </button>
+                      <button className="flex items-center gap-1 hover:text-green-500">
+                        <Share2 size={16} />
+                        <span>Chia sẻ</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
       {activeTab === 'members' && (
         <div className="space-y-4">
@@ -1494,6 +1538,7 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
           </div>
         </div>
       </Modal>
+      </div>
     </div>
   );
 };
