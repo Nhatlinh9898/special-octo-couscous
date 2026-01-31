@@ -282,6 +282,49 @@ export interface Supplier {
   status: 'active' | 'inactive';
 }
 
+// Club Management Types
+export interface ClubMember {
+  id: number;
+  fullName: string;
+  email: string;
+  role: 'president' | 'vice_president' | 'secretary' | 'treasurer' | 'member';
+  joinedDate: string;
+  status: 'active' | 'inactive' | 'pending';
+  avatar?: string;
+  phone?: string;
+  grade?: string;
+  class?: string;
+}
+
+export interface ClubPost {
+  id: number;
+  title: string;
+  content: string;
+  type: 'announcement' | 'news' | 'discussion' | 'achievement';
+  author: string;
+  authorAvatar?: string;
+  createdAt: string;
+  likes: number;
+  comments: number;
+  images?: string[];
+  clubId: number;
+}
+
+export interface ClubEvent {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  maxParticipants?: number;
+  currentParticipants: number;
+  registrationDeadline: string;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  clubId: number;
+  createdAt: string;
+}
+
 export interface ExpenseReport {
   id: number;
   month: string;

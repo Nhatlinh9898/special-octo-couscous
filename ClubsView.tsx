@@ -6,6 +6,7 @@ import { Button, Modal } from './components';
 import { aiService } from './aiService';
 import CreateClubForm from './CreateClubForm';
 import ClubScheduleView from './ClubScheduleView';
+import ClubDetailView from './ClubDetailView';
 
 const ClubsView = () => {
   const [clubs, setClubs] = useState<any[]>([]);
@@ -13,6 +14,8 @@ const ClubsView = () => {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [selectedClub, setSelectedClub] = useState<any>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showClubDetail, setShowClubDetail] = useState(false);
+  const [selectedClubId, setSelectedClubId] = useState<string>('');
   // AI States
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [clubResult, setClubResult] = useState<AIAnalysisResult | null>(null);
@@ -138,6 +141,16 @@ const ClubsView = () => {
     setShowScheduleModal(true);
   };
 
+  const handleViewClubDetail = (club: any) => {
+    setSelectedClubId(club.id.toString());
+    setShowClubDetail(true);
+  };
+
+  const handleBackFromDetail = () => {
+    setShowClubDetail(false);
+    setSelectedClubId('');
+  };
+
   const handleAISuggest = async () => {
     setIsSuggesting(true);
     try {
@@ -249,6 +262,10 @@ const ClubsView = () => {
 
   return (
     <div className="space-y-6">
+      {showClubDetail ? (
+        <ClubDetailView clubId={selectedClubId} onBack={handleBackFromDetail} />
+      ) : (
+        <>
        <div className="flex justify-between items-center">
         <div>
            <h2 className="text-2xl font-bold text-gray-800">Câu lạc bộ & Ngoại khóa</h2>
@@ -316,14 +333,18 @@ const ClubsView = () => {
                            <Clock size={16}/>
                         </button>
                         <button 
+                          onClick={() => handleViewClubDetail(club)}
+                          className="p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition"
+                          title="Xem chi tiết"
+                        >
+                           <ArrowRight size={18}/>
+                        </button>
+                        <button 
                           onClick={() => handleDeleteClub(club.id)}
                           className="p-2 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition"
                           title="Xóa CLB"
                         >
                            <Trash2 size={16}/>
-                        </button>
-                        <button className="p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition">
-                           <ArrowRight size={18}/>
                         </button>
                      </div>
                   </div>
@@ -613,6 +634,8 @@ const ClubsView = () => {
             </div>
          </div>
       </Modal>
+        </>
+      )}
     </div>
   );
 };
