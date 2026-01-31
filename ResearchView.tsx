@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FlaskConical, FileText, CheckCircle2, Circle, Clock, Plus, BarChart2, Loader2, Microscope,
   Upload, Download, Eye, Edit, Trash2, Calendar, Target, TrendingUp, Users, DollarSign,
-  FilePlus, FolderOpen, FileCheck, AlertCircle, ChevronRight, Search, Filter
+  FilePlus, FolderOpen, FileCheck, AlertCircle, ChevronRight, Search, Filter, X
 } from 'lucide-react';
 import { api } from './data';
 import { ResearchProject, ResearchProgress, ResearchFile, AIAnalysisResult } from './types';
@@ -369,225 +369,289 @@ const ResearchView = () => {
       {/* Progress Update Modal */}
       {console.log('Progress modal render check - showProgressModal:', showProgressModal, 'selectedProject:', selectedProject?.id)}
       {showProgressModal && selectedProject && (
-        <Modal isOpen={showProgressModal} onClose={() => setShowProgressModal(false)} title="Cập nhật tiến trình đề tài">
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-800 mb-2">{selectedProject.title}</h4>
-              <p className="text-sm text-gray-600">Tiến độ hiện tại: {selectedProject.progress}%</p>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tiến độ (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={progressForm.progressPercentage}
-                onChange={(e) => setProgressForm({...progressForm, progressPercentage: parseInt(e.target.value) || 0})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả tiến trình</label>
-              <textarea
-                value={progressForm.description}
-                onChange={(e) => setProgressForm({...progressForm, description: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
-                placeholder="Mô tả chi tiết về tiến trình hiện tại..."
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Target size={16} className="inline mr-1" /> Thành tựu đạt được
-              </label>
-              {progressForm.achievements.map((achievement, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={achievement}
-                    onChange={(e) => updateArrayItem('achievements', index, e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập thành tựu..."
-                  />
-                  {progressForm.achievements.length > 1 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => removeArrayItem('achievements', index)}
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => addArrayItem('achievements')}
-                className="w-full"
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Cập nhật tiến trình đề tài</h3>
+              <button 
+                onClick={() => setShowProgressModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
               >
-                <Plus size={14} className="mr-1" /> Thêm thành tựu
-              </Button>
+                <X size={20} />
+              </button>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <AlertCircle size={16} className="inline mr-1" /> Thách thức gặp phải
-              </label>
-              {progressForm.challenges.map((challenge, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={challenge}
-                    onChange={(e) => updateArrayItem('challenges', index, e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập thách thức..."
-                  />
-                  {progressForm.challenges.length > 1 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => removeArrayItem('challenges', index)}
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  )}
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">{selectedProject.title}</h4>
+                  <p className="text-sm text-gray-600">Tiến độ hiện tại: {selectedProject.progress}%</p>
                 </div>
-              ))}
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => addArrayItem('challenges')}
-                className="w-full"
-              >
-                <Plus size={14} className="mr-1" /> Thêm thách thức
-              </Button>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <ChevronRight size={16} className="inline mr-1" /> Kế hoạch tiếp theo
-              </label>
-              {progressForm.nextSteps.map((step, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tiến độ (%)</label>
                   <input
-                    type="text"
-                    value={step}
-                    onChange={(e) => updateArrayItem('nextSteps', index, e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập kế hoạch..."
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={progressForm.progressPercentage}
+                    onChange={(e) => setProgressForm({...progressForm, progressPercentage: parseInt(e.target.value) || 0})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   />
-                  {progressForm.nextSteps.length > 1 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => removeArrayItem('nextSteps', index)}
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  )}
                 </div>
-              ))}
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => addArrayItem('nextSteps')}
-                className="w-full"
-              >
-                <Plus size={14} className="mr-1" /> Thêm kế hoạch
-              </Button>
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-4">
-              <Button variant="secondary" onClick={() => setShowProgressModal(false)}>
-                Hủy
-              </Button>
-              <Button onClick={handleUpdateProgress}>
-                <TrendingUp size={16} className="mr-1" /> Cập nhật tiến trình
-              </Button>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả tiến trình</label>
+                  <textarea
+                    value={progressForm.description}
+                    onChange={(e) => setProgressForm({...progressForm, description: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                    placeholder="Mô tả chi tiết về tiến trình hiện tại..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Target size={16} className="inline mr-1" /> Thành tựu đạt được
+                  </label>
+                  {progressForm.achievements.map((achievement, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={achievement}
+                        onChange={(e) => updateArrayItem('achievements', index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập thành tựu..."
+                      />
+                      {progressForm.achievements.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => removeArrayItem('achievements', index)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => addArrayItem('achievements')}
+                    className="w-full"
+                  >
+                    <Plus size={14} className="mr-1" /> Thêm thành tựu
+                  </Button>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <AlertCircle size={16} className="inline mr-1" /> Thách thức gặp phải
+                  </label>
+                  {progressForm.challenges.map((challenge, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={challenge}
+                        onChange={(e) => updateArrayItem('challenges', index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập thách thức..."
+                      />
+                      {progressForm.challenges.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => removeArrayItem('challenges', index)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => addArrayItem('challenges')}
+                    className="w-full"
+                  >
+                    <Plus size={14} className="mr-1" /> Thêm thách thức
+                  </Button>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <ChevronRight size={16} className="inline mr-1" /> Kế hoạch tiếp theo
+                  </label>
+                  {progressForm.nextSteps.map((step, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={step}
+                        onChange={(e) => updateArrayItem('nextSteps', index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập kế hoạch..."
+                      />
+                      {progressForm.nextSteps.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => removeArrayItem('nextSteps', index)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => addArrayItem('nextSteps')}
+                    className="w-full"
+                  >
+                    <Plus size={14} className="mr-1" /> Thêm kế hoạch
+                  </Button>
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowProgressModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleUpdateProgress}>
+                    <TrendingUp size={16} className="mr-1" /> Cập nhật tiến trình
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
 
       {/* File Upload Modal */}
       {console.log('File upload modal render check - showFileUploadModal:', showFileUploadModal, 'selectedProject:', selectedProject?.id)}
       {showFileUploadModal && selectedProject && (
-        <Modal isOpen={showFileUploadModal} onClose={() => setShowFileUploadModal(false)} title="Tải lên file nghiên cứu">
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-800 mb-2">{selectedProject.title}</h4>
-              <p className="text-sm text-gray-600">Tải lên file cho đề tài này</p>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tên file *</label>
-              <input
-                type="text"
-                value={fileForm.fileName}
-                onChange={(e) => setFileForm({...fileForm, fileName: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="Nhập tên file..."
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Loại file</label>
-              <select
-                value={fileForm.fileType}
-                onChange={(e) => setFileForm({...fileForm, fileType: e.target.value as ResearchFile['fileType']})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Tải lên file nghiên cứu</h3>
+              <button 
+                onClick={() => setShowFileUploadModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
               >
-                <option value="document">Tài liệu</option>
-                <option value="report">Báo cáo</option>
-                <option value="article">Bài viết khoa học</option>
-                <option value="presentation">Trình chiếu</option>
-                <option value="data">Dữ liệu nghiên cứu</option>
-                <option value="other">Khác</option>
-              </select>
+                <X size={20} />
+              </button>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-              <textarea
-                value={fileForm.description}
-                onChange={(e) => setFileForm({...fileForm, description: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
-                placeholder="Mô tả nội dung file..."
-              />
-            </div>
-            
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isPublic"
-                checked={fileForm.isPublic}
-                onChange={(e) => setFileForm({...fileForm, isPublic: e.target.checked})}
-                className="mr-2"
-              />
-              <label htmlFor="isPublic" className="text-sm text-gray-700">
-                Cho phép mọi người xem file này
-              </label>
-            </div>
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload size={32} className="mx-auto mb-2 text-gray-400" />
-              <p className="text-sm text-gray-600">Kéo và thả file vào đây hoặc click để chọn</p>
-              <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Max 10MB)</p>
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-4">
-              <Button variant="secondary" onClick={() => setShowFileUploadModal(false)}>
-                Hủy
-              </Button>
-              <Button onClick={handleUploadFile} disabled={!fileForm.fileName}>
-                <Upload size={16} className="mr-1" /> Tải lên
-              </Button>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">{selectedProject.title}</h4>
+                  <p className="text-sm text-gray-600">Tải lên file cho đề tài này</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tên file *</label>
+                  <input
+                    type="text"
+                    value={fileForm.fileName}
+                    onChange={(e) => setFileForm({...fileForm, fileName: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="Nhập tên file..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Loại file</label>
+                  <select
+                    value={fileForm.fileType}
+                    onChange={(e) => setFileForm({...fileForm, fileType: e.target.value as ResearchFile['fileType']})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="document">Tài liệu</option>
+                    <option value="report">Báo cáo</option>
+                    <option value="article">Bài viết khoa học</option>
+                    <option value="presentation">Trình chiếu</option>
+                    <option value="data">Dữ liệu nghiên cứu</option>
+                    <option value="other">Khác</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                  <textarea
+                    value={fileForm.description}
+                    onChange={(e) => setFileForm({...fileForm, description: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                    placeholder="Mô tả nội dung file..."
+                  />
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isPublic"
+                    checked={fileForm.isPublic}
+                    onChange={(e) => setFileForm({...fileForm, isPublic: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <label htmlFor="isPublic" className="text-sm text-gray-700">
+                    Cho phép mọi người xem file này
+                  </label>
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <Upload size={32} className="mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600">Kéo và thả file vào đây hoặc click để chọn</p>
+                  <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Max 10MB)</p>
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowFileUploadModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleUploadFile} disabled={!fileForm.fileName}>
+                    <Upload size={16} className="mr-1" /> Tải lên
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
 
       {/* Project Detail Modal */}
