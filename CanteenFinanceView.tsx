@@ -1455,7 +1455,7 @@ const CanteenFinanceView = () => {
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">•</span>
-                    <span>Tập trung vào các sản phẩm có biên lợi nhuận > 20%</span>
+                    <span>Tập trung vào các sản phẩm có biên lợi nhuận &gt; 20%</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">•</span>
