@@ -702,13 +702,16 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             
             <div className="flex gap-2">
               {!isUserMember ? (
-                <Button onClick={handleJoinClub} className="bg-green-600 hover:bg-green-700">
-                  <Users size={16} className="mr-2" /> Đăng ký thành viên
+                <Button 
+                  onClick={handleJoinClub} 
+                  className="bg-green-600 hover:bg-green-700 text-lg px-6 py-3"
+                >
+                  <Users size={16} className="mr-2" /> ĐĂNG KÝ THÀNH VIÊN ĐỂ VIẾT BÀI
                 </Button>
               ) : (
-                <div className="flex items-center gap-2 text-green-600">
+                <div className="flex items-center gap-2 text-green-600 bg-green-100 px-4 py-2 rounded-lg">
                   <CheckCircle size={16} />
-                  <span>Đã là thành viên</span>
+                  <span className="font-medium">✅ Đã là thành viên - Có thể viết bài!</span>
                 </div>
               )}
               <Button variant="secondary" onClick={onBack}>
@@ -842,8 +845,11 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
         Members: {members.length}<br/>
         Events: {events.length}<br/>
         Chat Messages: {chatMessages.length}<br/>
-        Is User Member: {isUserMember ? 'Yes' : 'No'}<br/>
-        Is User Admin: {isUserAdmin ? 'Yes' : 'No'}
+        <strong>Current User:</strong> {currentUser?.fullName || 'Not logged in'}<br/>
+        <strong>User Email:</strong> {currentUser?.email || 'No email'}<br/>
+        <strong>Is User Member:</strong> {isUserMember ? '✅ YES' : '❌ NO'}<br/>
+        <strong>Is User Admin:</strong> {isUserAdmin ? '✅ YES' : '❌ NO'}<br/>
+        <strong>Can Write Posts:</strong> {(isUserMember || isUserAdmin) ? '✅ YES' : '❌ NO - Need to join club first'}
       </div>
 
       {/* Tab Content */}
