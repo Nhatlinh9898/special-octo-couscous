@@ -1161,9 +1161,210 @@ export const MOCK_CLUB_ACTIVITIES: ClubActivity[] = [
 // ...
 
 export const MOCK_PROJECTS: ResearchProject[] = [
-  { id: 1, title: "Hệ thống tưới cây tự động IoT", field: "Công nghệ", leaderName: "Nguyen Van A", members: 3, status: "Ongoing", budget: 5000000, startDate: "2023-09-15", progress: 60 },
-  { id: 2, title: "Nghiên cứu văn học dân gian địa phương", field: "Xã hội", leaderName: "Tran Thi B", members: 5, status: "Completed", budget: 2000000, startDate: "2023-01-10", progress: 100 },
-  { id: 3, title: "Chế tạo Robot hỗ trợ người già", field: "Kỹ thuật", leaderName: "Le Van C", members: 4, status: "Proposal", budget: 10000000, startDate: "2023-12-01", progress: 10 },
+  { 
+    id: 1, 
+    title: "Hệ thống tưới cây tự động IoT", 
+    field: "Công nghệ", 
+    leaderName: "Nguyen Van A", 
+    members: 3, 
+    status: "Ongoing", 
+    budget: 5000000, 
+    startDate: "2023-09-15",
+    progress: 60,
+    description: "Phát triển hệ thống tưới cây thông minh sử dụng công nghệ IoT để tối ưu hóa việc sử dụng nước trong nông nghiệp.",
+    objectives: [
+      "Thiết kế và chế tạo cảm biến độ ẩm đất",
+      "Phát triển thuật toán điều khiển tưới tự động",
+      "Tích hợp với ứng dụng di động để giám sát từ xa"
+    ],
+    methodology: "Sử dụng phương pháp nghiên cứu thực nghiệm kết hợp với mô hình hóa hệ thống.",
+    expectedOutcomes: [
+      "Giảm 30% lượng nước tiêu thụ",
+      "Tăng năng suất cây trồng 15%",
+      "Hệ thống có khả năng mở rộng"
+    ],
+    progressHistory: [
+      {
+        id: 1,
+        projectId: 1,
+        date: "2023-10-01",
+        progressPercentage: 25,
+        description: "Hoàn thành giai đoạn nghiên cứu lý thuyết",
+        achievements: ["Hoàn thành khảo sát thị trường", "Thu thập dữ liệu cảm biến"],
+        challenges: ["Khó khăn trong việc tìm nhà cung cấp cảm biến"],
+        nextSteps: ["Bắt đầu giai đoạn thiết kế prototype"],
+        updatedBy: "Nguyen Van A",
+        files: []
+      },
+      {
+        id: 2,
+        projectId: 1,
+        date: "2023-11-15",
+        progressPercentage: 60,
+        description: "Đang trong giai đoạn thử nghiệm prototype",
+        achievements: ["Thiết kế thành công mạch điều khiển", "Lập trình firmware cơ bản"],
+        challenges: ["Cảm biến cần hiệu chỉnh lại", "Kết nối wireless chưa ổn định"],
+        nextSteps: ["Hoàn thiện thuật toán điều khiển", "Bắt đầu thử nghiệm thực tế"],
+        updatedBy: "Nguyen Van A",
+        files: []
+      }
+    ],
+    files: [
+      {
+        id: 1,
+        projectId: 1,
+        fileName: "Research_Proposal_IoT_Irrigation.pdf",
+        fileType: "document",
+        fileSize: 2048576,
+        uploadDate: "2023-09-20",
+        uploadedBy: "Nguyen Van A",
+        description: "Đề xuất nghiên cứu ban đầu",
+        downloadUrl: "/files/Research_Proposal_IoT_Irrigation.pdf",
+        isPublic: true
+      }
+    ],
+    reports: [],
+    finalFiles: [],
+    createdAt: "2023-09-15",
+    updatedAt: "2023-11-15"
+  },
+  { 
+    id: 2, 
+    title: "Nghiên cứu văn học dân gian địa phương", 
+    field: "Xã hội", 
+    leaderName: "Tran Thi B", 
+    members: 5, 
+    status: "Completed", 
+    budget: 2000000, 
+    startDate: "2023-01-10",
+    endDate: "2023-08-30",
+    progress: 100,
+    description: "Sưu tầm và nghiên cứu các câu chuyện dân gian, ca dao, tục ngữ của địa phương.",
+    objectives: [
+      "Sưu tầm ít nhất 50 câu chuyện dân gian",
+      "Phân tích giá trị văn hóa và giáo dục",
+      "Xuất bản tuyển tập văn học dân gian"
+    ],
+    methodology: "Phương pháp nghiên cứu tài liệu, phỏng vấn thực địa và phân tích nội dung.",
+    expectedOutcomes: [
+      "Tuyển tập 50 câu chuyện dân gian",
+      "Bài báo khoa học về giá trị văn hóa",
+      "Sách giáo khoa địa phương"
+    ],
+    progressHistory: [
+      {
+        id: 3,
+        projectId: 2,
+        date: "2023-08-30",
+        progressPercentage: 100,
+        description: "Hoàn thành dự án nghiên cứu",
+        achievements: ["Sưu tầm thành công 52 câu chuyện", "Xuất bản sách thành công"],
+        challenges: ["Khó khăn trong việc xác minh nguồn gốc"],
+        nextSteps: ["Trình bày kết quả tại hội thảo khoa học"],
+        updatedBy: "Tran Thi B",
+        files: []
+      }
+    ],
+    files: [
+      {
+        id: 2,
+        projectId: 2,
+        fileName: "Folklore_Research_Final_Report.pdf",
+        fileType: "report",
+        fileSize: 5242880,
+        uploadDate: "2023-09-01",
+        uploadedBy: "Tran Thi B",
+        description: "Báo cáo cuối cùng dự án",
+        downloadUrl: "/files/Folklore_Research_Final_Report.pdf",
+        isPublic: true
+      }
+    ],
+    reports: [
+      {
+        id: 3,
+        projectId: 2,
+        fileName: "Folklore_Analysis_Article.pdf",
+        fileType: "article",
+        fileSize: 1048576,
+        uploadDate: "2023-07-15",
+        uploadedBy: "Tran Thi B",
+        description: "Bài viết phân tích giá trị văn học dân gian",
+        downloadUrl: "/files/Folklore_Analysis_Article.pdf",
+        isPublic: true
+      }
+    ],
+    finalFiles: [
+      {
+        id: 4,
+        projectId: 2,
+        fileName: "Folklore_Collection_Book.pdf",
+        fileType: "document",
+        fileSize: 8388608,
+        uploadDate: "2023-08-25",
+        uploadedBy: "Tran Thi B",
+        description: "Tuyển tập văn học dân gian hoàn chỉnh",
+        downloadUrl: "/files/Folklore_Collection_Book.pdf",
+        isPublic: true
+      }
+    ],
+    createdAt: "2023-01-10",
+    updatedAt: "2023-08-30"
+  },
+  { 
+    id: 3, 
+    title: "Chế tạo Robot hỗ trợ người già", 
+    field: "Kỹ thuật", 
+    leaderName: "Le Van C", 
+    members: 4, 
+    status: "Proposal", 
+    budget: 10000000, 
+    startDate: "2023-12-01",
+    progress: 10,
+    description: "Thiết kế và chế tạo robot hỗ trợ người cao tuổi trong các hoạt động sinh hoạt hàng ngày.",
+    objectives: [
+      "Thiết kế robot có khả năng nhận diện vật thể",
+      "Phát triển hệ thống điều khiển giọng nói",
+      "Tích hợp các chức năng hỗ trợ cơ bản"
+    ],
+    methodology: "Kết hợp giữa thiết kế cơ khí, lập trình nhúng và trí tuệ nhân tạo.",
+    expectedOutcomes: [
+      "Prototype robot chức năng cơ bản",
+      "Hệ thống điều khiển thông minh",
+      "Báo cáo khả thi kỹ thuật"
+    ],
+    progressHistory: [
+      {
+        id: 4,
+        projectId: 3,
+        date: "2023-12-15",
+        progressPercentage: 10,
+        description: "Giai đoạn chuẩn bị và nghiên cứu sơ bộ",
+        achievements: ["Hoàn thành khảo sát nhu cầu", "Thu thập tài liệu tham khảo"],
+        challenges: ["Ngân sách hạn hẹp", "Thiếu thiết bị chuyên dụng"],
+        nextSteps: ["Bắt đầu thiết kế cơ khí", "Tìm kiếm nhà tài trợ"],
+        updatedBy: "Le Van C",
+        files: []
+      }
+    ],
+    files: [
+      {
+        id: 5,
+        projectId: 3,
+        fileName: "Robot_Project_Proposal.pdf",
+        fileType: "document",
+        fileSize: 3145728,
+        uploadDate: "2023-12-05",
+        uploadedBy: "Le Van C",
+        description: "Đề xuất dự án robot hỗ trợ người già",
+        downloadUrl: "/files/Robot_Project_Proposal.pdf",
+        isPublic: false
+      }
+    ],
+    reports: [],
+    finalFiles: [],
+    createdAt: "2023-12-01",
+    updatedAt: "2023-12-15"
+  }
 ];
 
 export const MOCK_SESSIONS: CounselingSession[] = [
