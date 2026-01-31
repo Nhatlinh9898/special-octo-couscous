@@ -522,6 +522,20 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     setShowEventModal(true);
   };
 
+  const handleEditEvent = (event: ClubEvent) => {
+    setEditingEvent(event);
+    setEventForm({
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      time: event.time || '09:00',
+      location: event.location || '',
+      maxParticipants: event.maxParticipants?.toString() || '',
+      registrationDeadline: event.registrationDeadline || event.date
+    });
+    setShowEventModal(true);
+  };
+
   const handleSaveEvent = async () => {
     try {
       const eventData = {
@@ -530,22 +544,50 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
         clubId: parseInt(clubId || '1'),
         maxParticipants: eventForm.maxParticipants ? parseInt(eventForm.maxParticipants) : null,
         currentParticipants: editingEvent ? editingEvent.currentParticipants : 0,
-        createdAt: editingEvent ? editingEvent.createdAt : new Date().toISOString()
+        createdAt: editingEvent ? editingEvent.createdAt : new Date().toISOString(),
+        status: 'upcoming'
       };
 
       if (editingEvent) {
         setEvents(prev => prev.map(e => e.id === editingEvent.id ? eventData : e));
+        alert('Cập nhật sự kiện thành công!');
       } else {
         setEvents(prev => [eventData, ...prev]);
+        alert('Tạo sự kiện thành công!');
       }
 
       setShowEventModal(false);
       setEditingEvent(null);
-      alert(editingEvent ? 'Cập nhật sự kiện thành công!' : 'Tạo sự kiện thành công!');
     } catch (error) {
       console.error('Error saving event:', error);
       alert('Có lỗi xảy ra khi lưu sự kiện.');
     }
+  };
+
+  const handleDeleteEvent = (eventId: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) return;
+    
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+    alert('Xóa sự kiện thành công!');
+  };
+
+  const handleRegisterForEvent = (eventId: number) => {
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+
+    if (event.maxParticipants && event.currentParticipants >= event.maxParticipants) {
+      alert('Sự kiện đã đủ số người tham gia!');
+      return;
+    }
+
+    // Update participant count
+    setEvents(prev => prev.map(e => 
+      e.id === eventId 
+        ? { ...e, currentParticipants: e.currentParticipants + 1 }
+        : e
+    ));
+
+    alert('Đăng ký tham gia sự kiện thành công!');
   };
 
   const isUserMember = members.some(m => m.email === currentUser?.email);
@@ -828,20 +870,40 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             {events.map(event => (
               <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-bold text-gray-800">{event.title}</h3>
                     <p className="text-sm text-gray-600 mt-1">{event.description}</p>
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
-                    event.status === 'ongoing' ? 'bg-green-100 text-green-800' :
-                    event.status === 'completed' ? 'bg-gray-100 text-gray-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {event.status === 'upcoming' ? 'Sắp diễn ra' :
-                     event.status === 'ongoing' ? 'Đang diễn ra' :
-                     event.status === 'completed' ? 'Đã kết thúc' : 'Đã hủy'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
+                      event.status === 'ongoing' ? 'bg-green-100 text-green-800' :
+                      event.status === 'completed' ? 'bg-gray-100 text-gray-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {event.status === 'upcoming' ? 'Sắp diễn ra' :
+                       event.status === 'ongoing' ? 'Đang diễn ra' :
+                       event.status === 'completed' ? 'Đã kết thúc' : 'Đã hủy'}
+                    </span>
+                    {isUserAdmin && (
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => handleEditEvent(event)}
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          title="Chỉnh sửa sự kiện"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteEvent(event.id)}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          title="Xóa sự kiện"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="space-y-2 text-sm text-gray-500">
@@ -857,6 +919,9 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
                     <div className="flex items-center gap-2">
                       <Users size={16} />
                       <span>{event.currentParticipants}/{event.maxParticipants} người tham gia</span>
+                      {event.currentParticipants >= event.maxParticipants && (
+                        <span className="text-red-600 font-medium">(Đã đủ)</span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -866,9 +931,21 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
                     <span className="text-xs text-gray-500">
                       Hạn đăng ký: {new Date(event.registrationDeadline).toLocaleDateString('vi-VN')}
                     </span>
-                    <Button size="sm" variant="secondary">
-                      Đăng ký tham gia
-                    </Button>
+                    <div className="flex gap-2">
+                      {!isUserMember ? (
+                        <Button size="sm" variant="secondary" disabled>
+                          <Users size={14} className="mr-1" /> Cần là thành viên
+                        </Button>
+                      ) : event.maxParticipants && event.currentParticipants >= event.maxParticipants ? (
+                        <Button size="sm" variant="secondary" disabled>
+                          <Users size={14} className="mr-1" /> Đã đủ người
+                        </Button>
+                      ) : (
+                        <Button size="sm" onClick={() => handleRegisterForEvent(event.id)}>
+                          <Users size={14} className="mr-1" /> Đăng ký tham gia
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -879,6 +956,11 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
               <Calendar size={48} className="mx-auto mb-2 text-gray-300" />
               <p className="text-gray-500">Chưa có sự kiện nào</p>
+              {(isUserMember || isUserAdmin) && (
+                <Button onClick={handleCreateEvent} className="mt-4">
+                  <Plus size={16} className="mr-2" /> Tạo sự kiện đầu tiên
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -969,6 +1051,97 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
           </div>
         </div>
       )}
+
+      {/* Event Modal */}
+      <Modal isOpen={showEventModal} onClose={() => setShowEventModal(false)} title={editingEvent ? 'Chỉnh sửa sự kiện' : 'Tạo sự kiện mới'}>
+        <div className="p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tên sự kiện *</label>
+              <input
+                type="text"
+                value={eventForm.title}
+                onChange={(e) => setEventForm({...eventForm, title: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nhập tên sự kiện"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả sự kiện *</label>
+              <textarea
+                value={eventForm.description}
+                onChange={(e) => setEventForm({...eventForm, description: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                rows={3}
+                placeholder="Mô tả chi tiết về sự kiện"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày tổ chức *</label>
+                <input
+                  type="date"
+                  value={eventForm.date}
+                  onChange={(e) => setEventForm({...eventForm, date: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian *</label>
+                <input
+                  type="time"
+                  value={eventForm.time}
+                  onChange={(e) => setEventForm({...eventForm, time: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm *</label>
+                <input
+                  type="text"
+                  value={eventForm.location}
+                  onChange={(e) => setEventForm({...eventForm, location: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="Nhập địa điểm tổ chức"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số người tối đa</label>
+                <input
+                  type="number"
+                  value={eventForm.maxParticipants}
+                  onChange={(e) => setEventForm({...eventForm, maxParticipants: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="Không giới hạn"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hạn đăng ký</label>
+                <input
+                  type="date"
+                  value={eventForm.registrationDeadline}
+                  onChange={(e) => setEventForm({...eventForm, registrationDeadline: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="secondary" onClick={() => setShowEventModal(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleSaveEvent} disabled={!eventForm.title || !eventForm.description || !eventForm.date || !eventForm.time || !eventForm.location}>
+              {editingEvent ? 'Cập nhật' : 'Tạo sự kiện'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Join Modal */}
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} title="Đăng ký thành viên">
