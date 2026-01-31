@@ -388,6 +388,57 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     setChatMessages(chatMessagesMap[clubIdNum] || chatMessagesMap[1]);
   };
 
+  // Admin approval functions
+  const [applications, setApplications] = useState<any[]>([]);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<any>(null);
+
+  const loadApplications = () => {
+    const allApplications = JSON.parse(localStorage.getItem('clubApplications') || '[]');
+    const clubApplications = allApplications.filter((app: any) => app.clubId === parseInt(clubId || '1'));
+    setApplications(clubApplications);
+  };
+
+  const handleApproveApplication = (applicationId: number) => {
+    const allApplications = JSON.parse(localStorage.getItem('clubApplications') || '[]');
+    const updatedApplications = allApplications.map((app: any) => 
+      app.id === applicationId ? { ...app, status: 'approved', approvedDate: new Date().toISOString() } : app
+    );
+    localStorage.setItem('clubApplications', JSON.stringify(updatedApplications));
+    
+    // Add to members list
+    const application = allApplications.find((app: any) => app.id === applicationId);
+    if (application) {
+      const newMember = {
+        id: Date.now(),
+        fullName: application.fullName,
+        email: application.email,
+        role: 'member',
+        joinedDate: new Date().toISOString().split('T')[0],
+        status: 'active',
+        avatar: '/default-avatar.jpg'
+      };
+      setMembers(prev => [...prev, newMember]);
+      
+      // Save to localStorage
+      const savedEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+      localStorage.setItem(`club_events_${clubId}`, JSON.stringify(savedEvents));
+    }
+    
+    loadApplications();
+    alert('Đã phê duyệt đơn đăng ký!');
+  };
+
+  const handleRejectApplication = (applicationId: number) => {
+    const allApplications = JSON.parse(localStorage.getItem('clubApplications') || '[]');
+    const updatedApplications = allApplications.map((app: any) => 
+      app.id === applicationId ? { ...app, status: 'rejected', rejectedDate: new Date().toISOString() } : app
+    );
+    localStorage.setItem('clubApplications', JSON.stringify(updatedApplications));
+    loadApplications();
+    alert('Đã từ chối đơn đăng ký!');
+  };
+
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
@@ -412,6 +463,12 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     setCurrentUser(user);
   };
+
+  useEffect(() => {
+    loadClubData();
+    loadCurrentUser();
+    loadApplications();
+  }, [clubId]);
 
   const handleJoinClub = () => {
     setJoinForm({
@@ -828,6 +885,21 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
           >
             Chat ({chatMessages.length})
           </button>
+          {isUserAdmin && (
+            <button 
+              onClick={() => {
+                console.log('Clicking approval tab');
+                setActiveTab('approval');
+              }}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+                activeTab === 'approval' 
+                  ? 'bg-white text-orange-600' 
+                  : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+              }`}
+            >
+              Xét duyệt ({applications.filter(app => app.status === 'pending').length})
+            </button>
+          )}
         </div>
       </div>
 
@@ -1130,6 +1202,73 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'approval' && isUserAdmin && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Xét duyệt đơn đăng ký</h2>
+            <span className="text-sm text-gray-500">
+              {applications.filter(app => app.status === 'pending').length} đơn chờ duyệt
+            </span>
+          </div>
+
+          {applications.length === 0 ? (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+              <Users size={48} className="mx-auto mb-2 text-gray-300" />
+              <p className="text-gray-500">Chưa có đơn đăng ký nào</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {applications.map(application => (
+                <div key={application.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800">{application.fullName}</h3>
+                      <p className="text-sm text-gray-500">{application.email}</p>
+                      <p className="text-sm text-gray-500">{application.phone}</p>
+                      <p className="text-sm text-gray-500">Lớp: {application.class}</p>
+                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      application.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      application.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      application.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {application.status === 'pending' ? 'Chờ duyệt' :
+                       application.status === 'approved' ? 'Đã duyệt' :
+                       application.status === 'rejected' ? 'Đã từ chối' : 'Unknown'}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    <p><strong>Lý do tham gia:</strong> {application.reason || 'Không có'}</p>
+                    <p><strong>Kỹ năng:</strong> {application.skills || 'Không có'}</p>
+                    <p><strong>Ngày đăng ký:</strong> {new Date(application.submittedDate).toLocaleDateString('vi-VN')}</p>
+                  </div>
+
+                  {application.status === 'pending' && (
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => handleApproveApplication(application.id)}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <CheckCircle size={16} className="mr-2" /> Phê duyệt
+                      </Button>
+                      <Button 
+                        onClick={() => handleRejectApplication(application.id)}
+                        variant="secondary"
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <XCircle size={16} className="mr-2" /> Từ chối
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
