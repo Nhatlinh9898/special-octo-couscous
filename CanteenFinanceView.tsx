@@ -1971,8 +1971,8 @@ const CanteenFinanceView = () => {
                     <div className="space-y-1">
                       {expenseReports[0]?.monthlyTrend.map((trend, index) => (
                         <div key={index} className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{t.month}</span>
-                          <span className="text-sm font-medium">{formatCurrency(t.amount)}</span>
+                          <span className="text-sm text-gray-600">{trend.month}</span>
+                          <span className="text-sm font-medium">{formatCurrency(trend.amount)}</span>
                         </div>
                       ))}
                     </div>
