@@ -465,6 +465,98 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     alert('Đã từ chối đơn đăng ký!');
   };
 
+  // Schedule management
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState({
+    title: '',
+    description: '',
+    dayOfWeek: '2', // 2 = Thứ 3
+    time: '15:00',
+    frequency: 'weekly', // weekly, biweekly, monthly
+    location: club?.meetingRoom || '',
+    color: 'blue'
+  });
+  const [schedules, setSchedules] = useState<any[]>([
+    {
+      id: 1,
+      title: 'Sinh hoạt thường lệ',
+      description: 'Buổi sinh hoạt hàng tuần của CLB',
+      dayOfWeek: '2',
+      time: '15:00',
+      frequency: 'weekly',
+      location: club?.meetingRoom || '',
+      color: 'blue'
+    },
+    {
+      id: 2,
+      title: 'Workshop đặc biệt',
+      description: 'Workshop nâng cao cho thành viên',
+      dayOfWeek: '5',
+      time: '17:00',
+      frequency: 'biweekly',
+      location: club?.meetingRoom || '',
+      color: 'green'
+    }
+  ]);
+
+  const handleCreateSchedule = () => {
+    setScheduleForm({
+      title: '',
+      description: '',
+      dayOfWeek: '2',
+      time: '15:00',
+      frequency: 'weekly',
+      location: club?.meetingRoom || '',
+      color: 'blue'
+    });
+    setShowScheduleModal(true);
+  };
+
+  const handleSaveSchedule = () => {
+    const newSchedule = {
+      id: Date.now(),
+      ...scheduleForm
+    };
+    setSchedules(prev => [...prev, newSchedule]);
+    setShowScheduleModal(false);
+    alert('Đã thêm lịch sinh hoạt thành công!');
+  };
+
+  const handleDeleteSchedule = (scheduleId: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa lịch sinh hoạt này?')) return;
+    setSchedules(prev => prev.filter(s => s.id !== scheduleId));
+    alert('Đã xóa lịch sinh hoạt thành công!');
+  };
+
+  const getDayName = (dayOfWeek: string) => {
+    const days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    return days[parseInt(dayOfWeek)] || dayOfWeek;
+  };
+
+  const getFrequencyText = (frequency: string) => {
+    switch (frequency) {
+      case 'weekly': return 'Hàng tuần';
+      case 'biweekly': return '2 tuần/lần';
+      case 'monthly': return 'Hàng tháng';
+      default: return frequency;
+    }
+  };
+
+  const getColorClasses = (color: string) => {
+    switch (color) {
+      case 'blue':
+        return 'border-blue-500 bg-blue-50 text-blue-800 bg-blue-100';
+      case 'green':
+        return 'border-green-500 bg-green-50 text-green-800 bg-green-100';
+      case 'purple':
+        return 'border-purple-500 bg-purple-50 text-purple-800 bg-purple-100';
+      case 'red':
+        return 'border-red-500 bg-red-50 text-red-800 bg-red-100';
+      default:
+        return 'border-gray-500 bg-gray-50 text-gray-800 bg-gray-100';
+    }
+  };
+
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
@@ -1160,41 +1252,55 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       )}
 
       {activeTab === 'schedule' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800">Lịch sinh hoạt</h2>
-            <Button variant="secondary">
-              <Plus size={16} className="mr-2" /> Thêm lịch
-            </Button>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <Clock className="text-blue-500" />
+              Lịch sinh hoạt
+            </h2>
+            {(isUserAdmin || isUserMember) && (
+              <Button onClick={handleCreateSchedule} className="bg-blue-600 hover:bg-blue-700">
+                <Plus size={16} className="mr-2" /> Thêm lịch
+              </Button>
+            )}
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 border-l-4 border-blue-500 bg-blue-50">
-                <div className="text-center">
-                  <div className="text-sm text-blue-600 font-medium">Thứ 3</div>
-                  <div className="text-lg font-bold text-blue-800">15:00</div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-800">Sinh hoạt thường lệ</h4>
-                  <p className="text-sm text-gray-600">Buổi sinh hoạt hàng tuần của CLB</p>
-                </div>
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Hàng tuần</span>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 border-l-4 border-green-500 bg-green-50">
-                <div className="text-center">
-                  <div className="text-sm text-green-600 font-medium">Thứ 6</div>
-                  <div className="text-lg font-bold text-green-800">17:00</div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-800">Workshop đặc biệt</h4>
-                  <p className="text-sm text-gray-600">Workshop nâng cao cho thành viên</p>
-                </div>
-                <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">2 tuần/lần</span>
-              </div>
+          {schedules.length === 0 ? (
+            <div className="text-center py-12">
+              <Clock size={48} className="mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-medium text-gray-600 mb-2">Chưa có lịch sinh hoạt nào</h3>
+              <p className="text-gray-500">Hãy thêm lịch sinh hoạt đầu tiên cho CLB!</p>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {schedules.map(schedule => (
+                <div key={schedule.id} className={`flex items-center gap-4 p-4 border-l-4 ${getColorClasses(schedule.color)} rounded-lg`}>
+                  <div className="text-center">
+                    <div className="text-sm font-medium">{getDayName(schedule.dayOfWeek)}</div>
+                    <div className="text-lg font-bold">{schedule.time}</div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-800">{schedule.title}</h4>
+                    <p className="text-sm text-gray-600">{schedule.description}</p>
+                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                      <MapPin size={14} />
+                      <span>{schedule.location}</span>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${getColorClasses(schedule.color)}`}>
+                    {getFrequencyText(schedule.frequency)}
+                  </span>
+                  {(isUserAdmin || isUserMember) && (
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="secondary" onClick={() => handleDeleteSchedule(schedule.id)}>
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -1538,6 +1644,112 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
           </div>
         </div>
       </Modal>
+
+      {/* Schedule Modal */}
+      {showScheduleModal && (
+        <Modal onClose={() => setShowScheduleModal(false)} title="Thêm lịch sinh hoạt">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+              <input
+                type="text"
+                value={scheduleForm.title}
+                onChange={(e) => setScheduleForm({...scheduleForm, title: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nhập tiêu đề lịch sinh hoạt"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+              <textarea
+                value={scheduleForm.description}
+                onChange={(e) => setScheduleForm({...scheduleForm, description: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                placeholder="Mô tả chi tiết về lịch sinh hoạt"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thứ trong tuần</label>
+                <select
+                  value={scheduleForm.dayOfWeek}
+                  onChange={(e) => setScheduleForm({...scheduleForm, dayOfWeek: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="1">Thứ 2</option>
+                  <option value="2">Thứ 3</option>
+                  <option value="3">Thứ 4</option>
+                  <option value="4">Thứ 5</option>
+                  <option value="5">Thứ 6</option>
+                  <option value="6">Thứ 7</option>
+                  <option value="0">Chủ nhật</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                <input
+                  type="time"
+                  value={scheduleForm.time}
+                  onChange={(e) => setScheduleForm({...scheduleForm, time: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tần suất</label>
+                <select
+                  value={scheduleForm.frequency}
+                  onChange={(e) => setScheduleForm({...scheduleForm, frequency: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="weekly">Hàng tuần</option>
+                  <option value="biweekly">2 tuần/lần</option>
+                  <option value="monthly">Hàng tháng</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Màu sắc</label>
+                <select
+                  value={scheduleForm.color}
+                  onChange={(e) => setScheduleForm({...scheduleForm, color: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="blue">Xanh dương</option>
+                  <option value="green">Xanh lá</option>
+                  <option value="purple">Tím</option>
+                  <option value="red">Đỏ</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+              <input
+                type="text"
+                value={scheduleForm.location}
+                onChange={(e) => setScheduleForm({...scheduleForm, location: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Địa điểm sinh hoạt"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="secondary" onClick={() => setShowScheduleModal(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleSaveSchedule} disabled={!scheduleForm.title}>
+              Lưu lịch
+            </Button>
+          </div>
+        </Modal>
+      )}
       </div>
     </div>
   );
