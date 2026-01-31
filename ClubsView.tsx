@@ -41,6 +41,52 @@ const ClubsView = () => {
     status: 'upcoming'
   });
 
+  const resetSystem = () => {
+    // Clear all localStorage data
+    localStorage.removeItem('clubs');
+    localStorage.removeItem('club_activities');
+    localStorage.removeItem('activityRegistrations');
+    
+    // Clear club-specific events
+    for (let i = 1; i <= 5; i++) {
+      localStorage.removeItem(`club_events_${i}`);
+    }
+    
+    // Reset all states
+    setClubs([]);
+    setActivities([]);
+    setSchedules([]);
+    setSelectedClub(null);
+    setShowActivityModal(false);
+    setShowClubModal(false);
+    setShowCreateModal(false);
+    setShowScheduleModal(false);
+    setEditingActivity(null);
+    setActivityForm({
+      title: '',
+      description: '',
+      clubId: 0,
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().slice(0, 5),
+      location: '',
+      type: 'regular',
+      maxParticipants: '',
+      registrationDeadline: new Date().toISOString().split('T')[0],
+      requirements: '',
+      budget: '',
+      status: 'upcoming'
+    });
+    
+    console.log('System reset completed');
+    alert('Hệ thống đã được khởi động lại!');
+    
+    // Reload data fresh
+    setTimeout(() => {
+      loadClubs();
+      loadActivities();
+    }, 100);
+  };
+
   useEffect(() => {
     loadClubs();
     loadActivities();
@@ -403,12 +449,22 @@ const ClubsView = () => {
         <div className="flex gap-2">
            <Button 
              variant="secondary" 
-             className="text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100"
+             onClick={resetSystem}
+             className="text-sm"
+             title="Khởi động lại hệ thống"
+           >
+             🔄 Reset
+           </Button>
+           <Button 
+             variant="secondary" 
              onClick={handleAISuggest}
              disabled={isSuggesting}
            >
              {isSuggesting ? <Loader2 size={18} className="animate-spin"/> : <Sparkles size={18}/>}
              {isSuggesting ? 'AI Đang tìm...' : 'AI Gợi ý Hoạt động'}
+           </Button>
+           <Button variant="secondary" onClick={() => setShowCreateModal(true)} className="text-sm">
+             <Plus size={16} className="mr-1"/> Tạo CLB mới
            </Button>
            <Button 
              variant="secondary" 
@@ -417,7 +473,6 @@ const ClubsView = () => {
            >
              <Plus size={18} className="mr-2"/> Tạo Hoạt động mới
            </Button>
-           <Button onClick={() => setShowCreateModal(true)}><Plus size={20} className="mr-2"/> Tạo CLB mới</Button>
         </div>
       </div>
 
