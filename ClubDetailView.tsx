@@ -695,7 +695,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
         <div className="flex space-x-1">
           <button 
-            onClick={() => setActiveTab('posts')}
+            onClick={() => {
+              console.log('Clicking posts tab');
+              setActiveTab('posts');
+            }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'posts' 
                 ? 'bg-blue-50 text-blue-600' 
@@ -705,7 +708,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Bài viết
           </button>
           <button 
-            onClick={() => setActiveTab('members')}
+            onClick={() => {
+              console.log('Clicking members tab');
+              setActiveTab('members');
+            }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'members' 
                 ? 'bg-blue-50 text-blue-600' 
@@ -715,7 +721,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Thành viên ({members.length})
           </button>
           <button 
-            onClick={() => setActiveTab('events')}
+            onClick={() => {
+              console.log('Clicking events tab');
+              setActiveTab('events');
+            }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'events' 
                 ? 'bg-blue-50 text-blue-600' 
@@ -725,7 +734,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Sự kiện ({events.length})
           </button>
           <button 
-            onClick={() => setActiveTab('schedule')}
+            onClick={() => {
+              console.log('Clicking schedule tab');
+              setActiveTab('schedule');
+            }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'schedule' 
                 ? 'bg-blue-50 text-blue-600' 
@@ -735,7 +747,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Lịch sinh hoạt
           </button>
           <button 
-            onClick={() => setActiveTab('chat')}
+            onClick={() => {
+              console.log('Clicking chat tab');
+              setActiveTab('chat');
+            }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'chat' 
                 ? 'bg-blue-50 text-blue-600' 
@@ -745,6 +760,18 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Chat ({chatMessages.length})
           </button>
         </div>
+      </div>
+
+      {/* Debug Info */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
+        <strong>Debug Info:</strong><br/>
+        Active Tab: {activeTab}<br/>
+        Posts: {posts.length}<br/>
+        Members: {members.length}<br/>
+        Events: {events.length}<br/>
+        Chat Messages: {chatMessages.length}<br/>
+        Is User Member: {isUserMember ? 'Yes' : 'No'}<br/>
+        Is User Admin: {isUserAdmin ? 'Yes' : 'No'}
       </div>
 
       {/* Tab Content */}
