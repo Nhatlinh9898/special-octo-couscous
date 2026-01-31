@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, TrendingDown, Package, Users, ShoppingCart, CreditCard, Calendar, FileText, Plus, Edit, Trash2, Eye, Download, AlertCircle, CheckCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Package, Users, ShoppingCart, CreditCard, Calendar, FileText, Plus, Edit, Trash2, Eye, Download, AlertCircle, CheckCircle, QrCode, Camera, Barcode } from 'lucide-react';
 import { 
   MOCK_FINANCIAL_TRANSACTIONS, 
   MOCK_PROFIT_ANALYSIS, 
@@ -30,8 +30,12 @@ const CanteenFinanceView = () => {
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showQRScannerModal, setShowQRScannerModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<FinancialTransaction | null>(null);
   const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null);
+  const [scannedItem, setScannedItem] = useState<InventoryItem | null>(null);
+  const [scannedCode, setScannedCode] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
   const [transactionForm, setTransactionForm] = useState({
     type: 'income' as 'income' | 'expense',
     category: 'revenue' as any,
@@ -227,6 +231,73 @@ const CanteenFinanceView = () => {
         return item;
       }));
     }
+  };
+
+  // QR Code Scanning Functions
+  const handleOpenQRScanner = () => {
+    setShowQRScannerModal(true);
+    setScannedCode('');
+    setScannedItem(null);
+    setIsScanning(false);
+  };
+
+  const handleScanQRCode = () => {
+    setIsScanning(true);
+    // Simulate QR code scanning
+    setTimeout(() => {
+      // Generate a random item from inventory for demo
+      const randomItem = inventory[Math.floor(Math.random() * inventory.length)];
+      setScannedCode(`INV-${randomItem.id}-${Date.now()}`);
+      setScannedItem(randomItem);
+      setIsScanning(false);
+    }, 2000);
+  };
+
+  const handleManualCodeInput = (code: string) => {
+    // Parse code format: INV-{id}-{timestamp}
+    const match = code.match(/INV-(\d+)-/);
+    if (match) {
+      const itemId = parseInt(match[1]);
+      const item = inventory.find(i => i.id === itemId);
+      if (item) {
+        setScannedItem(item);
+        setScannedCode(code);
+      } else {
+        alert('Không tìm thấy sản phẩm với mã này!');
+      }
+    } else {
+      alert('Mã không hợp lệ! Vui lòng nhập đúng định dạng.');
+    }
+  };
+
+  const handleQRRestock = () => {
+    if (!scannedItem) return;
+    
+    const quantity = prompt(`Nhập số lượng cần nhập kho cho ${scannedItem.name}:`);
+    if (quantity && !isNaN(parseFloat(quantity))) {
+      setInventory(prev => prev.map(item => {
+        if (item.id === scannedItem.id) {
+          const newStock = item.currentStock + parseFloat(quantity);
+          return {
+            ...item,
+            currentStock: newStock,
+            lastRestockDate: new Date().toISOString().split('T')[0],
+            status: newStock <= item.minStock ? 'low_stock' : newStock >= item.maxStock ? 'out_of_stock' : 'in_stock'
+          };
+        }
+        return item;
+      }));
+      
+      alert(`Đã nhập kho thành công ${quantity} ${scannedItem.unit} ${scannedItem.name}!`);
+      setShowQRScannerModal(false);
+      setScannedItem(null);
+      setScannedCode('');
+    }
+  };
+
+  const generateQRCodeForItem = (item: InventoryItem) => {
+    // Generate QR code data for inventory item
+    return `INV-${item.id}-${item.name}-${Date.now()}`;
   };
 
   const handleSaveTransaction = () => {
@@ -476,9 +547,14 @@ const CanteenFinanceView = () => {
               <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <Package size={20} className="text-orange-500"/> Quản lý Nguyên vật
               </h3>
-              <Button onClick={handleAddInventory}>
-                <Plus size={16}/> Thêm nguyên vật
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handleOpenQRScanner} variant="success">
+                  <QrCode size={16}/> Quét mã nhập kho
+                </Button>
+                <Button onClick={handleAddInventory}>
+                  <Plus size={16}/> Thêm nguyên vật
+                </Button>
+              </div>
             </div>
             
             {/* Category Filter */}
@@ -606,6 +682,17 @@ const CanteenFinanceView = () => {
                       className="flex-1"
                     >
                       <Plus size={12}/>
+                    </Button>
+                    <Button
+                      variant="info"
+                      size="sm"
+                      onClick={() => {
+                        const qrCode = generateQRCodeForItem(item);
+                        alert(`Mã QR cho ${item.name}:\n${qrCode}\n\nSử dụng mã này để quét khi nhập kho!`);
+                      }}
+                      className="flex-1"
+                    >
+                      <QrCode size={12}/>
                     </Button>
                     <Button
                       variant="danger"
@@ -1128,6 +1215,151 @@ const CanteenFinanceView = () => {
               >
                 Lưu nguyên vật
               </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* QR Scanner Modal */}
+      {showQRScannerModal && (
+        <Modal 
+          isOpen={showQRScannerModal} 
+          onClose={() => setShowQRScannerModal(false)} 
+          title="Quét mã QR nhập kho"
+        >
+          <div className="p-6">
+            <div className="space-y-6">
+              {/* Scanner Area */}
+              <div className="text-center">
+                <div className={`w-64 h-64 mx-auto border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center ${
+                  isScanning ? 'bg-blue-50 border-blue-400' : 'bg-gray-50'
+                }`}>
+                  {isScanning ? (
+                    <>
+                      <Camera size={48} className="text-blue-500 mb-2 animate-pulse"/>
+                      <p className="text-blue-600 font-medium">Đang quét mã...</p>
+                      <div className="w-16 h-1 bg-blue-500 rounded-full mt-2 animate-pulse"></div>
+                    </>
+                  ) : (
+                    <>
+                      <QrCode size={48} className="text-gray-400 mb-2"/>
+                      <p className="text-gray-600">Đặt mã QR vào camera</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Scanned Item Info */}
+              {scannedItem && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                    <CheckCircle size={16} className="text-green-600"/>
+                    Đã quét thành công!
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">Sản phẩm:</span>
+                      <p className="font-medium">{scannedItem.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Tồn kho:</span>
+                      <p className="font-medium">{scannedItem.currentStock} {scannedItem.unit}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Đơn giá:</span>
+                      <p className="font-medium">{formatCurrency(scannedItem.unitPrice)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Nhà cung cấp:</span>
+                      <p className="font-medium text-xs">{scannedItem.supplier}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-600">Mã quét:</span>
+                    <p className="font-mono text-xs bg-white px-2 py-1 rounded">{scannedCode}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Manual Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hoặc nhập mã thủ công:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={scannedCode}
+                    onChange={(e) => setScannedCode(e.target.value)}
+                    placeholder="INV-1-1640995200000"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <Button
+                    onClick={() => handleManualCodeInput(scannedCode)}
+                    disabled={!scannedCode}
+                  >
+                    <Barcode size={16}/>
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Định dạng: INV-[ID]-[TIMESTAMP]
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setShowQRScannerModal(false);
+                    setScannedItem(null);
+                    setScannedCode('');
+                    setIsScanning(false);
+                  }}
+                  className="flex-1"
+                >
+                  Đóng
+                </Button>
+                <Button
+                  onClick={handleScanQRCode}
+                  disabled={isScanning}
+                  className="flex-1"
+                >
+                  {isScanning ? (
+                    <>
+                      <Camera size={16} className="animate-pulse mr-2"/>
+                      Đang quét...
+                    </>
+                  ) : (
+                    <>
+                      <Camera size={16} className="mr-2"/>
+                      Quét mã QR
+                    </>
+                  )}
+                </Button>
+                {scannedItem && (
+                  <Button
+                    onClick={handleQRRestock}
+                    variant="success"
+                    className="flex-1"
+                  >
+                    <Plus size={16} className="mr-2"/>
+                    Nhập kho
+                  </Button>
+                )}
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800 mb-2">Hướng dẫn sử dụng:</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• Click "Quét mã QR" để bắt đầu quét</li>
+                  <li>• Đặt mã QR của sản phẩm vào camera</li>
+                  <li>• Hoặc nhập mã thủ công nếu có sẵn</li>
+                  <li>• Sau khi quét thành công, click "Nhập kho"</li>
+                  <li>• Nhập số lượng cần nhập và xác nhận</li>
+                </ul>
+              </div>
             </div>
           </div>
         </Modal>

@@ -3,13 +3,14 @@ import { Bell, X } from 'lucide-react';
 import { AppContext } from './context';
 import { Notification } from './types';
 
-export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'danger' | 'success' }> = ({ children, variant = 'primary', className = '', ...props }) => {
+export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'info' }> = ({ children, variant = 'primary', className = '', ...props }) => {
   const baseStyle = "px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed";
   const variants = {
     primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-200",
     secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50",
     danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm shadow-red-200",
-    success: "bg-green-600 text-white hover:bg-green-700 shadow-sm shadow-green-200"
+    success: "bg-green-600 text-white hover:bg-green-700 shadow-sm shadow-green-200",
+    info: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-200"
   };
   return (
     <button className={`${baseStyle} ${variants[variant]} ${className}`} {...props}>
