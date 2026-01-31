@@ -29,7 +29,9 @@ const CanteenFinanceView = () => {
   const [expenseReports, setExpenseReports] = useState<ExpenseReport[]>([]);
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<FinancialTransaction | null>(null);
+  const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null);
   const [transactionForm, setTransactionForm] = useState({
     type: 'income' as 'income' | 'expense',
     category: 'revenue' as any,
@@ -40,6 +42,20 @@ const CanteenFinanceView = () => {
     status: 'completed' as 'completed' | 'pending' | 'cancelled',
     paymentMethod: 'cash' as 'cash' | 'transfer' | 'qr',
     createdBy: 'Nguyễn Thị Hanh'
+  });
+
+  const [inventoryForm, setInventoryForm] = useState({
+    name: '',
+    category: 'food_ingredient',
+    unit: '',
+    currentStock: '',
+    minStock: '',
+    maxStock: '',
+    unitPrice: '',
+    supplier: '',
+    lastRestockDate: new Date().toISOString().split('T')[0],
+    expiryDate: '',
+    status: 'in_stock' as 'in_stock' | 'low_stock' | 'out_of_stock'
   });
 
   useEffect(() => {
@@ -123,6 +139,93 @@ const CanteenFinanceView = () => {
   const handleDeleteBudget = (id: number) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa ngân sách này?')) {
       setBudgetPlans(prev => prev.filter(b => b.id !== id));
+    }
+  };
+
+  // Inventory CRUD functions
+  const handleAddInventory = () => {
+    setEditingInventory(null);
+    setInventoryForm({
+      name: '',
+      category: 'food_ingredient',
+      unit: '',
+      currentStock: '',
+      minStock: '',
+      maxStock: '',
+      unitPrice: '',
+      supplier: '',
+      lastRestockDate: new Date().toISOString().split('T')[0],
+      expiryDate: '',
+      status: 'in_stock'
+    });
+    setShowInventoryModal(true);
+  };
+
+  const handleEditInventory = (item: InventoryItem) => {
+    setEditingInventory(item);
+    setInventoryForm({
+      name: item.name,
+      category: item.category,
+      unit: item.unit,
+      currentStock: item.currentStock.toString(),
+      minStock: item.minStock.toString(),
+      maxStock: item.maxStock.toString(),
+      unitPrice: item.unitPrice.toString(),
+      supplier: item.supplier,
+      lastRestockDate: item.lastRestockDate,
+      expiryDate: item.expiryDate || '',
+      status: item.status
+    });
+    setShowInventoryModal(true);
+  };
+
+  const handleSaveInventory = () => {
+    const newInventory: InventoryItem = {
+      id: editingInventory ? editingInventory.id : Date.now(),
+      name: inventoryForm.name,
+      category: inventoryForm.category,
+      unit: inventoryForm.unit,
+      currentStock: parseFloat(inventoryForm.currentStock),
+      minStock: parseFloat(inventoryForm.minStock),
+      maxStock: parseFloat(inventoryForm.maxStock),
+      unitPrice: parseFloat(inventoryForm.unitPrice),
+      supplier: inventoryForm.supplier,
+      lastRestockDate: inventoryForm.lastRestockDate,
+      expiryDate: inventoryForm.expiryDate || undefined,
+      status: inventoryForm.status
+    };
+
+    if (editingInventory) {
+      setInventory(prev => prev.map(i => i.id === editingInventory.id ? newInventory : i));
+    } else {
+      setInventory(prev => [...prev, newInventory]);
+    }
+
+    setShowInventoryModal(false);
+    setEditingInventory(null);
+  };
+
+  const handleDeleteInventory = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa nguyên vật liệu này?')) {
+      setInventory(prev => prev.filter(i => i.id !== id));
+    }
+  };
+
+  const handleRestock = (id: number) => {
+    const quantity = prompt('Nhập số lượng cần nhập kho:');
+    if (quantity && !isNaN(parseFloat(quantity))) {
+      setInventory(prev => prev.map(item => {
+        if (item.id === id) {
+          const newStock = item.currentStock + parseFloat(quantity);
+          return {
+            ...item,
+            currentStock: newStock,
+            lastRestockDate: new Date().toISOString().split('T')[0],
+            status: newStock <= item.minStock ? 'low_stock' : newStock >= item.maxStock ? 'out_of_stock' : 'in_stock'
+          };
+        }
+        return item;
+      }));
     }
   };
 
@@ -369,11 +472,52 @@ const CanteenFinanceView = () => {
       {activeTab === 'inventory' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Package size={20} className="text-orange-500"/> Quản lý Nguyên vật
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <Package size={20} className="text-orange-500"/> Quản lý Nguyên vật
+              </h3>
+              <Button onClick={handleAddInventory}>
+                <Plus size={16}/> Thêm nguyên vật
+              </Button>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Category Filter */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => {
+                  // Filter logic here
+                }}
+                className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
+              >
+                Tất cả ({inventory.length})
+              </button>
+              <button
+                onClick={() => {
+                  // Filter logic here
+                }}
+                className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
+              >
+                Thực phẩm ({inventory.filter(i => i.category === 'food_ingredient').length})
+              </button>
+              <button
+                onClick={() => {
+                  // Filter logic here
+                }}
+                className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
+              >
+                Đồ uống ({inventory.filter(i => i.category === 'beverage').length})
+              </button>
+              <button
+                onClick={() => {
+                  // Filter logic here
+                }}
+                className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
+              >
+                Bao bì ({inventory.filter(i => i.category === 'packaging').length})
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {inventory.map(item => (
                 <div key={item.id} className={`border rounded-lg p-4 ${
                   item.status === 'out_of_stock' 
@@ -383,7 +527,7 @@ const CanteenFinanceView = () => {
                     : 'border-green-200 bg-green-50'
                 }`}>
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-800">{item.name}</h4>
+                    <h4 className="font-medium text-gray-800 text-sm">{item.name}</h4>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       item.status === 'out_of_stock' 
                         ? 'bg-red-100 text-red-800' 
@@ -391,7 +535,7 @@ const CanteenFinanceView = () => {
                         ? 'bg-yellow-100 text-yellow-800' 
                         : 'bg-green-100 text-green-800'
                     }`}>
-                      {item.status === 'out_of' ? 'Hết hàng' : item.status === 'low_stock' ? 'Sắp hết' : 'Còn đủ'}
+                      {item.status === 'out_of_stock' ? 'Hết hàng' : item.status === 'low_stock' ? 'Sắp hết' : 'Còn đủ'}
                     </span>
                   </div>
                   <div className="space-y-1 text-sm">
@@ -400,13 +544,77 @@ const CanteenFinanceView = () => {
                       <span className="font-medium">{item.currentStock} {item.unit}</span>
                     </div>
                     <div className="flex justify-between">
+                      <span className="text-gray-600">Tối thiểu:</span>
+                      <span className="text-gray-500">{item.minStock} {item.unit}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-gray-600">Giá:</span>
                       <span className="font-medium">{formatCurrency(item.unitPrice)}/{item.unit}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Nhà cung cấp:</span>
-                      <span className="font-medium">{item.supplier}</span>
+                      <span className="text-gray-600">NCC:</span>
+                      <span className="text-xs text-gray-500 truncate">{item.supplier}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Nhập kho:</span>
+                      <span className="text-xs text-gray-500">{item.lastRestockDate}</span>
+                    </div>
+                    {item.expiryDate && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">HSD:</span>
+                        <span className="text-xs text-gray-500">{item.expiryDate}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Stock Progress Bar */}
+                  <div className="mt-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${
+                          item.status === 'out_of_stock' 
+                            ? 'bg-red-500' 
+                            : item.status === 'low_stock' 
+                            ? 'bg-yellow-500' 
+                            : 'bg-green-500'
+                        }`}
+                        style={{ 
+                          width: `${Math.min((item.currentStock / item.maxStock) * 100, 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>{item.minStock}</span>
+                      <span>{item.maxStock}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-1 mt-3">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleEditInventory(item)}
+                      className="flex-1"
+                    >
+                      <Edit size={12}/>
+                    </Button>
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => handleRestock(item.id)}
+                      className="flex-1"
+                    >
+                      <Plus size={12}/>
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDeleteInventory(item.id)}
+                      className="flex-1"
+                    >
+                      <Trash2 size={12}/>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -762,6 +970,163 @@ const CanteenFinanceView = () => {
                 disabled={!transactionForm.amount || !transactionForm.description}
               >
                 Lưu giao dịch
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Inventory Modal */}
+      {showInventoryModal && (
+        <Modal 
+          isOpen={showInventoryModal} 
+          onClose={() => setShowInventoryModal(false)} 
+          title={editingInventory ? 'Chỉnh sửa nguyên vật' : 'Thêm nguyên vật mới'}
+        >
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tên nguyên vật *</label>
+                  <input
+                    type="text"
+                    value={inventoryForm.name}
+                    onChange={(e) => setInventoryForm({...inventoryForm, name: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Nhập tên nguyên vật"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục *</label>
+                  <select
+                    value={inventoryForm.category}
+                    onChange={(e) => setInventoryForm({...inventoryForm, category: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="food_ingredient">Nguyên liệu thực phẩm</option>
+                    <option value="beverage">Đồ uống</option>
+                    <option value="packaging">Bao bì</option>
+                    <option value="cleaning">Gia vị & Chất tẩy</option>
+                    <option value="other">Khác</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Đơn vị *</label>
+                  <input
+                    type="text"
+                    value={inventoryForm.unit}
+                    onChange={(e) => setInventoryForm({...inventoryForm, unit: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="kg, cái, chai, hộp..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhà cung cấp *</label>
+                  <input
+                    type="text"
+                    value={inventoryForm.supplier}
+                    onChange={(e) => setInventoryForm({...inventoryForm, supplier: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Tên nhà cung cấp"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tồn kho hiện tại *</label>
+                  <input
+                    type="number"
+                    value={inventoryForm.currentStock}
+                    onChange={(e) => setInventoryForm({...inventoryForm, currentStock: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tồn kho tối thiểu *</label>
+                  <input
+                    type="number"
+                    value={inventoryForm.minStock}
+                    onChange={(e) => setInventoryForm({...inventoryForm, minStock: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tồn kho tối đa *</label>
+                  <input
+                    type="number"
+                    value={inventoryForm.maxStock}
+                    onChange={(e) => setInventoryForm({...inventoryForm, maxStock: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Đơn giá *</label>
+                  <input
+                    type="number"
+                    value={inventoryForm.unitPrice}
+                    onChange={(e) => setInventoryForm({...inventoryForm, unitPrice: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày nhập kho *</label>
+                  <input
+                    type="date"
+                    value={inventoryForm.lastRestockDate}
+                    onChange={(e) => setInventoryForm({...inventoryForm, lastRestockDate: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hạn sử dụng</label>
+                  <input
+                    type="date"
+                    value={inventoryForm.expiryDate}
+                    onChange={(e) => setInventoryForm({...inventoryForm, expiryDate: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái *</label>
+                  <select
+                    value={inventoryForm.status}
+                    onChange={(e) => setInventoryForm({...inventoryForm, status: e.target.value as any})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="in_stock">Còn đủ</option>
+                    <option value="low_stock">Sắp hết</option>
+                    <option value="out_of_stock">Hết hàng</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="secondary"
+                onClick={() => setShowInventoryModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={handleSaveInventory}
+                disabled={!inventoryForm.name || !inventoryForm.unit || !inventoryForm.supplier || !inventoryForm.currentStock || !inventoryForm.minStock || !inventoryForm.maxStock || !inventoryForm.unitPrice}
+              >
+                Lưu nguyên vật
               </Button>
             </div>
           </div>

@@ -159,6 +159,7 @@ export const MOCK_ROUTES: TransportRoute[] = [
 ];
 
 export const MOCK_INVENTORY: InventoryItem[] = [
+  // Nguyên liệu thực phẩm chính
   { 
     id: 1, 
     name: "Thịt bò tươi", 
@@ -174,6 +175,47 @@ export const MOCK_INVENTORY: InventoryItem[] = [
   },
   { 
     id: 2, 
+    name: "Thịt heo tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 30,
+    minStock: 15,
+    maxStock: 80,
+    unitPrice: 120000,
+    supplier: "Công ty TNHH Thực phẩm ABC",
+    lastRestockDate: "2024-01-14",
+    status: "low_stock"
+  },
+  { 
+    id: 3, 
+    name: "Gà tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 40,
+    minStock: 20,
+    maxStock: 90,
+    unitPrice: 85000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-13",
+    status: "in_stock"
+  },
+  { 
+    id: 4, 
+    name: "Cá tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 25,
+    minStock: 10,
+    maxStock: 60,
+    unitPrice: 150000,
+    supplier: "Công ty Hải sản VNK",
+    lastRestockDate: "2024-01-12",
+    status: "in_stock"
+  },
+  
+  // Rau củ quả
+  { 
+    id: 5, 
     name: "Rau củ tươi", 
     category: "food_ingredient", 
     unit: "kg",
@@ -186,7 +228,74 @@ export const MOCK_INVENTORY: InventoryItem[] = [
     status: "low_stock"
   },
   { 
-    id: 3, 
+    id: 6, 
+    name: "Cà chua", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 20,
+    minStock: 10,
+    maxStock: 50,
+    unitPrice: 18000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-13",
+    status: "in_stock"
+  },
+  { 
+    id: 7, 
+    name: "Dưa leo", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 15,
+    minStock: 8,
+    maxStock: 40,
+    unitPrice: 12000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-12",
+    status: "in_stock"
+  },
+  { 
+    id: 8, 
+    name: "Hành tây", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 18,
+    minStock: 10,
+    maxStock: 45,
+    unitPrice: 22000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-11",
+    status: "in_stock"
+  },
+  { 
+    id: 9, 
+    name: "Khoai tây", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 35,
+    minStock: 15,
+    maxStock: 70,
+    unitPrice: 15000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-10",
+    status: "in_stock"
+  },
+  { 
+    id: 10, 
+    name: "Trái cây tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 25,
+    minStock: 12,
+    maxStock: 60,
+    unitPrice: 35000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-09",
+    status: "in_stock"
+  },
+  
+  // Đồ uống
+  { 
+    id: 11, 
     name: "Nước suối đóng chai", 
     category: "beverage", 
     unit: "chai",
@@ -199,7 +308,61 @@ export const MOCK_INVENTORY: InventoryItem[] = [
     status: "in_stock"
   },
   { 
-    id: 4, 
+    id: 12, 
+    name: "Trà túi lọc", 
+    category: "beverage", 
+    unit: "hộp",
+    currentStock: 50,
+    minStock: 15,
+    maxStock: 100,
+    unitPrice: 45000,
+    supplier: "Công ty Trà VN",
+    lastRestockDate: "2024-01-12",
+    status: "in_stock"
+  },
+  { 
+    id: 13, 
+    name: "Cà phê rang xay", 
+    category: "beverage", 
+    unit: "gói",
+    currentStock: 30,
+    minStock: 10,
+    maxStock: 80,
+    unitPrice: 25000,
+    supplier: "Công ty Cà phê VN",
+    lastRestockDate: "2024-01-11",
+    status: "in_stock"
+  },
+  { 
+    id: 14, 
+    name: "Sữa tươi", 
+    category: "beverage", 
+    unit: "hộp",
+    currentStock: 40,
+    minStock: 12,
+    maxStock: 90,
+    unitPrice: 28000,
+    supplier: "Công ty Sữa VN",
+    lastRestockDate: "2024-01-10",
+    status: "in_stock"
+  },
+  { 
+    id: 15, 
+    name: "Nước ngọt", 
+    category: "beverage", 
+    unit: "chai",
+    currentStock: 80,
+    minStock: 25,
+    maxStock: 150,
+    unitPrice: 12000,
+    supplier: "Công ty Nước giải khát",
+    lastRestockDate: "2024-01-09",
+    status: "in_stock"
+  },
+  
+  // Bao bì
+  { 
+    id: 16, 
     name: "Hộp xốp đựng thực phẩm", 
     category: "packaging", 
     unit: "cái",
@@ -212,7 +375,48 @@ export const MOCK_INVENTORY: InventoryItem[] = [
     status: "in_stock"
   },
   { 
-    id: 5, 
+    id: 17, 
+    name: "Túi nilon", 
+    category: "packaging", 
+    unit: "bịch",
+    currentStock: 500,
+    minStock: 100,
+    maxStock: 1000,
+    unitPrice: 500,
+    supplier: "Công ty Bao bì VN",
+    lastRestockDate: "2024-01-09",
+    status: "in_stock"
+  },
+  { 
+    id: 18, 
+    name: "Ly giấy", 
+    category: "packaging", 
+    unit: "cái",
+    currentStock: 300,
+    minStock: 80,
+    maxStock: 600,
+    unitPrice: 2000,
+    supplier: "Công ty Bao bì VN",
+    lastRestockDate: "2024-01-08",
+    status: "in_stock"
+  },
+  { 
+    id: 19, 
+    name: "Khăn giấy", 
+    category: "packaging", 
+    unit: "bịch",
+    currentStock: 150,
+    minStock: 40,
+    maxStock: 300,
+    unitPrice: 3500,
+    supplier: "Công ty Bao bì VN",
+    lastRestockDate: "2024-01-07",
+    status: "in_stock"
+  },
+  
+  // Gia vị và nguyên liệu khô
+  { 
+    id: 20, 
     name: "Dầu ăn", 
     category: "cleaning", 
     unit: "lít",
@@ -225,7 +429,126 @@ export const MOCK_INVENTORY: InventoryItem[] = [
     status: "low_stock"
   },
   { 
-    id: 6, 
+    id: 21, 
+    name: "Nước mắm", 
+    category: "cleaning", 
+    unit: "chai",
+    currentStock: 8,
+    minStock: 3,
+    maxStock: 25,
+    unitPrice: 35000,
+    supplier: "Công ty Gia vị VN",
+    lastRestockDate: "2024-01-11",
+    status: "in_stock"
+  },
+  { 
+    id: 22, 
+    name: "Đường", 
+    category: "cleaning", 
+    unit: "kg",
+    currentStock: 25,
+    minStock: 10,
+    maxStock: 60,
+    unitPrice: 25000,
+    supplier: "Công ty Đường VN",
+    lastRestockDate: "2024-01-10",
+    status: "in_stock"
+  },
+  { 
+    id: 23, 
+    name: "Muối", 
+    category: "cleaning", 
+    unit: "kg",
+    currentStock: 15,
+    minStock: 5,
+    maxStock: 40,
+    unitPrice: 12000,
+    supplier: "Công ty Gia vị VN",
+    lastRestockDate: "2024-01-09",
+    status: "in_stock"
+  },
+  { 
+    id: 24, 
+    name: "Tiêu", 
+    category: "cleaning", 
+    unit: "kg",
+    currentStock: 8,
+    minStock: 3,
+    maxStock: 25,
+    unitPrice: 180000,
+    supplier: "Công ty Gia vị VN",
+    lastRestockDate: "2024-01-08",
+    status: "in_stock"
+  },
+  { 
+    id: 25, 
+    name: "Bột ngọt", 
+    category: "cleaning", 
+    unit: "gói",
+    currentStock: 20,
+    minStock: 8,
+    maxStock: 50,
+    unitPrice: 5000,
+    supplier: "Công ty Gia vị VN",
+    lastRestockDate: "2024-01-07",
+    status: "in_stock"
+  },
+  
+  // Nguyên liệu làm bánh
+  { 
+    id: 26, 
+    name: "Bột mì", 
+    category: "other", 
+    unit: "kg",
+    currentStock: 40,
+    minStock: 15,
+    maxStock: 80,
+    unitPrice: 22000,
+    supplier: "Công ty Bột mì VN",
+    lastRestockDate: "2024-01-06",
+    status: "in_stock"
+  },
+  { 
+    id: 27, 
+    name: "Trứng gà", 
+    category: "other", 
+    unit: "quả",
+    currentStock: 100,
+    minStock: 30,
+    maxStock: 200,
+    unitPrice: 3500,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-05",
+    status: "in_stock"
+  },
+  { 
+    id: 28, 
+    name: "Sữa đặc", 
+    category: "other", 
+    unit: "lon",
+    currentStock: 25,
+    minStock: 8,
+    maxStock: 60,
+    unitPrice: 15000,
+    supplier: "Công ty Sữa VN",
+    lastRestockDate: "2024-01-04",
+    status: "in_stock"
+  },
+  { 
+    id: 29, 
+    name: "Bơ", 
+    category: "other", 
+    unit: "bịch",
+    currentStock: 15,
+    minStock: 5,
+    maxStock: 40,
+    unitPrice: 45000,
+    supplier: "Công ty Sữa VN",
+    lastRestockDate: "2024-01-03",
+    status: "in_stock"
+  },
+  { 
+    id: 30, 
     name: "Giấy ăn", 
     category: "other", 
     unit: "bịch",
@@ -234,7 +557,7 @@ export const MOCK_INVENTORY: InventoryItem[] = [
     maxStock: 2000,
     unitPrice: 500,
     supplier: "Công ty Giấy VN",
-    lastRestockDate: "2024-01-11",
+    lastRestockDate: "2024-01-02",
     status: "in_stock"
   }
 ];
