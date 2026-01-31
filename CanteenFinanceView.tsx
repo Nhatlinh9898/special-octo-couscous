@@ -23,7 +23,7 @@ import {
 import { Button, Modal } from './components';
 
 const CanteenFinanceView = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'inventory' | 'movements' | 'suppliers' | 'budget' | 'reports'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'inventory' | 'movements' | 'analytics' | 'suppliers' | 'budget' | 'reports'>('overview');
   
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [profitAnalysis, setProfitAnalysis] = useState<ProfitAnalysis[]>([]);
@@ -126,6 +126,137 @@ const CanteenFinanceView = () => {
     if (canteenMovements.length > 0) {
       setInventoryTransactions(prev => [...prev, ...canteenMovements]);
     }
+  };
+
+  // Analytics calculation functions
+  const calculateProductAnalytics = () => {
+    // Get all canteen transactions (revenue from sales)
+    const canteenTransactions = JSON.parse(localStorage.getItem('canteenFinancialTransactions') || '[]');
+    const canteenMovements = JSON.parse(localStorage.getItem('canteenInventoryMovements') || '[]');
+    
+    // Group movements by product
+    const productMovements: Record<string, {
+      totalQuantity: number;
+      totalRevenue: number;
+      totalCost: number;
+      movementCount: number;
+      avgPrice: number;
+      profit: number;
+      profitMargin: string;
+    }> = {};
+    
+    canteenMovements.forEach(movement => {
+      if (!productMovements[movement.itemName]) {
+        productMovements[movement.itemName] = {
+          totalQuantity: 0,
+          totalRevenue: 0,
+          totalCost: 0,
+          movementCount: 0,
+          avgPrice: 0,
+          profit: 0,
+          profitMargin: '0'
+        };
+      }
+      productMovements[movement.itemName].totalQuantity += movement.quantity;
+      productMovements[movement.itemName].totalRevenue += movement.totalValue;
+      productMovements[movement.itemName].movementCount += 1;
+    });
+
+    // Calculate cost and profit for each product
+    Object.keys(productMovements).forEach(productName => {
+      const inventoryItem = inventory.find(item => item.name === productName);
+      if (inventoryItem) {
+        productMovements[productName].totalCost = productMovements[productName].totalQuantity * inventoryItem.unitPrice;
+        productMovements[productName].avgPrice = inventoryItem.unitPrice;
+        productMovements[productName].profit = productMovements[productName].totalRevenue - productMovements[productName].totalCost;
+        productMovements[productName].profitMargin = ((productMovements[productName].profit / productMovements[productName].totalRevenue) * 100).toFixed(2);
+      }
+    });
+
+    // Sort by total revenue
+    const sortedProducts = Object.entries(productMovements)
+      .sort(([,a], [,b]) => (b as any).totalRevenue - (a as any).totalRevenue)
+      .map(([name, data]) => ({ name, ...data }));
+
+    return sortedProducts;
+  };
+
+  const generateInventoryRecommendations = () => {
+    const productAnalytics = calculateProductAnalytics();
+    const recommendations = [];
+
+    productAnalytics.forEach(product => {
+      const inventoryItem = inventory.find(item => item.name === product.name);
+      if (!inventoryItem) return;
+
+      // Analyze stock levels and sales trends
+      const stockRatio = inventoryItem.currentStock / inventoryItem.maxStock;
+      const dailySales = product.totalQuantity / 30; // Assuming 30 days period
+      
+      let recommendation = {
+        product: product.name,
+        currentStock: inventoryItem.currentStock,
+        maxStock: inventoryItem.maxStock,
+        unitPrice: inventoryItem.unitPrice,
+        supplier: inventoryItem.supplier,
+        dailySales: dailySales,
+        stockRatio: stockRatio,
+        priority: 'medium' as 'low' | 'medium' | 'high',
+        action: '',
+        quantity: 0,
+        reason: ''
+      };
+
+      // Generate recommendations based on stock levels and sales
+      if (stockRatio < 0.2) {
+        recommendation.priority = 'high';
+        recommendation.action = 'restock';
+        recommendation.quantity = Math.ceil(dailySales * 7); // 7 days supply
+        recommendation.reason = `Tồn kho thấp (${stockRatio.toFixed(1)}%), cần nhập ${recommendation.quantity} ${inventoryItem.unit}`;
+      } else if (stockRatio < 0.4) {
+        recommendation.priority = 'medium';
+        recommendation.action = 'monitor';
+        recommendation.quantity = Math.ceil(dailySales * 3); // 3 days supply
+        recommendation.reason = `Tồn kho trung bình, theo dõi ${recommendation.quantity} ${inventoryItem.unit}`;
+      } else if (stockRatio > 0.8) {
+        recommendation.priority = 'low';
+        recommendation.action = 'hold';
+        recommendation.reason = `Tồn kho đủ (${stockRatio.toFixed(1)}%), tạm ngừng nhập`;
+      }
+
+      // Check if product is profitable
+      if (parseFloat(product.profitMargin) < 0) {
+        recommendation.priority = 'high';
+        recommendation.action = 'review';
+        recommendation.reason = `Sản phẩm đang lỗ (${product.profitMargin}%), cần xem xét lại giá hoặc chi phí`;
+      }
+
+      recommendations.push(recommendation);
+    });
+
+    return recommendations.sort((a, b) => {
+      const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    });
+  };
+
+  const calculateFinancialSummary = () => {
+    const canteenTransactions = JSON.parse(localStorage.getItem('canteenFinancialTransactions') || '[]');
+    const canteenMovements = JSON.parse(localStorage.getItem('canteenInventoryMovements') || '[]');
+    
+    const totalRevenue = canteenTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const totalCost = canteenMovements.reduce((sum, m) => sum + m.totalValue, 0);
+    const totalProfit = totalRevenue - totalCost;
+    const profitMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(2) : '0';
+
+    return {
+      totalRevenue,
+      totalCost,
+      totalProfit,
+      profitMargin,
+      transactionCount: canteenTransactions.length,
+      movementCount: canteenMovements.length
+    };
   };
 
   const handleAddTransaction = () => {
@@ -571,9 +702,10 @@ const CanteenFinanceView = () => {
           { id: 'transactions', label: 'Giao dịch', icon: FileText },
           { id: 'inventory', label: 'Nguyên vật', icon: Package },
           { id: 'movements', label: 'Khi suất kho', icon: ShoppingCart },
+          { id: 'analytics', label: 'Phân tích', icon: TrendingUp },
           { id: 'suppliers', label: 'Nhà cung cấp', icon: Users },
           { id: 'budget', label: 'Ngân sách', icon: Calendar },
-          { id: 'reports', label: 'Báo cáo', icon: TrendingUp }
+          { id: 'reports', label: 'Báo cáo', icon: FileText }
         ].map(tab => (
           <button
             key={tab.id}
@@ -1124,6 +1256,295 @@ const CanteenFinanceView = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Tab */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          {/* Financial Summary */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <TrendingUp size={20} className="text-purple-500"/> Phân tích Tài chính Tổng hợp
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-green-600">Tổng Doanh thu</span>
+                  <TrendingUp size={16} className="text-green-500"/>
+                </div>
+                <p className="text-2xl font-bold text-green-700">
+                  {formatCurrency(calculateFinancialSummary().totalRevenue)}
+                </p>
+                <p className="text-xs text-green-600">
+                  {calculateFinancialSummary().transactionCount} giao dịch
+                </p>
+              </div>
+              
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-red-600">Tổng Chi phí</span>
+                  <TrendingDown size={16} className="text-red-500"/>
+                </div>
+                <p className="text-2xl font-bold text-red-700">
+                  {formatCurrency(calculateFinancialSummary().totalCost)}
+                </p>
+                <p className="text-xs text-red-600">
+                  {calculateFinancialSummary().movementCount} khi suất
+                </p>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-blue-600">Lợi nhuận</span>
+                  <Package size={16} className="text-blue-500"/>
+                </div>
+                <p className={`text-2xl font-bold ${calculateFinancialSummary().totalProfit >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  {formatCurrency(calculateFinancialSummary().totalProfit)}
+                </p>
+                <p className="text-xs text-blue-600">
+                  Biên lợi nhuận: {calculateFinancialSummary().profitMargin}%
+                </p>
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-purple-600">Hiệu quả</span>
+                  <CheckCircle size={16} className="text-purple-500"/>
+                </div>
+                <p className="text-2xl font-bold text-purple-700">
+                  {parseFloat(calculateFinancialSummary().profitMargin) > 20 ? 'Tốt' : 
+                   parseFloat(calculateFinancialSummary().profitMargin) > 10 ? 'Khá tốt' : 
+                   parseFloat(calculateFinancialSummary().profitMargin) > 0 ? 'Trung bình' : 'Cần cải thiện'}
+                </p>
+                <p className="text-xs text-purple-600">
+                  Dựa trên biên lợi nhuận
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Performance Analysis */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FileText size={20} className="text-blue-500"/> Phân tích Hiệu suất Sản phẩm
+            </h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doanh thu</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chi phí</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lợi nhuận</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Biên lợi nhuận</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Giao dịch</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {calculateProductAnalytics().slice(0, 10).map((product, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm font-medium">{product.name}</td>
+                      <td className="px-4 py-3 text-sm">{product.totalQuantity}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-green-600">{formatCurrency(product.totalRevenue)}</td>
+                      <td className="px-4 py-3 text-sm text-red-600">{formatCurrency(product.totalCost)}</td>
+                      <td className={`px-4 py-3 text-sm font-medium ${product.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatCurrency(product.profit)}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          parseFloat(product.profitMargin) >= 20 
+                            ? 'bg-green-100 text-green-800' 
+                            : parseFloat(product.profitMargin) >= 10 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : parseFloat(product.profitMargin) >= 0 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {product.profitMargin}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{product.movementCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Inventory Recommendations */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <Package size={20} className="text-orange-500"/> Đề xuất Kế hoạch Nguyên vật
+            </h3>
+            
+            <div className="space-y-4">
+              {generateInventoryRecommendations().slice(0, 8).map((rec, index) => (
+                <div key={index} className={`border rounded-lg p-4 ${
+                  rec.priority === 'high' 
+                    ? 'border-red-200 bg-red-50' 
+                    : rec.priority === 'medium' 
+                    ? 'border-yellow-200 bg-yellow-50' 
+                    : 'border-green-200 bg-green-50'
+                }`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-medium text-gray-800">{rec.product}</h4>
+                      <p className="text-xs text-gray-600">Nhà cung cấp: {rec.supplier}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      rec.priority === 'high' 
+                        ? 'bg-red-100 text-red-800' 
+                        : rec.priority === 'medium' 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {rec.priority === 'high' ? 'Ưu tiên cao' : rec.priority === 'medium' ? 'Trung bình' : 'Thấp'}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-2">
+                    <div>
+                      <span className="text-gray-600">Tồn kho:</span>
+                      <p className="font-medium">{rec.currentStock}/{rec.maxStock}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Giá:</span>
+                      <p className="font-medium">{formatCurrency(rec.unitPrice)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Bán/ngày:</span>
+                      <p className="font-medium">{rec.dailySales.toFixed(1)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Hành động:</span>
+                      <p className="font-medium">{rec.action}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-2 rounded border border-gray-200">
+                    <p className="text-sm text-gray-700">{rec.reason}</p>
+                  </div>
+                  
+                  {rec.action === 'restock' && (
+                    <Button variant="success" size="sm" className="mt-2">
+                      <Plus size={14}/> Nhập kho ngay
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Strategic Recommendations */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <TrendingUp size={20} className="text-indigo-500"/> Đề xuất Chiến lược
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                  <TrendingUp size={16} className="text-green-500"/> Tối ưu hóa Lợi nhuận
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">•</span>
+                    <span>Tập trung vào các sản phẩm có biên lợi nhuận > 20%</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">•</span>
+                    <span>Giảm hoặc loại bỏ sản phẩm đang lỗ</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">•</span>
+                    <span>Tăng giá cho các sản phẩm có nhu cầu cao</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">•</span>
+                    <span>Tạo combo để tăng giá trị đơn hàng</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                  <Package size={16} className="text-blue-500"/> Quản lý Tồn kho
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-1">•</span>
+                    <span>Duy trì tồn kho tối thiểu 7 ngày</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-1">•</span>
+                    <span>Nhập hàng theo lịch định kỳ</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-1">•</span>
+                    <span>Theo dõi hàng tồn kho thấp</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-1">•</span>
+                    <span>Tối ưu nhà cung cấp uy tín</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                  <Calendar size={16} className="text-purple-500"/> Lập kế hoạch Ngân sách
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">•</span>
+                    <span>Phân bổ ngân sách theo sản phẩm bán chạy</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">•</span>
+                    <span>Dự trù 10% cho chi phí phát sinh</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">•</span>
+                    <span>Đánh giá hiệu quả hàng tháng</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">•</span>
+                    <span>Điều chỉnh kế hoạch theo thực tế</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                  <Users size={16} className="text-orange-500"/> Quan hệ Nhà cung cấp
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>Đàm phán giá với các nhà cung cấp</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>Ký hợp dài hạn để có giá tốt</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>Đa dạng nhà cung cấp dự phòng</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>Đánh giá hiệu suất định kỳ</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
