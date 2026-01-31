@@ -1,4 +1,4 @@
-import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage, MealSchedule } from './types';
+import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage, MealSchedule, FinancialTransaction, ProfitAnalysis, BudgetPlan, Supplier, ExpenseReport } from './types';
 
 export const MOCK_TEACHERS: Teacher[] = [
   { id: 101, fullName: "Nguyen Van A", email: "anv@school.edu.vn", phone: "0901234567", major: "Toán Học", avatar: "https://ui-avatars.com/api/?name=Nguyen+Van+A&background=e0e7ff&color=4338ca" },
@@ -159,9 +159,261 @@ export const MOCK_ROUTES: TransportRoute[] = [
 ];
 
 export const MOCK_INVENTORY: InventoryItem[] = [
-  { id: 1, name: "Máy chiếu Panasonic", category: "Thiết bị điện tử", quantity: 20, location: "Kho A", condition: 'GOOD' },
-  { id: 2, name: "Bàn ghế học sinh", category: "Nội thất", quantity: 500, location: "Các lớp học", condition: 'GOOD' },
-  { id: 3, name: "Kính hiển vi quang học", category: "Thiết bị thí nghiệm", quantity: 30, location: "Phòng Lab Lý", condition: 'MAINTENANCE' },
+  { 
+    id: 1, 
+    name: "Thịt bò tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 50,
+    minStock: 10,
+    maxStock: 100,
+    unitPrice: 180000,
+    supplier: "Công ty TNHH Thực phẩm ABC",
+    lastRestockDate: "2024-01-15",
+    status: "in_stock"
+  },
+  { 
+    id: 2, 
+    name: "Rau củ tươi", 
+    category: "food_ingredient", 
+    unit: "kg",
+    currentStock: 30,
+    minStock: 15,
+    maxStock: 80,
+    unitPrice: 25000,
+    supplier: "Nông trại XYZ",
+    lastRestockDate: "2024-01-14",
+    status: "low_stock"
+  },
+  { 
+    id: 3, 
+    name: "Nước suối đóng chai", 
+    category: "beverage", 
+    unit: "chai",
+    currentStock: 100,
+    minStock: 20,
+    maxStock: 200,
+    unitPrice: 8000,
+    supplier: "Công ty Nước giải khát",
+    lastRestockDate: "2024-01-13",
+    status: "in_stock"
+  },
+  { 
+    id: 4, 
+    name: "Hộp xốp đựng thực phẩm", 
+    category: "packaging", 
+    unit: "cái",
+    currentStock: 200,
+    minStock: 50,
+    maxStock: 500,
+    unitPrice: 1500,
+    supplier: "Công ty Bao bì VN",
+    lastRestockDate: "2024-01-10",
+    status: "in_stock"
+  },
+  { 
+    id: 5, 
+    name: "Dầu ăn", 
+    category: "cleaning", 
+    unit: "lít",
+    currentStock: 5,
+    minStock: 2,
+    maxStock: 20,
+    unitPrice: 45000,
+    supplier: "Công ty Hóa chất ABC",
+    lastRestockDate: "2024-01-12",
+    status: "low_stock"
+  },
+  { 
+    id: 6, 
+    name: "Giấy ăn", 
+    category: "other", 
+    unit: "bịch",
+    currentStock: 1000,
+    minStock: 200,
+    maxStock: 2000,
+    unitPrice: 500,
+    supplier: "Công ty Giấy VN",
+    lastRestockDate: "2024-01-11",
+    status: "in_stock"
+  }
+];
+
+// Financial Management Data
+export const MOCK_FINANCIAL_TRANSACTIONS: FinancialTransaction[] = [
+  {
+    id: 1,
+    type: 'income',
+    category: 'revenue',
+    amount: 5000000,
+    description: 'Doanh thu bán đồ ăn - Tuần 1',
+    date: '2024-01-15',
+    reference: 'INV-2024-001',
+    status: 'completed',
+    paymentMethod: 'transfer',
+    createdBy: 'Nguyễn Thị Hanh',
+    createdAt: '2024-01-15T09:00:00Z'
+  },
+  {
+    id: 2,
+    type: 'income',
+    category: 'revenue',
+    amount: 3500000,
+    description: 'Doanh thu đồ uống - Tuần 1',
+    date: '2024-01-15',
+    reference: 'INV-2024-002',
+    status: 'completed',
+    paymentMethod: 'cash',
+    createdBy: 'Nguyễn Thị Hanh',
+    createdAt: '2024-01-15T10:30:00Z'
+  },
+  {
+    id: 3,
+    type: 'expense',
+    category: 'supplier_payment',
+    amount: 2000000,
+    description: 'Thanh toán nguyên liệu thực phẩm - Công ty TNHH Thực phẩm ABC',
+    date: '2024-01-14',
+    reference: 'SUP-2024-001',
+    status: 'completed',
+    paymentMethod: 'transfer',
+    createdBy: 'Nguyễn Thị Hanh',
+    createdAt: '2024-01-14T14:00:00Z'
+  },
+  {
+    id: 4,
+    type: 'expense',
+    category: 'salary',
+    amount: 15000000,
+    description: 'Lương nhân viên tháng 1',
+    date: '2024-01-25',
+    reference: 'SAL-2024-001',
+    status: 'pending',
+    paymentMethod: 'transfer',
+    createdBy: 'Nguyễn Thị Hanh',
+    createdAt: '2024-01-25T08:00:00Z'
+  },
+  {
+    id: 5,
+    type: 'expense',
+    category: 'utilities',
+    amount: 500000,
+    description: 'Điện, nước tháng 1',
+    date: '2024-01-20',
+    reference: 'UTL-2024-001',
+    status: 'completed',
+    paymentMethod: 'transfer',
+    createdBy: 'Nguyễn Thị Hanh',
+    createdAt: '2024-01-20T11:00:00Z'
+  }
+];
+
+export const MOCK_PROFIT_ANALYSIS: ProfitAnalysis[] = [
+  {
+    id: 1,
+    period: 'Tháng 1/2024',
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    totalRevenue: 8500000,
+    totalExpenses: 18000000,
+    grossProfit: -9500000,
+    netProfit: -9500000,
+    profitMargin: -11.18,
+    totalOrders: 245,
+    averageOrderValue: 34694,
+    topSellingItems: [
+      { itemId: 1, itemName: 'Cơm Rang Thập Cẩm', quantity: 45, revenue: 1575000 },
+      { itemId: 2, itemName: 'Phở Bò', quantity: 32, revenue: 1280000 },
+      { itemId: 4, itemName: 'Nước Cam Ép', quantity: 60, revenue: 1500000 }
+    ],
+    expenseBreakdown: [
+      { category: 'salary', amount: 15000000, percentage: 83.33 },
+      { category: 'supplier_payment', amount: 2000000, percentage: 11.11 },
+      { category: 'utilities', amount: 500000, percentage: 2.78 },
+      { category: 'other', amount: 500000, percentage: 2.78 }
+    ]
+  }
+];
+
+export const MOCK_BUDGET_PLANS: BudgetPlan[] = [
+  {
+    id: 1,
+    name: 'Ngân sách tháng 1/2024',
+    period: 'Tháng 1/2024',
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    totalBudget: 20000000,
+    allocatedBudget: 18000000,
+    spentAmount: 18000000,
+    remainingBudget: 2000000,
+    categories: [
+      { category: 'Nguyên vật thực phẩm', allocated: 8000000, spent: 7500000, remaining: 500000 },
+      { category: 'Đồ uống', allocated: 3000000, spent: 2800000, remaining: 200000 },
+      { category: 'Lương nhân viên', allocated: 5000000, spent: 5000000, remaining: 0 },
+      { category: 'Chi phí vận hành', allocated: 2000000, spent: 2700000, remaining: -700000 }
+    ],
+    status: 'active',
+    createdAt: '2024-01-01T00:00:00Z'
+  }
+];
+
+export const MOCK_SUPPLIERS: Supplier[] = [
+  {
+    id: 1,
+    name: 'Công ty TNHH Thực phẩm ABC',
+    contactPerson: 'Nguyễn Văn An',
+    phone: '0912345678',
+    email: 'an.nv@thucphamabc.com',
+    address: '123 Nguyễn Trãi, Q.1, TP.HCM',
+    categories: ['Thịt', 'Rau củ', 'Hải sản'],
+    paymentTerms: 'Net 30 ngày',
+    rating: 4.5,
+    status: 'active'
+  },
+  {
+    id: 2,
+    name: 'Nông trại XYZ',
+    contactPerson: 'Trần Thị Bình',
+    phone: '0923456789',
+    email: 'binh.tt@nongtraixyz.com',
+    address: '456 Quốc lộ 1A, Q.2, TP.HCM',
+    categories: ['Rau củ', 'Trái cây', 'Gia vị'],
+    paymentTerms: 'Net 15 ngày',
+    rating: 4.2,
+    status: 'active'
+  },
+  {
+    id: 3,
+    name: 'Công ty Nước giải khát',
+    contactPerson: 'Lê Văn Cường',
+    phone: '09345678901',
+    email: 'cuong.lv@nuocgiaikhat.com',
+    address: '789 Nguyễn Huệ, Q.3, TP.HCM',
+    categories: ['Nước suối', 'Nước ngọt', 'Trà'],
+    paymentTerms: 'COD',
+    rating: 4.0,
+    status: 'active'
+  }
+];
+
+export const MOCK_EXPENSE_REPORTS: ExpenseReport[] = [
+  {
+    id: 1,
+    month: 'Tháng 1',
+    year: 2024,
+    totalExpenses: 18000000,
+    expensesByCategory: [
+      { category: 'salary', amount: 15000000, transactions: 1 },
+      { category: 'supplier_payment', amount: 2000000, transactions: 3 },
+      { category: 'utilities', amount: 500000, transactions: 2 },
+      { category: 'other', amount: 500000, transactions: 1 }
+    ],
+    monthlyTrend: [
+      { month: 'Tháng 11', amount: 16000000 },
+      { month: 'Tháng 12', amount: 17500000 },
+      { month: 'Tháng 1', amount: 18000000 }
+    ]
+  }
 ];
 
 export const MOCK_STAFF: Staff[] = [

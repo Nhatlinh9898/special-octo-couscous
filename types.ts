@@ -136,15 +136,6 @@ export interface TransportRoute {
   status: 'ON_ROUTE' | 'IDLE';
 }
 
-export interface InventoryItem {
-  id: number;
-  name: string;
-  category: string;
-  quantity: number;
-  location: string;
-  condition: 'GOOD' | 'DAMAGED' | 'MAINTENANCE';
-}
-
 export interface Staff {
   id: number;
   fullName: string;
@@ -198,6 +189,113 @@ export interface MenuItemForm {
   ingredients: string;
   preparationTime: string;
   image: string;
+}
+
+// Financial Management Types
+export interface FinancialTransaction {
+  id: number;
+  type: 'income' | 'expense';
+  category: 'revenue' | 'supplier_payment' | 'salary' | 'utilities' | 'maintenance' | 'other';
+  amount: number;
+  description: string;
+  date: string;
+  reference: string;
+  status: 'completed' | 'pending' | 'cancelled';
+  paymentMethod: 'cash' | 'transfer' | 'qr';
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface InventoryItem {
+  id: number;
+  name: string;
+  category: string;
+  unit: string;
+  currentStock: number;
+  minStock: number;
+  maxStock: number;
+  unitPrice: number;
+  supplier: string;
+  lastRestockDate: string;
+  expiryDate?: string;
+  status: 'in_stock' | 'low_stock' | 'out_of_stock';
+  quantity?: number;
+  location?: string;
+  condition?: 'GOOD' | 'FAIR' | 'POOR' | 'MAINTENANCE';
+}
+
+export interface ProfitAnalysis {
+  id: number;
+  period: string;
+  startDate: string;
+  endDate: string;
+  totalRevenue: number;
+  totalExpenses: number;
+  grossProfit: number;
+  netProfit: number;
+  profitMargin: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  topSellingItems: {
+    itemId: number;
+    itemName: string;
+    quantity: number;
+    revenue: number;
+  }[];
+  expenseBreakdown: {
+    category: string;
+    amount: number;
+    percentage: number;
+  }[];
+}
+
+export interface BudgetPlan {
+  id: number;
+  name: string;
+  period: string;
+  startDate: string;
+  endDate: string;
+  totalBudget: number;
+  allocatedBudget: number;
+  spentAmount: number;
+  remainingBudget: number;
+  categories: {
+    category: string;
+    allocated: number;
+    spent: number;
+    remaining: number;
+  }[];
+  status: 'active' | 'completed' | 'cancelled';
+  createdAt: string;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  address: string;
+  categories: string[];
+  paymentTerms: string;
+  rating: number;
+  status: 'active' | 'inactive';
+}
+
+export interface ExpenseReport {
+  id: number;
+  month: string;
+  year: number;
+  totalExpenses: number;
+  expensesByCategory: {
+    category: string;
+    amount: number;
+    transactions: number;
+  }[];
+  monthlyTrend: {
+    month: string;
+    amount: number;
+  }[];
 }
 
 export interface DormRoom {
