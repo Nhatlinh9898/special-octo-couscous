@@ -39,12 +39,14 @@ const CanteenFinanceView = () => {
   const [showQRScannerModal, setShowQRScannerModal] = useState(false);
   const [showMovementQRScannerModal, setShowMovementQRScannerModal] = useState(false);
   const [showMovementModal, setShowMovementModal] = useState(false);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<FinancialTransaction | null>(null);
   const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null);
   const [scannedItem, setScannedItem] = useState<InventoryItem | null>(null);
   const [scannedCode, setScannedCode] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [editingMovement, setEditingMovement] = useState<InventoryTransaction | null>(null);
+  const [editingBudget, setEditingBudget] = useState<BudgetPlan | null>(null);
   const [movementForm, setMovementForm] = useState({
     inventoryItemId: 0,
     quantity: '',
@@ -52,6 +54,15 @@ const CanteenFinanceView = () => {
     date: new Date().toISOString().split('T')[0],
     time: new Date().toTimeString().slice(0, 5),
     notes: ''
+  });
+  const [budgetForm, setBudgetForm] = useState({
+    name: '',
+    period: '',
+    startDate: '',
+    endDate: '',
+    totalBudget: '',
+    allocatedBudget: '',
+    categories: []
   });
   const [transactionForm, setTransactionForm] = useState({
     type: 'income' as 'income' | 'expense',
@@ -312,11 +323,73 @@ const CanteenFinanceView = () => {
   };
 
   const handleAddBudget = () => {
-    console.log('Add budget');
+    setEditingBudget(null);
+    setBudgetForm({
+      name: '',
+      period: '',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(new Date().setMonth(new Date().getMonth() + 1, 1)).toISOString().split('T')[0],
+      totalBudget: '',
+      allocatedBudget: '',
+      categories: []
+    });
+    setShowBudgetModal(true);
   };
 
   const handleEditBudget = (budget: BudgetPlan) => {
-    console.log('Edit budget:', budget);
+    setEditingBudget(budget);
+    setBudgetForm({
+      name: budget.name,
+      period: budget.period,
+      startDate: budget.startDate,
+      endDate: budget.endDate,
+      totalBudget: budget.totalBudget.toString(),
+      allocatedBudget: budget.allocatedBudget.toString(),
+      categories: budget.categories
+    });
+    setShowBudgetModal(true);
+  };
+
+  const handleSaveBudget = () => {
+    const newBudget: BudgetPlan = {
+      id: editingBudget ? editingBudget.id : Date.now(),
+      name: budgetForm.name,
+      period: budgetForm.period,
+      startDate: budgetForm.startDate,
+      endDate: budgetForm.endDate,
+      totalBudget: parseFloat(budgetForm.totalBudget),
+      allocatedBudget: parseFloat(budgetForm.allocatedBudget),
+      spentAmount: editingBudget ? editingBudget.spentAmount : 0,
+      remainingBudget: parseFloat(budgetForm.totalBudget) - parseFloat(budgetForm.allocatedBudget),
+      categories: budgetForm.categories.map(cat => ({
+        category: cat,
+        allocated: parseFloat(budgetForm.totalBudget) / budgetForm.categories.length,
+        spent: 0,
+        remaining: parseFloat(budgetForm.totalBudget) / budgetForm.categories.length
+      })),
+      status: editingBudget ? editingBudget.status : 'active',
+      createdAt: editingBudget ? editingBudget.createdAt : new Date().toISOString()
+    };
+
+    if (editingBudget) {
+      setBudgetPlans(prev => prev.map(b => b.id === editingBudget.id ? newBudget : b));
+    } else {
+      setBudgetPlans(prev => [...prev, newBudget]);
+    }
+
+    setShowBudgetModal(false);
+    setEditingBudget(null);
+    setBudgetForm({
+      name: '',
+      period: '',
+      startDate: '',
+      endDate: '',
+      totalBudget: '',
+      allocatedBudget: '',
+      categories: []
+    });
+
+    alert(`Đã ${editingBudget ? 'cập nhật' : 'tạo'} ngân sách "${newBudget.name}" thành công!`);
   };
 
   const handleDeleteBudget = (id: number) => {
@@ -2443,6 +2516,186 @@ const CanteenFinanceView = () => {
                 disabled={!movementForm.inventoryItemId || !movementForm.quantity || !movementForm.reason}
               >
                 {editingMovement ? 'Cập nhật' : 'Lưu'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Budget Modal */}
+      {showBudgetModal && (
+        <Modal 
+          isOpen={showBudgetModal} 
+          onClose={() => setShowBudgetModal(false)} 
+          title={editingBudget ? 'Chỉnh sửa ngân sách' : 'Tạo ngân sách mới'}
+        >
+          <div className="p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên ngân sách *</label>
+                <input
+                  type="text"
+                  value={budgetForm.name}
+                  onChange={(e) => setBudgetForm({...budgetForm, name: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Nhập tên ngân sách"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kỳ *</label>
+                <input
+                  type="text"
+                  value={budgetForm.period}
+                  onChange={(e) => setBudgetForm({...budgetForm, period: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Ví dụ: Tháng 1/2024"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu *</label>
+                  <input
+                    type="date"
+                    value={budgetForm.startDate}
+                    onChange={(e) => setBudgetForm({...budgetForm, startDate: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc *</label>
+                  <input
+                    type="date"
+                    value={budgetForm.endDate}
+                    onChange={(e) => setBudgetForm({...budgetForm, endDate: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tổng ngân sách *</label>
+                  <input
+                    type="number"
+                    value={budgetForm.totalBudget}
+                    onChange={(e) => setBudgetForm({...budgetForm, totalBudget: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Đã phân bổ *</label>
+                  <input
+                    type="number"
+                    value={budgetForm.allocatedBudget}
+                    onChange={(e) => setBudgetForm({...budgetForm, allocatedBudget: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục ngân sách</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="food"
+                      checked={budgetForm.categories.includes('food')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setBudgetForm({...budgetForm, categories: [...budgetForm.categories, 'food']});
+                        } else {
+                          setBudgetForm({...budgetForm, categories: budgetForm.categories.filter(c => c !== 'food')});
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                    />
+                    <label htmlFor="food" className="text-sm text-gray-700">Đồ ăn</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="beverages"
+                      checked={budgetForm.categories.includes('beverages')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setBudgetForm({...budgetForm, categories: [...budgetForm.categories, 'beverages']});
+                        } else {
+                          setBudgetForm({...budgetForm, categories: budgetForm.categories.filter(c => c !== 'beverages')});
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                    />
+                    <label htmlFor="beverages" className="text-sm text-gray-700">Đồ uống</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="packaging"
+                      checked={budgetForm.categories.includes('packaging')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setBudgetForm({...budgetForm, categories: [...budgetForm.categories, 'packaging']});
+                        } else {
+                          setBudgetForm({...budgetForm, categories: budgetForm.categories.filter(c => c !== 'packaging')});
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                    />
+                    <label htmlFor="packaging" className="text-sm text-gray-700">Bao bì</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="utilities"
+                      checked={budgetForm.categories.includes('utilities')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setBudgetForm({...budgetForm, categories: [...budgetForm.categories, 'utilities']});
+                        } else {
+                          setBudgetForm({...budgetForm, categories: budgetForm.categories.filter(c => c !== 'utilities')});
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                    />
+                    <label htmlFor="utilities" className="text-sm text-gray-700">Chi phí vận hành</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="other"
+                      checked={budgetForm.categories.includes('other')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setBudgetForm({...budgetForm, categories: [...budgetForm.categories, 'other']});
+                        } else {
+                          setBudgetForm({...budgetForm, categories: budgetForm.categories.filter(c => c !== 'other')});
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                    />
+                    <label htmlFor="other" className="text-sm text-gray-700">Khác</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setShowBudgetModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={handleSaveBudget}
+                disabled={!budgetForm.name || !budgetForm.period || !budgetForm.totalBudget || !budgetForm.allocatedBudget}
+              >
+                {editingBudget ? 'Cập nhật' : 'Lưu'}
               </Button>
             </div>
           </div>
