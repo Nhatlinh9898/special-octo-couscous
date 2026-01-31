@@ -37,11 +37,22 @@ const CanteenFinanceView = () => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showQRScannerModal, setShowQRScannerModal] = useState(false);
+  const [showMovementQRScannerModal, setShowMovementQRScannerModal] = useState(false);
+  const [showMovementModal, setShowMovementModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<FinancialTransaction | null>(null);
   const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null);
   const [scannedItem, setScannedItem] = useState<InventoryItem | null>(null);
   const [scannedCode, setScannedCode] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [editingMovement, setEditingMovement] = useState<InventoryTransaction | null>(null);
+  const [movementForm, setMovementForm] = useState({
+    inventoryItemId: 0,
+    quantity: '',
+    reason: '',
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toTimeString().slice(0, 5),
+    notes: ''
+  });
   const [transactionForm, setTransactionForm] = useState({
     type: 'income' as 'income' | 'expense',
     category: 'revenue' as any,
@@ -306,6 +317,151 @@ const CanteenFinanceView = () => {
   const generateQRCodeForItem = (item: InventoryItem) => {
     // Generate QR code data for inventory item
     return `INV-${item.id}-${item.name}-${Date.now()}`;
+  };
+
+  // Movement QR Scanner Functions
+  const handleOpenMovementQRScanner = () => {
+    setShowMovementQRScannerModal(true);
+    setScannedCode('');
+    setScannedItem(null);
+    setIsScanning(false);
+    setEditingMovement(null);
+  };
+
+  const handleScanMovementQRCode = () => {
+    setIsScanning(true);
+    // Simulate QR code scanning
+    setTimeout(() => {
+      // Generate a random item from inventory for demo
+      const randomItem = inventory[Math.floor(Math.random() * inventory.length)];
+      setScannedCode(`MOV-${randomItem.id}-${Date.now()}`);
+      setScannedItem(randomItem);
+      setIsScanning(false);
+    }, 2000);
+  };
+
+  const handleManualMovementCodeInput = (code: string) => {
+    // Parse code format: MOV-{id}-{timestamp}
+    const match = code.match(/MOV-(\d+)-/);
+    if (match) {
+      const itemId = parseInt(match[1]);
+      const item = inventory.find(i => i.id === itemId);
+      if (item) {
+        setScannedItem(item);
+        setScannedCode(code);
+        // Pre-fill movement form with scanned item
+        setMovementForm({
+          inventoryItemId: item.id,
+          quantity: '',
+          reason: `Quét mã QR cho ${item.name}`,
+          date: new Date().toISOString().split('T')[0],
+          time: new Date().toTimeString().slice(0, 5),
+          notes: ''
+        });
+      } else {
+        alert('Không tìm thấy sản phẩm với mã này!');
+      }
+    } else {
+      alert('Mã không hợp lệ! Vui lòng nhập đúng định dạng MOV-[ID]-[TIMESTAMP].');
+    }
+  };
+
+  const handleRecordMovement = () => {
+    setEditingMovement(null);
+    setMovementForm({
+      inventoryItemId: 0,
+      quantity: '',
+      reason: '',
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().slice(0, 5),
+      notes: ''
+    });
+    setShowMovementModal(true);
+  };
+
+  const handleEditMovement = (transaction: InventoryTransaction) => {
+    setEditingMovement(transaction);
+    setMovementForm({
+      inventoryItemId: transaction.inventoryItemId,
+      quantity: transaction.quantity.toString(),
+      reason: transaction.reason,
+      date: transaction.date,
+      time: transaction.time,
+      notes: transaction.notes || ''
+    });
+    setShowMovementModal(true);
+  };
+
+  const handleSaveMovement = () => {
+    if (!movementForm.inventoryItemId || !movementForm.quantity || !movementForm.reason) {
+      alert('Vui lòng điền đầy đủ thông tin!');
+      return;
+    }
+
+    const item = inventory.find(i => i.id === movementForm.inventoryItemId);
+    if (!item) {
+      alert('Không tìm thấy sản phẩm!');
+      return;
+    }
+
+    const newMovement: InventoryTransaction = {
+      id: editingMovement ? editingMovement.id : Date.now(),
+      inventoryItemId: movementForm.inventoryItemId,
+      itemName: item.name,
+      transactionType: movementForm.quantity.startsWith('-') ? 'out' : 'in',
+      quantity: Math.abs(parseFloat(movementForm.quantity)),
+      unitPrice: item.unitPrice,
+      totalValue: Math.abs(parseFloat(movementForm.quantity)) * item.unitPrice,
+      reference: editingMovement ? editingMovement.reference : `MOV-${Date.now()}`,
+      reason: movementForm.reason,
+      date: movementForm.date,
+      time: movementForm.time,
+      createdBy: 'Nguyễn Thị Hanh',
+      approvedBy: 'Trần Văn Bảo',
+      status: 'completed',
+      supplier: item.supplier,
+      notes: movementForm.notes
+    };
+
+    if (editingMovement) {
+      setInventoryTransactions(prev => prev.map(t => t.id === editingMovement.id ? newMovement : t));
+    } else {
+      setInventoryTransactions(prev => [...prev, newMovement]);
+    }
+
+    // Update inventory stock
+    const stockChange = newMovement.transactionType === 'in' ? newMovement.quantity : -newMovement.quantity;
+    setInventory(prev => prev.map(item => {
+      if (item.id === newMovement.inventoryItemId) {
+        const newStock = item.currentStock + stockChange;
+        return {
+          ...item,
+          currentStock: newStock,
+          lastRestockDate: newMovement.date,
+          status: newStock <= item.minStock ? 'low_stock' : newStock >= item.maxStock ? 'out_of_stock' : 'in_stock'
+        };
+      }
+      return item;
+    }));
+
+    setShowMovementModal(false);
+    setEditingMovement(null);
+    setMovementForm({
+      inventoryItemId: 0,
+      quantity: '',
+      reason: '',
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().slice(0, 5),
+      notes: ''
+    });
+
+    alert(`Đã ghi nhận ${newMovement.transactionType === 'in' ? 'nhập kho' : 'xuất kho'} ${Math.abs(newMovement.quantity)} ${item.unit} ${item.name} thành công!`);
+  };
+
+  const handleDeleteMovement = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
+      setInventoryTransactions(prev => prev.filter(t => t.id !== id));
+    }
   };
 
   const handleSaveTransaction = () => {
@@ -727,9 +883,14 @@ const CanteenFinanceView = () => {
               <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <ShoppingCart size={20} className="text-blue-500"/> Khi suất kho
               </h3>
-              <Button variant="success">
-                <Plus size={16}/> Ghi nhận khi suất
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="success" onClick={handleOpenMovementQRScanner}>
+                  <QrCode size={16}/> Quét mã khi suất
+                </Button>
+                <Button onClick={handleRecordMovement}>
+                  <Plus size={16}/> Ghi nhận khi suất
+                </Button>
+              </div>
             </div>
             
             {/* Summary Cards */}
@@ -815,6 +976,7 @@ const CanteenFinanceView = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lý do</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Người tạo</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -847,6 +1009,24 @@ const CanteenFinanceView = () => {
                         }`}>
                           {transaction.status === 'completed' ? 'Hoàn thành' : transaction.status === 'pending' ? 'Chờ duyệt' : 'Đã hủy'}
                         </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleEditMovement(transaction)}
+                          >
+                            <Edit size={14}/>
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDeleteMovement(transaction.id)}
+                          >
+                            <Trash2 size={14}/>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1562,6 +1742,250 @@ const CanteenFinanceView = () => {
                   <li>• Nhập số lượng cần nhập và xác nhận</li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Movement QR Scanner Modal */}
+      {showMovementQRScannerModal && (
+        <Modal 
+          isOpen={showMovementQRScannerModal} 
+          onClose={() => setShowMovementQRScannerModal(false)} 
+          title="Quét mã QR khi suất kho"
+        >
+          <div className="p-6">
+            <div className="space-y-6">
+              {/* Scanner Area */}
+              <div className="text-center">
+                <div className={`w-64 h-64 mx-auto border-2 border-dashed border-gray-300 rounded-lg flex flex flex-col items-center justify-center ${
+                  isScanning ? 'bg-blue-50 border-blue-400' : 'bg-gray-50'
+                }`}>
+                  {isScanning ? (
+                    <>
+                      <Camera size={48} className="text-blue-500 mb-2 animate-pulse"/>
+                      <p className="text-blue-600 font-medium">Đang quét mã...</p>
+                      <div className="w-16 h-1 bg-blue-500 rounded-full mt-2 animate-pulse"></div>
+                    </>
+                  ) : (
+                    <>
+                      <QrCode size={48} className="text-gray-400 mb-2"/>
+                      <p className="text-gray-600">Đặt mã QR khi suất vào camera</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Scanned Item Info */}
+              {scannedItem && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                    <CheckCircle size={16} className="text-green-600"/>
+                    Đã quét thành công!
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">Sản phẩm:</span>
+                      <p className="font-medium">{scannedItem.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Tồn kho:</span>
+                      <p className="font-medium">{scannedItem.currentStock} {scannedItem.unit}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Đơn giá:</span>
+                      <p className="font-medium">{formatCurrency(scannedItem.unitPrice)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Nhà cung cấp:</span>
+                      <p className="font-medium text-xs">{scannedItem.supplier}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-600">Mã quét:</span>
+                    <p className="font-mono text-xs bg-white px-2 py-1 rounded">{scannedCode}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Manual Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hoặc nhập mã thủ công:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={scannedCode}
+                    onChange={(e) => setScannedCode(e.target.value)}
+                    placeholder="MOV-1-1640995200000"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <Button
+                    onClick={() => handleManualMovementCodeInput(scannedCode)}
+                    disabled={!scannedCode}
+                  >
+                    <Barcode size={16}/>
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Định dạng: MOV-[ID]-[TIMESTAMP]
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setShowMovementQRScannerModal(false);
+                    setScannedItem(null);
+                    setScannedCode('');
+                    setIsScanning(false);
+                    setEditingMovement(null);
+                  }}
+                  className="flex-1"
+                >
+                  Đóng
+                </Button>
+                <Button
+                  onClick={handleScanMovementQRCode}
+                  disabled={isScanning}
+                  className="flex-1"
+                >
+                  {isScanning ? (
+                    <>
+                      <Camera size={16} className="animate-pulse mr-2"/>
+                      Đang quét...
+                    </>
+                  ) : (
+                    <>
+                      <Camera size={16} className="mr-2"/>
+                      Quét mã QR
+                    </>
+                  )}
+                </Button>
+                {scannedItem && (
+                  <Button
+                    onClick={handleQRRestock}
+                    variant="success"
+                    className="flex-1"
+                  >
+                    <Plus size={16} className="mr-2"/>
+                    Nhập kho
+                  </Button>
+                )}
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800 mb-2">Hướng dẫn sử dụng:</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• Click "Quét mã QR" để bắt đầu quét</li>
+                  <li>• Đặt mã QR của sản phẩm vào camera</li>
+                  <li>• Hoặc nhập mã thủ công nếu có sẵn</li>
+                  <li>• Sau khi quét thành công, click "Nhập kho"</li>
+                  <li>• Nhập số lượng (dùng dấu "-" cho xuất kho)</li>
+                  <li>• Xác nhận và lưu giao dịch</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Movement Record Modal */}
+      {showMovementModal && (
+        <Modal 
+          isOpen={showMovementModal} 
+          onClose={() => setShowMovementModal(false)} 
+          title={editingMovement ? 'Chỉnh sửa giao dịch' : 'Ghi nhận khi suất kho'}
+        >
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sản phẩm *</label>
+                  <select
+                    value={movementForm.inventoryItemId}
+                    onChange={(e) => setMovementForm({...movementForm, inventoryItemId: parseInt(e.target.value)})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">Chọn sản phẩm</option>
+                    {inventory.map(item => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Số lượng *</label>
+                  <input
+                    type="text"
+                    value={movementForm.quantity}
+                    onChange={(e) => setMovementForm({...movementForm, quantity: e.target.value})}
+                    placeholder="Nhập số lượng (dùng '-' cho xuất kho)"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Lý do khi suất *</label>
+                <textarea
+                  value={movementForm.reason}
+                  onChange={(e) => setMovementForm({...movementForm, reason: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  rows={3}
+                  placeholder="Nhập lý do khi suất kho"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày *</label>
+                  <input
+                    type="date"
+                    value={movementForm.date}
+                    onChange={(e) => setMovementForm({...movementForm, date: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Giờ *</label>
+                  <input
+                    type="time"
+                    value={movementForm.time}
+                    onChange={(e) => setMovementForm({...movementForm, time: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+                <textarea
+                  value={movementForm.notes}
+                  onChange={(e) => setMovementForm({...movementForm, notes: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  rows={2}
+                  placeholder="Ghi chú thêm thông tin"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setShowMovementModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={handleSaveMovement}
+                disabled={!movementForm.inventoryItemId || !movementForm.quantity || !movementForm.reason}
+              >
+                {editingMovement ? 'Cập nhật' : 'Lưu'}
+              </Button>
             </div>
           </div>
         </Modal>
