@@ -30,11 +30,27 @@ export const Card: React.FC<{ title: string; value: string | number; icon: React
   </div>
 );
 
-export const Modal: React.FC<{ isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode; maxWidth?: string }> = ({ isOpen, onClose, title, children, maxWidth = "max-w-lg" }) => {
+export const Modal: React.FC<{ 
+  isOpen: boolean; 
+  onClose: () => void; 
+  title: string; 
+  children: React.ReactNode; 
+  maxWidth?: string;
+  size?: 'small' | 'medium' | 'large'
+}> = ({ isOpen, onClose, title, children, maxWidth, size = 'medium' }) => {
   if (!isOpen) return null;
+
+  const sizeClasses = {
+    small: 'max-w-md',
+    medium: 'max-w-lg',
+    large: 'max-w-4xl'
+  };
+
+  const modalMaxWidth = maxWidth || sizeClasses[size];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm">
-      <div className={`bg-white rounded-xl shadow-xl w-full ${maxWidth} overflow-hidden animate-fade-in-up`}>
+      <div className={`bg-white rounded-xl shadow-xl w-full ${modalMaxWidth} overflow-hidden animate-fade-in-up`}>
         <div className="flex justify-between items-center p-4 border-b border-gray-100">
           <h3 className="text-lg font-bold text-gray-800">{title}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition">

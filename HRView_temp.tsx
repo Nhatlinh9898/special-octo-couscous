@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Plus, Search, Check, X, Briefcase, User as UserIcon, Phone, Mail, Activity, Loader2, FileText, Calendar, Users, Home, Heart, Award, GraduationCap, Building, Clock, Edit, Eye, Download, Upload, Shield, BookOpen, DollarSign, TrendingUp, TrendingDown, Bell } from 'lucide-react';
 import { api } from './data';
 import { aiService } from './aiService';
@@ -59,7 +59,7 @@ const HRView = () => {
   const [showAddLeaveModal, setShowAddLeaveModal] = useState(false);
   const [leaveForm, setLeaveForm] = useState({
     staffId: 0,
-    type: 'Nghỉ phép năm',
+    type: 'Ngh盻・phﾃｩp nﾄノ',
     startDate: '',
     endDate: '',
     reason: '',
@@ -85,13 +85,13 @@ const HRView = () => {
     salaryIncreaseDate: '',
     workLocation: '',
     companyInfo: {
-      name: 'CÔNG TY TNHH [Tên công ty]',
-      address: '[Địa chỉ công ty]',
-      phone: '[Số điện thoại]',
+      name: 'Cﾃ年G TY TNHH [Tﾃｪn cﾃｴng ty]',
+      address: '[ﾄ雪ｻ蟻 ch盻・cﾃｴng ty]',
+      phone: '[S盻・ﾄ訴盻㌻ tho蘯｡i]',
       email: '[Email]',
-      taxCode: '[Mã số thuế]',
-      representative: '[Tên đại diện]',
-      position: '[Chức vụ đại diện]'
+      taxCode: '[Mﾃ｣ s盻・thu蘯ｿ]',
+      representative: '[Tﾃｪn ﾄ黛ｺ｡i di盻㌻]',
+      position: '[Ch盻ｩc v盻･ ﾄ黛ｺ｡i di盻㌻]'
     },
     employeeInfo: {
       idCard: '',
@@ -174,28 +174,28 @@ const HRView = () => {
       {
         id: 1,
         staffId: staffList[0]?.id || 1,
-        staffName: staffList[0]?.fullName || 'Nguyễn Văn A',
+        staffName: staffList[0]?.fullName || 'Nguy盻・ Vﾄハ A',
         contractType: 'PERMANENT',
         startDate: '2023-01-15',
         endDate: '2026-01-14',
-        position: 'Giáo viên Toán',
+        position: 'Giﾃ｡o viﾃｪn Toﾃ｡n',
         salary: 15000000,
-        benefits: 'Bảo hiểm y tế, phụ cấp ăn trưa, thưởng hiệu suất',
-        terms: 'Hợp đồng lao động theo quy định pháp luật Việt Nam',
+        benefits: 'B蘯｣o hi盻ノ y t蘯ｿ, ph盻･ c蘯･p ﾄハ trﾆｰa, thﾆｰ盻殤g hi盻㎡ su蘯･t',
+        terms: 'H盻｣p ﾄ黛ｻ渡g lao ﾄ黛ｻ冢g theo quy ﾄ黛ｻ杵h phﾃ｡p lu蘯ｭt Vi盻㏄ Nam',
         status: 'ACTIVE',
         createdAt: '2023-01-15'
       },
       {
         id: 2,
         staffId: staffList[1]?.id || 2,
-        staffName: staffList[1]?.fullName || 'Trần Thị B',
+        staffName: staffList[1]?.fullName || 'Tr蘯ｧn Th盻・B',
         contractType: 'TEMPORARY',
         startDate: '2023-03-01',
         endDate: '2023-12-31',
-        position: 'Giáo viên Văn',
+        position: 'Giﾃ｡o viﾃｪn Vﾄハ',
         salary: 12000000,
-        benefits: 'Bảo hiểm xã hội, phụ cấp đi lại',
-        terms: 'Hợp đồng thời vụ 10 tháng',
+        benefits: 'B蘯｣o hi盻ノ xﾃ｣ h盻冓, ph盻･ c蘯･p ﾄ訴 l蘯｡i',
+        terms: 'H盻｣p ﾄ黛ｻ渡g th盻拱 v盻･ 10 thﾃ｡ng',
         status: 'ACTIVE',
         createdAt: '2023-03-01'
       }
@@ -206,25 +206,25 @@ const HRView = () => {
       {
         id: 1,
         staffId: staffList[0]?.id || 1,
-        staffName: staffList[0]?.fullName || 'Nguyễn Văn A',
-        name: 'Nguyễn Văn B',
-        relationship: 'Vợ',
+        staffName: staffList[0]?.fullName || 'Nguy盻・ Vﾄハ A',
+        name: 'Nguy盻・ Vﾄハ B',
+        relationship: 'V盻｣',
         phone: '0901234568',
         email: 'nguyenvanb@email.com',
-        occupation: 'Giáo viên',
-        address: 'Hà Nội',
+        occupation: 'Giﾃ｡o viﾃｪn',
+        address: 'Hﾃ N盻冓',
         emergencyContact: true
       },
       {
         id: 2,
         staffId: staffList[0]?.id || 1,
-        staffName: staffList[0]?.fullName || 'Nguyễn Văn A',
-        name: 'Nguyễn Văn C',
+        staffName: staffList[0]?.fullName || 'Nguy盻・ Vﾄハ A',
+        name: 'Nguy盻・ Vﾄハ C',
         relationship: 'Con',
         phone: '0901234569',
         email: '',
-        occupation: 'Học sinh',
-        address: 'Hà Nội',
+        occupation: 'H盻皇 sinh',
+        address: 'Hﾃ N盻冓',
         emergencyContact: false
       }
     ]);
@@ -234,7 +234,7 @@ const HRView = () => {
       {
         id: 1,
         staffId: staffList[0]?.id || 1,
-        staffName: staffList[0]?.fullName || 'Nguyễn Văn A',
+        staffName: staffList[0]?.fullName || 'Nguy盻・ Vﾄハ A',
         baseSalary: 15000000,
         allowances: 2800000,
         bonuses: 1700000,
@@ -248,7 +248,7 @@ const HRView = () => {
       {
         id: 2,
         staffId: staffList[1]?.id || 2,
-        staffName: staffList[1]?.fullName || 'Trần Thị B',
+        staffName: staffList[1]?.fullName || 'Tr蘯ｧn Th盻・B',
         baseSalary: 14000000,
         allowances: 2300000,
         bonuses: 1150000,
@@ -262,7 +262,7 @@ const HRView = () => {
       {
         id: 3,
         staffId: staffList[2]?.id || 3,
-        staffName: staffList[2]?.fullName || 'Lê Văn C',
+        staffName: staffList[2]?.fullName || 'Lﾃｪ Vﾄハ C',
         baseSalary: 8000000,
         allowances: 900000,
         bonuses: 600000,
@@ -279,204 +279,204 @@ const HRView = () => {
     setContractTemplates([
       {
         id: 1,
-        name: 'Hợp đồng Lao động',
+        name: 'H盻｣p ﾄ黛ｻ渡g Lao ﾄ黛ｻ冢g',
         type: 'LABOR',
-        description: 'Hợp đồng lao động theo Bộ luật Lao động Việt Nam',
-        icon: '📄',
+        description: 'H盻｣p ﾄ黛ｻ渡g lao ﾄ黛ｻ冢g theo B盻・lu蘯ｭt Lao ﾄ黛ｻ冢g Vi盻㏄ Nam',
+        icon: '塘',
         color: 'blue',
         content: {
-          title: 'HỢP ĐỒNG LAO ĐỘNG',
+          title: 'H盻｢P ﾄ雪ｻ誰G LAO ﾄ雪ｻ朗G',
           parties: {
-            employer: 'BÊN A - CÔNG TY [Tên công ty]',
-            employee: 'BÊN B - NGƯỜI LAO ĐỘNG'
+            employer: 'Bﾃ劾 A - Cﾃ年G TY [Tﾃｪn cﾃｴng ty]',
+            employee: 'Bﾃ劾 B - NGﾆｯ盻廬 LAO ﾄ雪ｻ朗G'
           },
           articles: [
             {
-              article: 'Điều 1: Nội dung công việc',
-              content: 'Bên B đồng ý làm việc theo vị trí [Chức vụ] với các nội dung công việc cụ thể như đã thỏa thuận trong bản mô tả công việc.'
+              article: 'ﾄ進盻「 1: N盻冓 dung cﾃｴng vi盻㌘',
+              content: 'Bﾃｪn B ﾄ黛ｻ渡g ﾃｽ lﾃm vi盻㌘ theo v盻・trﾃｭ [Ch盻ｩc v盻･] v盻嬖 cﾃ｡c n盻冓 dung cﾃｴng vi盻㌘ c盻･ th盻・nhﾆｰ ﾄ妥｣ th盻渋 thu蘯ｭn trong b蘯｣n mﾃｴ t蘯｣ cﾃｴng vi盻㌘.'
             },
             {
-              article: 'Điều 2: Thời hạn hợp đồng',
-              content: 'Hợp đồng này được ký kết từ ngày [Ngày bắt đầu] đến ngày [Ngày kết thúc]. Thời gian thử việc là [Số tháng] tháng.'
+              article: 'ﾄ進盻「 2: Th盻拱 h蘯｡n h盻｣p ﾄ黛ｻ渡g',
+              content: 'H盻｣p ﾄ黛ｻ渡g nﾃy ﾄ柁ｰ盻｣c kﾃｽ k蘯ｿt t盻ｫ ngﾃy [Ngﾃy b蘯ｯt ﾄ黛ｺｧu] ﾄ黛ｺｿn ngﾃy [Ngﾃy k蘯ｿt thﾃｺc]. Th盻拱 gian th盻ｭ vi盻㌘ lﾃ [S盻・thﾃ｡ng] thﾃ｡ng.'
             },
             {
-              article: 'Điều 3: Địa điểm làm việc',
-              content: 'Bên B làm việc tại [Địa điểm làm việc].'
+              article: 'ﾄ進盻「 3: ﾄ雪ｻ蟻 ﾄ訴盻ノ lﾃm vi盻㌘',
+              content: 'Bﾃｪn B lﾃm vi盻㌘ t蘯｡i [ﾄ雪ｻ蟻 ﾄ訴盻ノ lﾃm vi盻㌘].'
             },
             {
-              article: 'Điều 4: Chế độ tiền lương',
-              content: 'Mức lương cơ bản: [Lương] VNĐ/tháng. Bên A trả lương cho Bên B hằng tháng vào ngày [Ngày trả lương].'
+              article: 'ﾄ進盻「 4: Ch蘯ｿ ﾄ黛ｻ・ti盻］ lﾆｰﾆ｡ng',
+              content: 'M盻ｩc lﾆｰﾆ｡ng cﾆ｡ b蘯｣n: [Lﾆｰﾆ｡ng] VNﾄ・thﾃ｡ng. Bﾃｪn A tr蘯｣ lﾆｰﾆ｡ng cho Bﾃｪn B h蘯ｱng thﾃ｡ng vﾃo ngﾃy [Ngﾃy tr蘯｣ lﾆｰﾆ｡ng].'
             },
             {
-              article: 'Điều 5: Thời gian làm việc',
-              content: 'Thời gian làm việc: [Số giờ] giờ/tuần. Thời gian nghỉ ngơi: [Số giờ] giờ/tuần.'
+              article: 'ﾄ進盻「 5: Th盻拱 gian lﾃm vi盻㌘',
+              content: 'Th盻拱 gian lﾃm vi盻㌘: [S盻・gi盻拆 gi盻・tu蘯ｧn. Th盻拱 gian ngh盻・ngﾆ｡i: [S盻・gi盻拆 gi盻・tu蘯ｧn.'
             },
             {
-              article: 'Điều 6: Nghĩa vụ của Bên B',
-              content: '- Thực hiện công việc theo đúng yêu cầu\n- Tuân thủ nội quy, quy chế của công ty\n- Bảo vệ tài sản của công ty'
+              article: 'ﾄ進盻「 6: Nghﾄｩa v盻･ c盻ｧa Bﾃｪn B',
+              content: '- Th盻ｱc hi盻㌻ cﾃｴng vi盻㌘ theo ﾄ妥ｺng yﾃｪu c蘯ｧu\n- Tuﾃ｢n th盻ｧ n盻冓 quy, quy ch蘯ｿ c盻ｧa cﾃｴng ty\n- B蘯｣o v盻・tﾃi s蘯｣n c盻ｧa cﾃｴng ty'
             },
             {
-              article: 'Điều 7: Quyền lợi của Bên B',
-              content: '- Được hưởng đầy đủ quyền lợi theo luật định\n- Được đào tạo, nâng cao trình độ chuyên môn\n- Được tham gia bảo hiểm xã hội, y tế, thất nghiệp'
+              article: 'ﾄ進盻「 7: Quy盻］ l盻｣i c盻ｧa Bﾃｪn B',
+              content: '- ﾄ脆ｰ盻｣c hﾆｰ盻殤g ﾄ黛ｺｧy ﾄ黛ｻｧ quy盻］ l盻｣i theo lu蘯ｭt ﾄ黛ｻ杵h\n- ﾄ脆ｰ盻｣c ﾄ妥o t蘯｡o, nﾃ｢ng cao trﾃｬnh ﾄ黛ｻ・chuyﾃｪn mﾃｴn\n- ﾄ脆ｰ盻｣c tham gia b蘯｣o hi盻ノ xﾃ｣ h盻冓, y t蘯ｿ, th蘯･t nghi盻㎝'
             },
             {
-              article: 'Điều 8: Nghĩa vụ của Bên A',
-              content: '- Trả lương đúng hạn\n- Cung cấp điều kiện làm việc an toàn\n- Tôn trọng nhân phẩm, danh dự của người lao động'
+              article: 'ﾄ進盻「 8: Nghﾄｩa v盻･ c盻ｧa Bﾃｪn A',
+              content: '- Tr蘯｣ lﾆｰﾆ｡ng ﾄ妥ｺng h蘯｡n\n- Cung c蘯･p ﾄ訴盻「 ki盻㌻ lﾃm vi盻㌘ an toﾃn\n- Tﾃｴn tr盻肱g nhﾃ｢n ph蘯ｩm, danh d盻ｱ c盻ｧa ngﾆｰ盻拱 lao ﾄ黛ｻ冢g'
             },
             {
-              article: 'Điều 9: Chế độ bảo hiểm',
-              content: 'Bên A có trách nhiệm đóng bảo hiểm xã hội, bảo hiểm y tế, bảo hiểm thất nghiệp cho Bên B theo quy định của pháp luật.'
+              article: 'ﾄ進盻「 9: Ch蘯ｿ ﾄ黛ｻ・b蘯｣o hi盻ノ',
+              content: 'Bﾃｪn A cﾃｳ trﾃ｡ch nhi盻㍊ ﾄ妥ｳng b蘯｣o hi盻ノ xﾃ｣ h盻冓, b蘯｣o hi盻ノ y t蘯ｿ, b蘯｣o hi盻ノ th蘯･t nghi盻㎝ cho Bﾃｪn B theo quy ﾄ黛ｻ杵h c盻ｧa phﾃ｡p lu蘯ｭt.'
             },
             {
-              article: 'Điều 10: Giải quyết tranh chấp',
-              content: 'Mọi tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng, hòa giải. Nếu không giải quyết được, sẽ đưa ra Tòa án nhân dân có thẩm quyền.'
+              article: 'ﾄ進盻「 10: Gi蘯｣i quy蘯ｿt tranh ch蘯･p',
+              content: 'M盻絞 tranh ch蘯･p phﾃ｡t sinh s蘯ｽ ﾄ柁ｰ盻｣c gi蘯｣i quy蘯ｿt thﾃｴng qua thﾆｰﾆ｡ng lﾆｰ盻｣ng, hﾃｲa gi蘯｣i. N蘯ｿu khﾃｴng gi蘯｣i quy蘯ｿt ﾄ柁ｰ盻｣c, s蘯ｽ ﾄ柁ｰa ra Tﾃｲa ﾃ｡n nhﾃ｢n dﾃ｢n cﾃｳ th蘯ｩm quy盻］.'
             }
           ]
         }
       },
       {
         id: 2,
-        name: 'Hợp đồng Mua bán',
+        name: 'H盻｣p ﾄ黛ｻ渡g Mua bﾃ｡n',
         type: 'SALE',
-        description: 'Hợp đồng mua bán tài sản theo Bộ luật Dân sự',
-        icon: '🛒',
+        description: 'H盻｣p ﾄ黛ｻ渡g mua bﾃ｡n tﾃi s蘯｣n theo B盻・lu蘯ｭt Dﾃ｢n s盻ｱ',
+        icon: '將',
         color: 'green',
         content: {
-          title: 'HỢP ĐỒNG MUA BÁN',
+          title: 'H盻｢P ﾄ雪ｻ誰G MUA Bﾃ¨',
           parties: {
-            seller: 'BÊN BÁN - [Tên người bán]',
-            buyer: 'BÊN MUA - [Tên người mua]'
+            seller: 'Bﾃ劾 Bﾃ¨ - [Tﾃｪn ngﾆｰ盻拱 bﾃ｡n]',
+            buyer: 'Bﾃ劾 MUA - [Tﾃｪn ngﾆｰ盻拱 mua]'
           },
           articles: [
             {
-              article: 'Điều 1: Đối tượng hợp đồng',
-              content: 'Bên Bán đồng ý bán và Bên Mua đồng ý mua tài sản sau: [Mô tả tài sản]'
+              article: 'ﾄ進盻「 1: ﾄ雪ｻ訴 tﾆｰ盻｣ng h盻｣p ﾄ黛ｻ渡g',
+              content: 'Bﾃｪn Bﾃ｡n ﾄ黛ｻ渡g ﾃｽ bﾃ｡n vﾃ Bﾃｪn Mua ﾄ黛ｻ渡g ﾃｽ mua tﾃi s蘯｣n sau: [Mﾃｴ t蘯｣ tﾃi s蘯｣n]'
             },
             {
-              article: 'Điều 2: Giá trị hợp đồng',
-              content: 'Giá trị tài sản là: [Giá] VNĐ. Phương thức thanh toán: [Phương thức thanh toán]'
+              article: 'ﾄ進盻「 2: Giﾃ｡ tr盻・h盻｣p ﾄ黛ｻ渡g',
+              content: 'Giﾃ｡ tr盻・tﾃi s蘯｣n lﾃ: [Giﾃ｡] VNﾄ・ Phﾆｰﾆ｡ng th盻ｩc thanh toﾃ｡n: [Phﾆｰﾆ｡ng th盻ｩc thanh toﾃ｡n]'
             },
             {
-              article: 'Điều 3: Chuyển giao tài sản',
-              content: 'Bên Bán giao tài sản cho Bên Mua vào ngày [Ngày giao]. Bên Mua kiểm tra và xác nhận tình trạng tài sản.'
+              article: 'ﾄ進盻「 3: Chuy盻ハ giao tﾃi s蘯｣n',
+              content: 'Bﾃｪn Bﾃ｡n giao tﾃi s蘯｣n cho Bﾃｪn Mua vﾃo ngﾃy [Ngﾃy giao]. Bﾃｪn Mua ki盻ノ tra vﾃ xﾃ｡c nh蘯ｭn tﾃｬnh tr蘯｡ng tﾃi s蘯｣n.'
             },
             {
-              article: 'Điều 4: Quyền và nghĩa vụ của Bên Bán',
-              content: '- Đảm bảo quyền sở hữu hợp pháp\n- Giao tài sản đúng thời hạn, đúng chất lượng\n- Cung cấp đầy đủ giấy tờ pháp lý'
+              article: 'ﾄ進盻「 4: Quy盻］ vﾃ nghﾄｩa v盻･ c盻ｧa Bﾃｪn Bﾃ｡n',
+              content: '- ﾄ雪ｺ｣m b蘯｣o quy盻］ s盻・h盻ｯu h盻｣p phﾃ｡p\n- Giao tﾃi s蘯｣n ﾄ妥ｺng th盻拱 h蘯｡n, ﾄ妥ｺng ch蘯･t lﾆｰ盻｣ng\n- Cung c蘯･p ﾄ黛ｺｧy ﾄ黛ｻｧ gi蘯･y t盻・phﾃ｡p lﾃｽ'
             },
             {
-              article: 'Điều 5: Quyền và nghĩa vụ của Bên Mua',
-              content: '- Thanh toán đủ giá trị tài sản\n- Nhận tài sản và kiểm tra tình trạng\n- Đăng ký quyền sở hữu (nếu có)'
+              article: 'ﾄ進盻「 5: Quy盻］ vﾃ nghﾄｩa v盻･ c盻ｧa Bﾃｪn Mua',
+              content: '- Thanh toﾃ｡n ﾄ黛ｻｧ giﾃ｡ tr盻・tﾃi s蘯｣n\n- Nh蘯ｭn tﾃi s蘯｣n vﾃ ki盻ノ tra tﾃｬnh tr蘯｡ng\n- ﾄ斉ハg kﾃｽ quy盻］ s盻・h盻ｯu (n蘯ｿu cﾃｳ)'
             },
             {
-              article: 'Điều 6: Cam kết',
-              content: 'Cả hai bên cam kết thực hiện đúng các nghĩa vụ trong hợp đồng.'
+              article: 'ﾄ進盻「 6: Cam k蘯ｿt',
+              content: 'C蘯｣ hai bﾃｪn cam k蘯ｿt th盻ｱc hi盻㌻ ﾄ妥ｺng cﾃ｡c nghﾄｩa v盻･ trong h盻｣p ﾄ黛ｻ渡g.'
             },
             {
-              article: 'Điều 7: Trách nhiệm vi phạm',
-              content: 'Bên nào vi phạm sẽ chịu trách nhiệm bồi thường thiệt hại theo quy định pháp luật.'
+              article: 'ﾄ進盻「 7: Trﾃ｡ch nhi盻㍊ vi ph蘯｡m',
+              content: 'Bﾃｪn nﾃo vi ph蘯｡m s蘯ｽ ch盻丘 trﾃ｡ch nhi盻㍊ b盻妬 thﾆｰ盻拵g thi盻㏄ h蘯｡i theo quy ﾄ黛ｻ杵h phﾃ｡p lu蘯ｭt.'
             }
           ]
         }
       },
       {
         id: 3,
-        name: 'Hợp đồng Hợp tác',
+        name: 'H盻｣p ﾄ黛ｻ渡g H盻｣p tﾃ｡c',
         type: 'COOPERATION',
-        description: 'Hợp đồng hợp tác kinh doanh',
-        icon: '🤝',
+        description: 'H盻｣p ﾄ黛ｻ渡g h盻｣p tﾃ｡c kinh doanh',
+        icon: '､・,
         color: 'purple',
         content: {
-          title: 'HỢP ĐỒNG HỢP TÁC KINH DOANH',
+          title: 'H盻｢P ﾄ雪ｻ誰G H盻｢P Tﾃ， KINH DOANH',
           parties: {
-            partyA: 'BÊN A - [Tên bên A]',
-            partyB: 'BÊN B - [Tên bên B]'
+            partyA: 'Bﾃ劾 A - [Tﾃｪn bﾃｪn A]',
+            partyB: 'Bﾃ劾 B - [Tﾃｪn bﾃｪn B]'
           },
           articles: [
             {
-              article: 'Điều 1: Mục tiêu hợp tác',
-              content: 'Cả hai bên cùng nhau hợp tác trong lĩnh vực [Lĩnh vực hợp tác] nhằm mục tiêu [Mục tiêu].'
+              article: 'ﾄ進盻「 1: M盻･c tiﾃｪu h盻｣p tﾃ｡c',
+              content: 'C蘯｣ hai bﾃｪn cﾃｹng nhau h盻｣p tﾃ｡c trong lﾄｩnh v盻ｱc [Lﾄｩnh v盻ｱc h盻｣p tﾃ｡c] nh蘯ｱm m盻･c tiﾃｪu [M盻･c tiﾃｪu].'
             },
             {
-              article: 'Điều 2: Phạm vi hợp tác',
-              content: 'Phạm vi hợp tác bao gồm: [Chi tiết phạm vi hợp tác]'
+              article: 'ﾄ進盻「 2: Ph蘯｡m vi h盻｣p tﾃ｡c',
+              content: 'Ph蘯｡m vi h盻｣p tﾃ｡c bao g盻杜: [Chi ti蘯ｿt ph蘯｡m vi h盻｣p tﾃ｡c]'
             },
             {
-              article: 'Điều 3: Thời hạn hợp tác',
-              content: 'Hợp đồng có hiệu lực từ ngày [Ngày bắt đầu] đến ngày [Ngày kết thúc].'
+              article: 'ﾄ進盻「 3: Th盻拱 h蘯｡n h盻｣p tﾃ｡c',
+              content: 'H盻｣p ﾄ黛ｻ渡g cﾃｳ hi盻㎡ l盻ｱc t盻ｫ ngﾃy [Ngﾃy b蘯ｯt ﾄ黛ｺｧu] ﾄ黛ｺｿn ngﾃy [Ngﾃy k蘯ｿt thﾃｺc].'
             },
             {
-              article: 'Điều 4: Trách nhiệm của Bên A',
-              content: '[Trách nhiệm cụ thể của Bên A]'
+              article: 'ﾄ進盻「 4: Trﾃ｡ch nhi盻㍊ c盻ｧa Bﾃｪn A',
+              content: '[Trﾃ｡ch nhi盻㍊ c盻･ th盻・c盻ｧa Bﾃｪn A]'
             },
             {
-              article: 'Điều 5: Trách nhiệm của Bên B',
-              content: '[Trách nhiệm cụ thể của Bên B]'
+              article: 'ﾄ進盻「 5: Trﾃ｡ch nhi盻㍊ c盻ｧa Bﾃｪn B',
+              content: '[Trﾃ｡ch nhi盻㍊ c盻･ th盻・c盻ｧa Bﾃｪn B]'
             },
             {
-              article: 'Điều 6: Phân chia lợi nhuận',
-              content: 'Lợi nhuận được phân chia theo tỷ lệ: [Tỷ lệ phân chia]'
+              article: 'ﾄ進盻「 6: Phﾃ｢n chia l盻｣i nhu蘯ｭn',
+              content: 'L盻｣i nhu蘯ｭn ﾄ柁ｰ盻｣c phﾃ｢n chia theo t盻ｷ l盻・ [T盻ｷ l盻・phﾃ｢n chia]'
             },
             {
-              article: 'Điều 7: Bảo mật thông tin',
-              content: 'Cả hai bên cam kết bảo mật thông tin trong suốt quá trình hợp tác.'
+              article: 'ﾄ進盻「 7: B蘯｣o m蘯ｭt thﾃｴng tin',
+              content: 'C蘯｣ hai bﾃｪn cam k蘯ｿt b蘯｣o m蘯ｭt thﾃｴng tin trong su盻奏 quﾃ｡ trﾃｬnh h盻｣p tﾃ｡c.'
             }
           ]
         }
       },
       {
         id: 4,
-        name: 'Biên bản Ghi nhớ',
+        name: 'Biﾃｪn b蘯｣n Ghi nh盻・,
         type: 'MEMORANDUM',
-        description: 'Biên bản ghi nhớ thỏa thuận',
-        icon: '📝',
+        description: 'Biﾃｪn b蘯｣n ghi nh盻・th盻渋 thu蘯ｭn',
+        icon: '統',
         color: 'orange',
         content: {
-          title: 'BIÊN BẢN GHI NHỚ',
+          title: 'BIﾃ劾 B蘯｢N GHI NH盻・,
           parties: {
-            party1: 'BÊN 1 - [Tên bên 1]',
-            party2: 'BÊN 2 - [Tên bên 2]'
+            party1: 'Bﾃ劾 1 - [Tﾃｪn bﾃｪn 1]',
+            party2: 'Bﾃ劾 2 - [Tﾃｪn bﾃｪn 2]'
           },
           articles: [
             {
-              article: '1. Nội dung thỏa thuận',
-              content: '[Nội dung chính của thỏa thuận]'
+              article: '1. N盻冓 dung th盻渋 thu蘯ｭn',
+              content: '[N盻冓 dung chﾃｭnh c盻ｧa th盻渋 thu蘯ｭn]'
             },
             {
-              article: '2. Thời gian thực hiện',
-              content: 'Thỏa thuận có hiệu lực từ ngày [Ngày] và được thực hiện trong thời gian [Thời gian].'
+              article: '2. Th盻拱 gian th盻ｱc hi盻㌻',
+              content: 'Th盻渋 thu蘯ｭn cﾃｳ hi盻㎡ l盻ｱc t盻ｫ ngﾃy [Ngﾃy] vﾃ ﾄ柁ｰ盻｣c th盻ｱc hi盻㌻ trong th盻拱 gian [Th盻拱 gian].'
             },
             {
-              article: '3. Trách nhiệm thực hiện',
-              content: 'Cả hai bên cùng chịu trách nhiệm thực hiện các nội dung đã thỏa thuận.'
+              article: '3. Trﾃ｡ch nhi盻㍊ th盻ｱc hi盻㌻',
+              content: 'C蘯｣ hai bﾃｪn cﾃｹng ch盻丘 trﾃ｡ch nhi盻㍊ th盻ｱc hi盻㌻ cﾃ｡c n盻冓 dung ﾄ妥｣ th盻渋 thu蘯ｭn.'
             },
             {
-              article: '4. Hiệu lực pháp lý',
-              content: 'Biên bản này có giá trị pháp lý và là cơ sở cho các thỏa thuận sau này.'
+              article: '4. Hi盻㎡ l盻ｱc phﾃ｡p lﾃｽ',
+              content: 'Biﾃｪn b蘯｣n nﾃy cﾃｳ giﾃ｡ tr盻・phﾃ｡p lﾃｽ vﾃ lﾃ cﾆ｡ s盻・cho cﾃ｡c th盻渋 thu蘯ｭn sau nﾃy.'
             }
           ]
         }
       }
     ]);
 
-    // Tạo thông báo mẫu để test
+    // T蘯｡o thﾃｴng bﾃ｡o m蘯ｫu ﾄ黛ｻ・test
     const sampleNotifications = [
       {
         id: Date.now() - 10000,
         type: 'leave_request',
-        title: 'Đơn xin phép mới',
-        message: 'Nguyễn Văn A (Khoa Toán - Lý - Hóa) xin nghỉ phép năm từ ngày 2024-02-01 đến 2024-02-03. Lý do: Việc gia đình',
-        recipientId: 1, // Giả sử ID 1 là quản lý
-        timestamp: new Date(Date.now() - 3600000), // 1 giờ trước
+        title: 'ﾄ脆｡n xin phﾃｩp m盻嬖',
+        message: 'Nguy盻・ Vﾄハ A (Khoa Toﾃ｡n - Lﾃｽ - Hﾃｳa) xin ngh盻・phﾃｩp nﾄノ t盻ｫ ngﾃy 2024-02-01 ﾄ黛ｺｿn 2024-02-03. Lﾃｽ do: Vi盻㌘ gia ﾄ妥ｬnh',
+        recipientId: 1, // Gi蘯｣ s盻ｭ ID 1 lﾃ qu蘯｣n lﾃｽ
+        timestamp: new Date(Date.now() - 3600000), // 1 gi盻・trﾆｰ盻嫩
         read: false
       },
       {
         id: Date.now() - 5000,
         type: 'leave_approved',
-        title: 'Đơn xin phép được duyệt',
-        message: 'Đơn xin nghỉ phép năm của bạn từ ngày 2024-01-25 đến 2024-01-26 đã được duyệt. Chúc bạn có kỳ nghỉ vui vẻ!',
-        recipientId: 2, // Giả sử ID 2 là nhân viên
-        timestamp: new Date(Date.now() - 1800000), // 30 phút trước
+        title: 'ﾄ脆｡n xin phﾃｩp ﾄ柁ｰ盻｣c duy盻㏄',
+        message: 'ﾄ脆｡n xin ngh盻・phﾃｩp nﾄノ c盻ｧa b蘯｡n t盻ｫ ngﾃy 2024-01-25 ﾄ黛ｺｿn 2024-01-26 ﾄ妥｣ ﾄ柁ｰ盻｣c duy盻㏄. Chﾃｺc b蘯｡n cﾃｳ k盻ｳ ngh盻・vui v蘯ｻ!',
+        recipientId: 2, // Gi蘯｣ s盻ｭ ID 2 lﾃ nhﾃ｢n viﾃｪn
+        timestamp: new Date(Date.now() - 1800000), // 30 phﾃｺt trﾆｰ盻嫩
         read: false
       }
     ];
@@ -511,36 +511,36 @@ const HRView = () => {
 
     setStaffList([...staffList, newStaff]);
 
-    // Tự động tạo hợp đồng cho nhân viên mới
+    // T盻ｱ ﾄ黛ｻ冢g t蘯｡o h盻｣p ﾄ黛ｻ渡g cho nhﾃ｢n viﾃｪn m盻嬖
     const newContract = {
       id: Date.now() + 1,
       staffId: newStaff.id,
       staffName: newStaff.fullName,
       contractType: 'PROBATION',
       startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 tháng thử việc
+      endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 thﾃ｡ng th盻ｭ vi盻㌘
       position: newStaffForm.role,
       salary: newStaffForm.salary,
-      benefits: 'Bảo hiểm xã hội, bảo hiểm y tế, phụ cấp ăn trưa',
-      terms: 'Hợp đồng thử việc 3 tháng theo quy định pháp luật Việt Nam',
+      benefits: 'B蘯｣o hi盻ノ xﾃ｣ h盻冓, b蘯｣o hi盻ノ y t蘯ｿ, ph盻･ c蘯･p ﾄハ trﾆｰa',
+      terms: 'H盻｣p ﾄ黛ｻ渡g th盻ｭ vi盻㌘ 3 thﾃ｡ng theo quy ﾄ黛ｻ杵h phﾃ｡p lu蘯ｭt Vi盻㏄ Nam',
       status: 'ACTIVE',
       createdAt: new Date().toISOString().split('T')[0]
     };
 
     setContracts([...contracts, newContract]);
 
-    // Tạo bảng lương cho nhân viên mới
+    // T蘯｡o b蘯｣ng lﾆｰﾆ｡ng cho nhﾃ｢n viﾃｪn m盻嬖
     const newPayroll = {
       id: Date.now() + 2,
       staffId: newStaff.id,
       staffName: newStaff.fullName,
       baseSalary: parseFloat(newStaffForm.salary),
-      allowances: Math.floor(parseFloat(newStaffForm.salary) * 0.15), // 15% lương cơ bản
+      allowances: Math.floor(parseFloat(newStaffForm.salary) * 0.15), // 15% lﾆｰﾆ｡ng cﾆ｡ b蘯｣n
       bonuses: 0,
       deductions: Math.floor(parseFloat(newStaffForm.salary) * 0.105), // 10.5% (8% BHXH + 1.5% BHYT + 1% BHTN)
       grossSalary: 0,
       netSalary: 0,
-      payPeriod: new Date().toISOString().slice(0, 7), // Tháng hiện tại
+      payPeriod: new Date().toISOString().slice(0, 7), // Thﾃ｡ng hi盻㌻ t蘯｡i
       paymentDate: '',
       status: 'PENDING'
     };
@@ -561,7 +561,7 @@ const HRView = () => {
       hireDate: '',
       status: 'Active'
     });
-    alert('Đã thêm nhân viên và tạo hợp đồng thành công!');
+    alert('ﾄ静｣ thﾃｪm nhﾃ｢n viﾃｪn vﾃ t蘯｡o h盻｣p ﾄ黛ｻ渡g thﾃnh cﾃｴng!');
   };
 
   const handleAddContract = () => {
@@ -584,7 +584,7 @@ const HRView = () => {
       terms: '',
       status: 'ACTIVE'
     });
-    alert('Đã tạo hợp đồng thành công!');
+    alert('ﾄ静｣ t蘯｡o h盻｣p ﾄ黛ｻ渡g thﾃnh cﾃｴng!');
   };
 
   const handleViewProfile = (staff: Staff) => {
@@ -599,20 +599,20 @@ const HRView = () => {
       salary: staff.salary,
       hireDate: '',
       status: staff.status,
-      education: 'Đại học Sư phạm Hà Nội',
-      experience: '5 năm giảng dạy',
-      skills: 'Toán, Lý, Hóa',
-      certifications: 'Giáo viên giỏi',
-      address: '123 Nguyễn Chí Thanh, Hà Nội',
-      emergencyContact: 'Nguyễn Văn B - 0901234568',
+      education: 'ﾄ雪ｺ｡i h盻皇 Sﾆｰ ph蘯｡m Hﾃ N盻冓',
+      experience: '5 nﾄノ gi蘯｣ng d蘯｡y',
+      skills: 'Toﾃ｡n, Lﾃｽ, Hﾃｳa',
+      certifications: 'Giﾃ｡o viﾃｪn gi盻淑',
+      address: '123 Nguy盻・ Chﾃｭ Thanh, Hﾃ N盻冓',
+      emergencyContact: 'Nguy盻・ Vﾄハ B - 0901234568',
       bankAccount: 'VCB 1234567890'
     });
     setShowProfileModal(true);
   };
 
   const handleViewContractDetail = (contract: any) => {
-    // Mở modal chi tiết hợp đồng
-    alert(`Chi tiết hợp đồng #${contract.id}\n\nNhân viên: ${contract.staffName}\nLoại hợp đồng: ${contract.contractType === 'PERMANENT' ? 'Vĩnh viễn' : 'Thời vụ'}\nChức vụ: ${contract.position}\nLương: ${formatCurrency(contract.salary)}\nThời gian: ${contract.startDate} - ${contract.endDate}\nPhúc lợi: ${contract.benefits}\nĐiều khoản: ${contract.terms}\nTrạng thái: ${contract.status === 'ACTIVE' ? 'Hiệu lực' : 'Hết hạn'}\nNgày tạo: ${contract.createdAt}`);
+    // M盻・modal chi ti蘯ｿt h盻｣p ﾄ黛ｻ渡g
+    alert(`Chi ti蘯ｿt h盻｣p ﾄ黛ｻ渡g #${contract.id}\n\nNhﾃ｢n viﾃｪn: ${contract.staffName}\nLo蘯｡i h盻｣p ﾄ黛ｻ渡g: ${contract.contractType === 'PERMANENT' ? 'Vﾄｩnh vi盻・' : 'Th盻拱 v盻･'}\nCh盻ｩc v盻･: ${contract.position}\nLﾆｰﾆ｡ng: ${formatCurrency(contract.salary)}\nTh盻拱 gian: ${contract.startDate} - ${contract.endDate}\nPhﾃｺc l盻｣i: ${contract.benefits}\nﾄ進盻「 kho蘯｣n: ${contract.terms}\nTr蘯｡ng thﾃ｡i: ${contract.status === 'ACTIVE' ? 'Hi盻㎡ l盻ｱc' : 'H蘯ｿt h蘯｡n'}\nNgﾃy t蘯｡o: ${contract.createdAt}`);
   };
 
   const handleUpdateProfile = () => {
@@ -621,7 +621,7 @@ const HRView = () => {
         s.id === selectedStaff.id ? {...s, ...profileForm} : s
       ));
       setShowProfileModal(false);
-      alert('Đã cập nhật thông tin nhân viên thành công!');
+      alert('ﾄ静｣ c蘯ｭp nh蘯ｭt thﾃｴng tin nhﾃ｢n viﾃｪn thﾃnh cﾃｴng!');
     }
   };
 
@@ -644,7 +644,7 @@ const HRView = () => {
       address: '',
       emergencyContact: false
     });
-    alert('Đã thêm thành viên gia đình thành công!');
+    alert('ﾄ静｣ thﾃｪm thﾃnh viﾃｪn gia ﾄ妥ｬnh thﾃnh cﾃｴng!');
   };
 
   const handleUseTemplate = (template: any) => {
@@ -712,7 +712,7 @@ const HRView = () => {
   };
 
   const handleDeleteFamilyMember = (memberId: number) => {
-    if (confirm('Bạn có chắc chắn muốn xóa thành viên gia đình này?')) {
+    if (confirm('B蘯｡n cﾃｳ ch蘯ｯc ch蘯ｯn mu盻創 xﾃｳa thﾃnh viﾃｪn gia ﾄ妥ｬnh nﾃy?')) {
       setFamilyMembers(familyMembers.filter(member => member.id !== memberId));
     }
   };
@@ -757,7 +757,7 @@ const HRView = () => {
 
   const handleAddLeaveRequest = () => {
     if (!leaveForm.staffId || !leaveForm.startDate || !leaveForm.reason) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+      alert('Vui lﾃｲng ﾄ訴盻］ ﾄ黛ｺｧy ﾄ黛ｻｧ thﾃｴng tin b蘯ｯt bu盻冂!');
       return;
     }
 
@@ -778,14 +778,14 @@ const HRView = () => {
     
     const staff = staffList.find(s => s.id === leaveForm.staffId);
     
-    // Gửi thông báo cho tất cả quản lý (Ban Giám hiệu)
-    const managers = staffList.filter(s => s.department === 'Ban Giám hiệu');
+    // G盻ｭi thﾃｴng bﾃ｡o cho t蘯･t c蘯｣ qu蘯｣n lﾃｽ (Ban Giﾃ｡m hi盻㎡)
+    const managers = staffList.filter(s => s.department === 'Ban Giﾃ｡m hi盻㎡');
     managers.forEach(manager => {
       addNotification({
         id: Date.now() + Math.random(),
         type: 'leave_request',
-        title: 'Đơn xin phép mới',
-        message: `${staff?.fullName} (${staff?.department}) xin nghỉ ${leaveForm.type.toLowerCase()} từ ngày ${leaveForm.startDate} đến ${leaveForm.endDate || leaveForm.startDate}. Lý do: ${leaveForm.reason}`,
+        title: 'ﾄ脆｡n xin phﾃｩp m盻嬖',
+        message: `${staff?.fullName} (${staff?.department}) xin ngh盻・${leaveForm.type.toLowerCase()} t盻ｫ ngﾃy ${leaveForm.startDate} ﾄ黛ｺｿn ${leaveForm.endDate || leaveForm.startDate}. Lﾃｽ do: ${leaveForm.reason}`,
         recipientId: manager.id,
         timestamp: new Date(),
         read: false,
@@ -796,7 +796,7 @@ const HRView = () => {
     // Reset form
     setLeaveForm({
       staffId: 0,
-      type: 'Nghỉ phép năm',
+      type: 'Ngh盻・phﾃｩp nﾄノ',
       startDate: '',
       endDate: '',
       reason: '',
@@ -805,7 +805,7 @@ const HRView = () => {
     });
     
     setShowAddLeaveModal(false);
-    alert('Đã gửi đơn xin phép thành công! Quản lý sẽ xem xét và phản hồi sớm.');
+    alert('ﾄ静｣ g盻ｭi ﾄ柁｡n xin phﾃｩp thﾃnh cﾃｴng! Qu蘯｣n lﾃｽ s蘯ｽ xem xﾃｩt vﾃ ph蘯｣n h盻妬 s盻嬶.');
   };
 
   const handleApproveLeave = (leaveId: number) => {
@@ -816,18 +816,18 @@ const HRView = () => {
       req.id === leaveId ? { ...req, status: 'Approved' } : req
     ));
     
-    // Thông báo cho nhân viên được duyệt
+    // Thﾃｴng bﾃ｡o cho nhﾃ｢n viﾃｪn ﾄ柁ｰ盻｣c duy盻㏄
     addNotification({
       id: Date.now(),
       type: 'leave_approved',
-      title: 'Đơn xin phép được duyệt',
-      message: `Đơn xin nghỉ ${leaveRequest?.type.toLowerCase()} của bạn từ ngày ${leaveRequest?.startDate} đến ${leaveRequest?.endDate} đã được duyệt. Chúc bạn có kỳ nghỉ vui vẻ!`,
+      title: 'ﾄ脆｡n xin phﾃｩp ﾄ柁ｰ盻｣c duy盻㏄',
+      message: `ﾄ脆｡n xin ngh盻・${leaveRequest?.type.toLowerCase()} c盻ｧa b蘯｡n t盻ｫ ngﾃy ${leaveRequest?.startDate} ﾄ黛ｺｿn ${leaveRequest?.endDate} ﾄ妥｣ ﾄ柁ｰ盻｣c duy盻㏄. Chﾃｺc b蘯｡n cﾃｳ k盻ｳ ngh盻・vui v蘯ｻ!`,
       recipientId: leaveRequest?.staffId,
       timestamp: new Date(),
       read: false
     });
     
-    alert('Đã duyệt đơn xin phép!');
+    alert('ﾄ静｣ duy盻㏄ ﾄ柁｡n xin phﾃｩp!');
   };
 
   const handleRejectLeave = (leaveId: number) => {
@@ -838,18 +838,18 @@ const HRView = () => {
       req.id === leaveId ? { ...req, status: 'Rejected' } : req
     ));
     
-    // Thông báo cho nhân viên bị từ chối
+    // Thﾃｴng bﾃ｡o cho nhﾃ｢n viﾃｪn b盻・t盻ｫ ch盻訴
     addNotification({
       id: Date.now(),
       type: 'leave_rejected',
-      title: 'Đơn xin phép bị từ chối',
-      message: `Đơn xin nghỉ ${leaveRequest?.type.toLowerCase()} của bạn từ ngày ${leaveRequest?.startDate} đã bị từ chối.`,
+      title: 'ﾄ脆｡n xin phﾃｩp b盻・t盻ｫ ch盻訴',
+      message: `ﾄ脆｡n xin ngh盻・${leaveRequest?.type.toLowerCase()} c盻ｧa b蘯｡n t盻ｫ ngﾃy ${leaveRequest?.startDate} ﾄ妥｣ b盻・t盻ｫ ch盻訴.`,
       recipientId: leaveRequest?.staffId,
       timestamp: new Date(),
       read: false
     });
     
-    alert('Đã từ chối đơn xin phép!');
+    alert('ﾄ静｣ t盻ｫ ch盻訴 ﾄ柁｡n xin phﾃｩp!');
   };
 
   const addNotification = (notification: any) => {
@@ -874,19 +874,19 @@ const HRView = () => {
 
   const handleGenerateContract = () => {
     if (!selectedTemplate || !templateForm.staffId) {
-      alert('Vui lòng chọn nhân viên!');
+      alert('Vui lﾃｲng ch盻肱 nhﾃ｢n viﾃｪn!');
       return;
     }
 
     const staff = staffList.find(s => s.id === parseInt(templateForm.staffId));
     if (!staff) return;
 
-    // Tạo các trang hợp đồng
+    // T蘯｡o cﾃ｡c trang h盻｣p ﾄ黛ｻ渡g
     const pages = generateContractPages(selectedTemplate, templateForm, staff);
     setContractPages(pages);
     setCurrentPage(0);
 
-    // Tạo hợp đồng từ mẫu
+    // T蘯｡o h盻｣p ﾄ黛ｻ渡g t盻ｫ m蘯ｫu
     const newContract = {
       id: Date.now(),
       staffId: staff.id,
@@ -910,24 +910,24 @@ const HRView = () => {
 
     setContracts([...contracts, newContract]);
     setShowAdvancedContractModal(false);
-    alert(`Đã tạo hợp đồng ${selectedTemplate.name} cho ${staff.fullName} thành công!`);
+    alert(`ﾄ静｣ t蘯｡o h盻｣p ﾄ黛ｻ渡g ${selectedTemplate.name} cho ${staff.fullName} thﾃnh cﾃｴng!`);
   };
 
   const generateContractPages = (template: any, form: any, staff: Staff) => {
     const pages = [];
     const qrCode = generateQRCode(Date.now().toString());
     
-    // Trang 1: Trang bìa và thông tin cơ bản
+    // Trang 1: Trang bﾃｬa vﾃ thﾃｴng tin cﾆ｡ b蘯｣n
     pages.push({
       id: 1,
-      title: 'TRANG BÌA',
+      title: 'TRANG Bﾃ窟',
       content: {
         header: {
           title: template.content.title,
-          subtitle: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',
-          subtitle2: 'Độc lập - Tự do - Hạnh phúc',
+          subtitle: 'C盻朗G Hﾃ但 Xﾃ・H盻露 CH盻ｦ NGHﾄｨA VI盻・ NAM',
+          subtitle2: 'ﾄ雪ｻ冂 l蘯ｭp - T盻ｱ do - H蘯｡nh phﾃｺc',
           qrCode: qrCode,
-          contractCode: `HĐ${Date.now().toString().slice(-6)}`
+          contractCode: `Hﾄ・{Date.now().toString().slice(-6)}`
         },
         parties: {
           company: form.companyInfo,
@@ -939,50 +939,50 @@ const HRView = () => {
       }
     });
 
-    // Trang 2: Thông tin doanh nghiệp
+    // Trang 2: Thﾃｴng tin doanh nghi盻㎝
     pages.push({
       id: 2,
-      title: 'THÔNG TIN DOANH NGHIỆP',
+      title: 'THﾃ年G TIN DOANH NGHI盻・',
       content: {
         company: {
           ...form.companyInfo,
-          businessLicense: '[Giấy phép kinh doanh số]',
-          capital: '[Vốn điều lệ]',
-          bankAccount: '[Tài khoản ngân hàng công ty]'
+          businessLicense: '[Gi蘯･y phﾃｩp kinh doanh s盻曽',
+          capital: '[V盻創 ﾄ訴盻「 l盻Ⅹ',
+          bankAccount: '[Tﾃi kho蘯｣n ngﾃ｢n hﾃng cﾃｴng ty]'
         },
         qrCode: qrCode,
         pageNumber: 2
       }
     });
 
-    // Trang 3: Thông tin người lao động
+    // Trang 3: Thﾃｴng tin ngﾆｰ盻拱 lao ﾄ黛ｻ冢g
     pages.push({
       id: 3,
-      title: 'THÔNG TIN NGƯỜI LAO ĐỘNG',
+      title: 'THﾃ年G TIN NGﾆｯ盻廬 LAO ﾄ雪ｻ朗G',
       content: {
         employee: {
           ...staff,
           ...form.employeeInfo,
-          education: '[Trình độ học vấn]',
-          experience: '[Kinh nghiệm làm việc]',
-          skills: '[Kỹ năng chuyên môn]'
+          education: '[Trﾃｬnh ﾄ黛ｻ・h盻皇 v蘯･n]',
+          experience: '[Kinh nghi盻㍊ lﾃm vi盻㌘]',
+          skills: '[K盻ｹ nﾄハg chuyﾃｪn mﾃｴn]'
         },
         qrCode: qrCode,
         pageNumber: 3
       }
     });
 
-    // Trang 4: Nội dung công việc và điều khoản
+    // Trang 4: N盻冓 dung cﾃｴng vi盻㌘ vﾃ ﾄ訴盻「 kho蘯｣n
     pages.push({
       id: 4,
-      title: 'NỘI DUNG CÔNG VIỆC',
+      title: 'N盻露 DUNG Cﾃ年G VI盻・',
       content: {
         jobDescription: {
           position: form.position,
           workLocation: form.workLocation,
           workHours: form.workHours,
           workDays: form.workDays,
-          duties: '[Mô tả chi tiết công việc]'
+          duties: '[Mﾃｴ t蘯｣ chi ti蘯ｿt cﾃｴng vi盻㌘]'
         },
         articles: template.content.articles,
         qrCode: qrCode,
@@ -990,10 +990,10 @@ const HRView = () => {
       }
     });
 
-    // Trang 5: Bảng lương chi tiết
+    // Trang 5: B蘯｣ng lﾆｰﾆ｡ng chi ti蘯ｿt
     pages.push({
       id: 5,
-      title: 'BẢNG LƯƠNG CHI TIẾT',
+      title: 'B蘯｢NG LﾆｯﾆNG CHI TI蘯ｾT',
       content: {
         payroll: {
           baseSalary: parseFloat(form.salary),
@@ -1008,7 +1008,7 @@ const HRView = () => {
       }
     });
 
-    // Tính toán lương
+    // Tﾃｭnh toﾃ｡n lﾆｰﾆ｡ng
     const payrollPage = pages[4].content.payroll;
     payrollPage.grossSalary = payrollPage.baseSalary + 
       Object.values(payrollPage.allowances).reduce((a: number, b: number) => a + b, 0) +
@@ -1017,10 +1017,10 @@ const HRView = () => {
     const totalDeductions = (payrollPage.baseSalary * (payrollPage.deductions.socialInsurance + payrollPage.deductions.healthInsurance + payrollPage.deductions.unemploymentInsurance) / 100) + payrollPage.deductions.incomeTax;
     payrollPage.netSalary = payrollPage.grossSalary - totalDeductions;
 
-    // Trang 6: Phụ lục và chữ ký
+    // Trang 6: Ph盻･ l盻･c vﾃ ch盻ｯ kﾃｽ
     pages.push({
       id: 6,
-      title: 'PHỤ LỤC VÀ CHỮ KÝ',
+      title: 'PH盻､ L盻､C Vﾃ CH盻ｮ Kﾃ・,
       content: {
         appendix: {
           specialTerms: form.specialTerms,
@@ -1032,12 +1032,12 @@ const HRView = () => {
           company: {
             representative: form.companyInfo.representive,
             position: form.companyInfo.position,
-            date: '[Ngày ký]'
+            date: '[Ngﾃy kﾃｽ]'
           },
           employee: {
             name: staff.fullName,
             position: form.position,
-            date: '[Ngày ký]'
+            date: '[Ngﾃy kﾃｽ]'
           }
         },
         qrCode: qrCode,
@@ -1049,7 +1049,7 @@ const HRView = () => {
   };
 
   const generateQRCode = (data: string) => {
-    // Tạo mã QR đơn giản (trong thực tế sẽ dùng thư viện QR)
+    // T蘯｡o mﾃ｣ QR ﾄ柁｡n gi蘯｣n (trong th盻ｱc t蘯ｿ s蘯ｽ dﾃｹng thﾆｰ vi盻㌻ QR)
     return `QR-${data}-${Date.now().toString().slice(-4)}`;
   };
 
@@ -1066,8 +1066,8 @@ const HRView = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-           <h2 className="text-2xl font-bold text-gray-800">Quản trị Nhân sự</h2>
-           <p className="text-gray-500">Quản lý hồ sơ nhân viên và nghỉ phép</p>
+           <h2 className="text-2xl font-bold text-gray-800">Qu蘯｣n tr盻・Nhﾃ｢n s盻ｱ</h2>
+           <p className="text-gray-500">Qu蘯｣n lﾃｽ h盻・sﾆ｡ nhﾃ｢n viﾃｪn vﾃ ngh盻・phﾃｩp</p>
         </div>
         
         {/* Notification Bell */}
@@ -1091,12 +1091,12 @@ const HRView = () => {
           {showNotificationPanel && (
             <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
               <div className="p-4 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-800">Thông báo</h3>
+                <h3 className="font-semibold text-gray-800">Thﾃｴng bﾃ｡o</h3>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-gray-500">
-                    Chưa có thông báo nào
+                    Chﾆｰa cﾃｳ thﾃｴng bﾃ｡o nﾃo
                   </div>
                 ) : (
                   notifications.map(notif => (
@@ -1133,42 +1133,42 @@ const HRView = () => {
       
       {/* Navigation Tabs */}
       <div className="flex gap-2">
-        <button 
-          onClick={() => setActiveTab('staff')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'staff' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <Users size={18} className="mr-2"/> Danh sách NV
-        </button>
-        <button 
-          onClick={() => setActiveTab('contracts')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'contracts' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <FileText size={18} className="mr-2"/> Hợp đồng
-        </button>
-        <button 
-          onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'templates' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <Upload size={18} className="mr-2"/> Mẫu HĐ
-        </button>
-        <button 
-          onClick={() => setActiveTab('profile')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'profile' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <UserIcon size={18} className="mr-2"/> Thông tin
-        </button>
-        <button 
-          onClick={() => setActiveTab('family')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'family' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <Home size={18} className="mr-2"/> Gia đình
-        </button>
-        <button 
-          onClick={() => setActiveTab('leave')}
-          className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'leave' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
-        >
-          <Calendar size={18} className="mr-2"/> Duyệt Phép
-        </button>
+           <button 
+             onClick={() => setActiveTab('staff')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'staff' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <Users size={18} className="mr-2"/> Danh sﾃ｡ch NV
+           </button>
+           <button 
+             onClick={() => setActiveTab('contracts')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'contracts' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <FileText size={18} className="mr-2"/> H盻｣p ﾄ黛ｻ渡g
+           </button>
+           <button 
+             onClick={() => setActiveTab('templates')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'templates' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <Upload size={18} className="mr-2"/> M蘯ｫu Hﾄ・           </button>
+           <button 
+             onClick={() => setActiveTab('profile')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'profile' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <UserIcon size={18} className="mr-2"/> Thﾃｴng tin
+           </button>
+           <button 
+             onClick={() => setActiveTab('family')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'family' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <Home size={18} className="mr-2"/> Gia ﾄ妥ｬnh
+           </button>
+           <button 
+             onClick={() => setActiveTab('leave')}
+             className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === 'leave' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}
+           >
+             <Calendar size={18} className="mr-2"/> Duy盻㏄ Phﾃｩp
+           </button>
+        </div>
       </div>
 
       {activeTab === 'staff' && (
@@ -1178,7 +1178,7 @@ const HRView = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input 
                   type="text" 
-                  placeholder="Tìm kiếm nhân viên, phòng ban..." 
+                  placeholder="Tﾃｬm ki蘯ｿm nhﾃ｢n viﾃｪn, phﾃｲng ban..." 
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -1192,9 +1192,9 @@ const HRView = () => {
                    disabled={isEvaluating}
                 >
                    {isEvaluating ? <Loader2 size={18} className="animate-spin"/> : <Activity size={18}/>}
-                   {isEvaluating ? 'Đang đánh giá...' : 'AI Đánh giá'}
+                   {isEvaluating ? 'ﾄ紳ng ﾄ妥｡nh giﾃ｡...' : 'AI ﾄ静｡nh giﾃ｡'}
                 </Button>
-                <Button onClick={() => setShowAddStaffModal(true)}><Plus size={20}/> Thêm Nhân viên</Button>
+                <Button onClick={() => setShowAddStaffModal(true)}><Plus size={20}/> Thﾃｪm Nhﾃ｢n viﾃｪn</Button>
              </div>
           </div>
 
@@ -1213,7 +1213,7 @@ const HRView = () => {
                         </div>
                      </div>
                      <span className={`px-2 py-1 rounded text-xs font-bold ${s.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                        {s.status === 'Active' ? 'Đang làm' : 'Nghỉ phép'}
+                        {s.status === 'Active' ? 'ﾄ紳ng lﾃm' : 'Ngh盻・phﾃｩp'}
                      </span>
                   </div>
                   
@@ -1224,7 +1224,7 @@ const HRView = () => {
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                     <span className="text-xs text-gray-500">Lương cơ bản</span>
+                     <span className="text-xs text-gray-500">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</span>
                      <span className="font-bold text-gray-800">{formatCurrency(s.salary)}</span>
                   </div>
                </div>
@@ -1236,9 +1236,9 @@ const HRView = () => {
       {activeTab === 'contracts' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Quản lý Hợp đồng Lao động</h3>
+            <h3 className="text-lg font-semibold">Qu蘯｣n lﾃｽ H盻｣p ﾄ黛ｻ渡g Lao ﾄ黛ｻ冢g</h3>
             <Button onClick={() => setShowContractModal(true)}>
-              <Plus size={18} /> Tạo Hợp đồng
+              <Plus size={18} /> T蘯｡o H盻｣p ﾄ黛ｻ渡g
             </Button>
           </div>
 
@@ -1246,15 +1246,15 @@ const HRView = () => {
             <table className="w-full text-left">
               <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
                 <tr>
-                  <th className="p-4">Mã HĐ</th>
-                  <th className="p-4">Nhân viên</th>
-                  <th className="p-4">Loại HĐ</th>
-                  <th className="p-4">Chức vụ</th>
-                  <th className="p-4 text-right">Lương</th>
-                  <th className="p-4">Ngày bắt đầu</th>
-                  <th className="p-4">Ngày kết thúc</th>
-                  <th className="p-4 text-center">Trạng thái</th>
-                  <th className="p-4 text-right">Hành động</th>
+                  <th className="p-4">Mﾃ｣ Hﾄ・/th>
+                  <th className="p-4">Nhﾃ｢n viﾃｪn</th>
+                  <th className="p-4">Lo蘯｡i Hﾄ・/th>
+                  <th className="p-4">Ch盻ｩc v盻･</th>
+                  <th className="p-4 text-right">Lﾆｰﾆ｡ng</th>
+                  <th className="p-4">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</th>
+                  <th className="p-4">Ngﾃy k蘯ｿt thﾃｺc</th>
+                  <th className="p-4 text-center">Tr蘯｡ng thﾃ｡i</th>
+                  <th className="p-4 text-right">Hﾃnh ﾄ黛ｻ冢g</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -1266,7 +1266,7 @@ const HRView = () => {
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
                         contract.contractType === 'PERMANENT' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                       }`}>
-                        {contract.contractType === 'PERMANENT' ? 'Vĩnh viễn' : 'Thời vụ'}
+                        {contract.contractType === 'PERMANENT' ? 'Vﾄｩnh vi盻・' : 'Th盻拱 v盻･'}
                       </span>
                     </td>
                     <td className="p-4">{contract.position}</td>
@@ -1277,7 +1277,7 @@ const HRView = () => {
                       <span className={`px-2 py-1 rounded text-xs font-bold ${
                         contract.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                       }`}>
-                        {contract.status === 'ACTIVE' ? 'Hiệu lực' : 'Hết hạn'}
+                        {contract.status === 'ACTIVE' ? 'Hi盻㎡ l盻ｱc' : 'H蘯ｿt h蘯｡n'}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -1305,7 +1305,7 @@ const HRView = () => {
       {activeTab === 'profile' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Thông tin Chi tiết Nhân viên</h3>
+            <h3 className="text-lg font-semibold">Thﾃｴng tin Chi ti蘯ｿt Nhﾃ｢n viﾃｪn</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1325,20 +1325,20 @@ const HRView = () => {
                     <button 
                       onClick={() => handleViewProfile(staff)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                      title="Xem chi tiết"
+                      title="Xem chi ti蘯ｿt"
                     >
                       <Eye size={16} />
                     </button>
                     <button 
                       onClick={() => handleEditStaff(staff)}
                       className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg"
-                      title="Chỉnh sửa"
+                      title="Ch盻穎h s盻ｭa"
                     >
                       <Edit size={16} />
                     </button>
                     <button 
                       className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                      title="Xem gia đình"
+                      title="Xem gia ﾄ妥ｬnh"
                     >
                       <Home size={16} />
                     </button>
@@ -1352,7 +1352,7 @@ const HRView = () => {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Lương cơ bản</span>
+                  <span className="text-xs text-gray-500">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</span>
                   <span className="font-bold text-gray-800">{formatCurrency(staff.salary)}</span>
                 </div>
               </div>
@@ -1365,9 +1365,9 @@ const HRView = () => {
       {activeTab === 'family' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Quản lý Thông tin Gia đình</h3>
+            <h3 className="text-lg font-semibold">Qu蘯｣n lﾃｽ Thﾃｴng tin Gia ﾄ妥ｬnh</h3>
             <Button onClick={() => setShowFamilyModal(true)}>
-              <Plus size={18} /> Thêm Thành viên
+              <Plus size={18} /> Thﾃｪm Thﾃnh viﾃｪn
             </Button>
           </div>
 
@@ -1390,7 +1390,7 @@ const HRView = () => {
                       setShowFamilyModal(true);
                     }}
                     className="text-blue-600 hover:bg-blue-50 rounded-lg p-2"
-                    title="Thêm thành viên gia đình"
+                    title="Thﾃｪm thﾃnh viﾃｪn gia ﾄ妥ｬnh"
                   >
                     <Plus size={16} />
                   </button>
@@ -1410,21 +1410,21 @@ const HRView = () => {
                             {member.emergencyContact && (
                               <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
                                 <Shield size={12} className="mr-1" />
-                                Liên hệ khẩn cấp
+                                Liﾃｪn h盻・kh蘯ｩn c蘯･p
                               </span>
                             )}
                             <div className="flex gap-1">
                               <button 
                                 onClick={() => handleEditFamilyMember(member)}
                                 className="text-blue-600 hover:bg-blue-50 rounded-lg p-1" 
-                                title="Chỉnh sửa"
+                                title="Ch盻穎h s盻ｭa"
                               >
                                 <Edit size={14} />
                               </button>
                               <button 
                                 onClick={() => handleDeleteFamilyMember(member.id)}
                                 className="text-red-600 hover:bg-red-50 rounded-lg p-1" 
-                                title="Xóa"
+                                title="Xﾃｳa"
                               >
                                 <X size={14} />
                               </button>
@@ -1432,10 +1432,10 @@ const HRView = () => {
                           </div>
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          <div>📞 {member.phone}</div>
-                          {member.email && <div>✉ {member.email}</div>}
-                          <div>💼 {member.occupation}</div>
-                          <div>📍 {member.address}</div>
+                          <div>到 {member.phone}</div>
+                          {member.email && <div>笨・{member.email}</div>}
+                          <div>直 {member.occupation}</div>
+                          <div>桃 {member.address}</div>
                         </div>
                       </div>
                     ))}
@@ -1450,9 +1450,9 @@ const HRView = () => {
       {activeTab === 'templates' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Mẫu Hợp đồng Chuẩn</h3>
+            <h3 className="text-lg font-semibold">M蘯ｫu H盻｣p ﾄ黛ｻ渡g Chu蘯ｩn</h3>
             <div className="text-sm text-gray-500">
-              Chọn mẫu hợp đồng và nhân viên để tạo hợp đồng nhanh chóng
+              Ch盻肱 m蘯ｫu h盻｣p ﾄ黛ｻ渡g vﾃ nhﾃ｢n viﾃｪn ﾄ黛ｻ・t蘯｡o h盻｣p ﾄ黛ｻ渡g nhanh chﾃｳng
             </div>
           </div>
 
@@ -1480,15 +1480,15 @@ const HRView = () => {
                     template.color === 'purple' ? 'bg-purple-100 text-purple-700' :
                     'bg-orange-100 text-orange-700'
                   }`}>
-                    {template.type === 'LABOR' ? 'Lao động' :
-                     template.type === 'SALE' ? 'Mua bán' :
-                     template.type === 'COOPERATION' ? 'Hợp tác' : 'Ghi nhớ'}
+                    {template.type === 'LABOR' ? 'Lao ﾄ黛ｻ冢g' :
+                     template.type === 'SALE' ? 'Mua bﾃ｡n' :
+                     template.type === 'COOPERATION' ? 'H盻｣p tﾃ｡c' : 'Ghi nh盻・}
                   </span>
                 </div>
 
                 <div className="space-y-3">
                   <div className="text-sm text-gray-600">
-                    <div className="font-medium text-gray-800 mb-1">Nội dung chính:</div>
+                    <div className="font-medium text-gray-800 mb-1">N盻冓 dung chﾃｭnh:</div>
                     <ul className="space-y-1">
                       {template.content.articles.slice(0, 3).map((article: any, idx: number) => (
                         <li key={idx} className="text-xs">
@@ -1501,20 +1501,20 @@ const HRView = () => {
 
                 <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                   <div className="text-xs text-gray-500">
-                    {template.content.articles.length} điều khoản
+                    {template.content.articles.length} ﾄ訴盻「 kho蘯｣n
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => handleUseTemplate(template)}
                       className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
                     >
-                      Sử dụng mẫu
+                      S盻ｭ d盻･ng m蘯ｫu
                     </button>
                     <button 
                       onClick={() => handlePreviewTemplate(template)}
                       className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50"
                     >
-                      Xem trước
+                      Xem trﾆｰ盻嫩
                     </button>
                   </div>
                 </div>
@@ -1527,13 +1527,13 @@ const HRView = () => {
       {activeTab === 'leave' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Quản lý Đơn Xin Phép</h3>
+            <h3 className="text-lg font-semibold">Qu蘯｣n lﾃｽ ﾄ脆｡n Xin Phﾃｩp</h3>
             <button 
               onClick={() => setShowAddLeaveModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               <Plus size={16} />
-              Tạo đơn xin phép
+              T蘯｡o ﾄ柁｡n xin phﾃｩp
             </button>
           </div>
           
@@ -1541,12 +1541,12 @@ const HRView = () => {
              <table className="w-full text-left">
                <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
                  <tr>
-                   <th className="p-4">Nhân viên</th>
-                   <th className="p-4">Loại nghỉ</th>
-                   <th className="p-4">Thời gian</th>
-                   <th className="p-4">Lý do</th>
-                   <th className="p-4 text-center">Trạng thái</th>
-                   <th className="p-4 text-right">Hành động</th>
+                   <th className="p-4">Nhﾃ｢n viﾃｪn</th>
+                   <th className="p-4">Lo蘯｡i ngh盻・/th>
+                   <th className="p-4">Th盻拱 gian</th>
+                   <th className="p-4">Lﾃｽ do</th>
+                   <th className="p-4 text-center">Tr蘯｡ng thﾃ｡i</th>
+                   <th className="p-4 text-right">Hﾃnh ﾄ黛ｻ冢g</th>
                  </tr>
                </thead>
                <tbody className="divide-y divide-gray-100">
@@ -1558,7 +1558,7 @@ const HRView = () => {
                        <td className="p-4"><span className="px-2 py-1 bg-gray-100 rounded text-xs">{req.type}</span></td>
                        <td className="p-4 text-sm">
                           <div className="font-medium">{req.startDate}</div>
-                          <div className="text-gray-500">đến {req.endDate}</div>
+                          <div className="text-gray-500">ﾄ黛ｺｿn {req.endDate}</div>
                        </td>
                        <td className="p-4 text-gray-600 italic">{req.reason}</td>
                        <td className="p-4 text-center">
@@ -1566,7 +1566,7 @@ const HRView = () => {
                              req.status === 'Approved' ? 'bg-green-100 text-green-700' :
                              req.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                           }`}>
-                             {req.status === 'Approved' ? 'Đã duyệt' : req.status === 'Rejected' ? 'Từ chối' : 'Chờ duyệt'}
+                             {req.status === 'Approved' ? 'ﾄ静｣ duy盻㏄' : req.status === 'Rejected' ? 'T盻ｫ ch盻訴' : 'Ch盻・duy盻㏄'}
                           </span>
                        </td>
                        <td className="p-4 text-right">
@@ -1575,14 +1575,14 @@ const HRView = () => {
                                 <button 
                                   onClick={() => handleApproveLeave(req.id)}
                                   className="p-1 text-green-600 hover:bg-green-50 rounded" 
-                                  title="Duyệt"
+                                  title="Duy盻㏄"
                                 >
                                   <Check size={20}/>
                                 </button>
                                 <button 
                                   onClick={() => handleRejectLeave(req.id)}
                                   className="p-1 text-red-600 hover:bg-red-50 rounded" 
-                                  title="Từ chối"
+                                  title="T盻ｫ ch盻訴"
                                 >
                                   <X size={20}/>
                                 </button>
@@ -1598,7 +1598,7 @@ const HRView = () => {
         </div>
       )}
 
-      <Modal isOpen={showEvalModal} onClose={() => setShowEvalModal(false)} title="Đánh giá Hiệu suất Nhân sự (AI)">
+      <Modal isOpen={showEvalModal} onClose={() => setShowEvalModal(false)} title="ﾄ静｡nh giﾃ｡ Hi盻㎡ su蘯･t Nhﾃ｢n s盻ｱ (AI)">
          {evalResult && (
             <div className="space-y-4">
                <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
@@ -1607,7 +1607,7 @@ const HRView = () => {
                </div>
                
                <div>
-                  <h5 className="font-semibold mb-2 flex items-center gap-2"><Activity size={16}/> Đề xuất cải thiện:</h5>
+                  <h5 className="font-semibold mb-2 flex items-center gap-2"><Activity size={16}/> ﾄ雪ｻ・xu蘯･t c蘯｣i thi盻㌻:</h5>
                   <ul className="space-y-1">
                      {evalResult.recommendations.map((rec, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm">
@@ -1618,24 +1618,24 @@ const HRView = () => {
                   </ul>
                </div>
                <div className="flex justify-end pt-2">
-                  <Button onClick={() => setShowEvalModal(false)}>Đóng</Button>
+                  <Button onClick={() => setShowEvalModal(false)}>ﾄ静ｳng</Button>
                </div>
             </div>
          )}
       </Modal>
 
       {/* Add Staff Modal */}
-      <Modal isOpen={showAddStaffModal} onClose={() => setShowAddStaffModal(false)} title="Thêm Nhân viên Mới">
+      <Modal isOpen={showAddStaffModal} onClose={() => setShowAddStaffModal(false)} title="Thﾃｪm Nhﾃ｢n viﾃｪn M盻嬖">
          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">H盻・vﾃ tﾃｪn</label>
                   <input
                      type="text"
                      value={newStaffForm.fullName}
                      onChange={(e) => setNewStaffForm({...newStaffForm, fullName: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập họ và tên"
+                     placeholder="Nh蘯ｭp h盻・vﾃ tﾃｪn"
                   />
                </div>
                <div>
@@ -1645,62 +1645,62 @@ const HRView = () => {
                      value={newStaffForm.email}
                      onChange={(e) => setNewStaffForm({...newStaffForm, email: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập email"
+                     placeholder="Nh蘯ｭp email"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">S盻・ﾄ訴盻㌻ tho蘯｡i</label>
                   <input
                      type="tel"
                      value={newStaffForm.phone}
                      onChange={(e) => setNewStaffForm({...newStaffForm, phone: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập số điện thoại"
+                     placeholder="Nh蘯ｭp s盻・ﾄ訴盻㌻ tho蘯｡i"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                   <input
                      type="text"
                      value={newStaffForm.role}
                      onChange={(e) => setNewStaffForm({...newStaffForm, role: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập chức vụ"
+                     placeholder="Nh蘯ｭp ch盻ｩc v盻･"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phòng ban</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｲng ban</label>
                   <select
                      value={newStaffForm.department}
                      onChange={(e) => setNewStaffForm({...newStaffForm, department: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn phòng ban</option>
-                     <option value="Ban Giám hiệu">Ban Giám hiệu</option>
-                     <option value="Khoa Toán - Lý - Hóa">Khoa Toán - Lý - Hóa</option>
-                     <option value="Khoa Ngữ Văn - Lịch Sử">Khoa Ngữ Văn - Lịch Sử</option>
-                     <option value="Khoa Tiếng Anh">Khoa Tiếng Anh</option>
-                     <option value="Khoa Sinh học - Hóa học">Khoa Sinh học - Hóa học</option>
-                     <option value="Phòng Kế toán">Phòng Kế toán</option>
-                     <option value="Phòng Hành chính">Phòng Hành chính</option>
-                     <option value="Phòng IT">Phòng IT</option>
-                     <option value="Thư viện">Thư viện</option>
+                     <option value="">Ch盻肱 phﾃｲng ban</option>
+                     <option value="Ban Giﾃ｡m hi盻㎡">Ban Giﾃ｡m hi盻㎡</option>
+                     <option value="Khoa Toﾃ｡n - Lﾃｽ - Hﾃｳa">Khoa Toﾃ｡n - Lﾃｽ - Hﾃｳa</option>
+                     <option value="Khoa Ng盻ｯ Vﾄハ - L盻議h S盻ｭ">Khoa Ng盻ｯ Vﾄハ - L盻議h S盻ｭ</option>
+                     <option value="Khoa Ti蘯ｿng Anh">Khoa Ti蘯ｿng Anh</option>
+                     <option value="Khoa Sinh h盻皇 - Hﾃｳa h盻皇">Khoa Sinh h盻皇 - Hﾃｳa h盻皇</option>
+                     <option value="Phﾃｲng K蘯ｿ toﾃ｡n">Phﾃｲng K蘯ｿ toﾃ｡n</option>
+                     <option value="Phﾃｲng Hﾃnh chﾃｭnh">Phﾃｲng Hﾃnh chﾃｭnh</option>
+                     <option value="Phﾃｲng IT">Phﾃｲng IT</option>
+                     <option value="Thﾆｰ vi盻㌻">Thﾆｰ vi盻㌻</option>
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lương cơ bản</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</label>
                   <input
                      type="number"
                      value={newStaffForm.salary}
                      onChange={(e) => setNewStaffForm({...newStaffForm, salary: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập lương cơ bản"
+                     placeholder="Nh蘯ｭp lﾆｰﾆ｡ng cﾆ｡ b蘯｣n"
                      min="0"
                   />
                </div>
@@ -1708,7 +1708,7 @@ const HRView = () => {
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày tuyển dụng</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy tuy盻ハ d盻･ng</label>
                   <input
                      type="date"
                      value={newStaffForm.hireDate}
@@ -1717,41 +1717,41 @@ const HRView = () => {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tr蘯｡ng thﾃ｡i</label>
                   <select
                      value={newStaffForm.status}
                      onChange={(e) => setNewStaffForm({...newStaffForm, status: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="Active">Đang làm</option>
-                     <option value="On Leave">Nghỉ phép</option>
+                     <option value="Active">ﾄ紳ng lﾃm</option>
+                     <option value="On Leave">Ngh盻・phﾃｩp</option>
                   </select>
                </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowAddStaffModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleAddStaff} disabled={!newStaffForm.fullName || !newStaffForm.email || !newStaffForm.role || !newStaffForm.department || !newStaffForm.salary}>
-                  Thêm nhân viên
+                  Thﾃｪm nhﾃ｢n viﾃｪn
                </Button>
             </div>
          </div>
       </Modal>
 
       {/* Edit Staff Modal */}
-      <Modal isOpen={showEditStaffModal} onClose={() => setShowEditStaffModal(false)} title="Chỉnh sửa Thông tin Nhân viên">
+      <Modal isOpen={showEditStaffModal} onClose={() => setShowEditStaffModal(false)} title="Ch盻穎h s盻ｭa Thﾃｴng tin Nhﾃ｢n viﾃｪn">
          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">H盻・vﾃ tﾃｪn</label>
                   <input
                      type="text"
                      value={newStaffForm.fullName}
                      onChange={(e) => setNewStaffForm({...newStaffForm, fullName: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập họ và tên"
+                     placeholder="Nh蘯ｭp h盻・vﾃ tﾃｪn"
                   />
                </div>
                <div>
@@ -1761,67 +1761,67 @@ const HRView = () => {
                      value={newStaffForm.email}
                      onChange={(e) => setNewStaffForm({...newStaffForm, email: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập email"
+                     placeholder="Nh蘯ｭp email"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">S盻・ﾄ訴盻㌻ tho蘯｡i</label>
                   <input
                      type="tel"
                      value={newStaffForm.phone}
                      onChange={(e) => setNewStaffForm({...newStaffForm, phone: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập số điện thoại"
+                     placeholder="Nh蘯ｭp s盻・ﾄ訴盻㌻ tho蘯｡i"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                   <input
                      type="text"
                      value={newStaffForm.position}
                      onChange={(e) => setNewStaffForm({...newStaffForm, position: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập chức vụ"
+                     placeholder="Nh蘯ｭp ch盻ｩc v盻･"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phòng ban</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｲng ban</label>
                   <select
                      value={newStaffForm.department}
                      onChange={(e) => setNewStaffForm({...newStaffForm, department: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn phòng ban</option>
-                     <option value="Ban Giám hiệu">Ban Giám hiệu</option>
-                     <option value="Khoa Toán - Lý - Hóa">Khoa Toán - Lý - Hóa</option>
-                     <option value="Khoa Ngữ Văn - Lịch Sử">Khoa Ngữ Văn - Lịch Sử</option>
-                     <option value="Khoa Tiếng Anh">Khoa Tiếng Anh</option>
-                     <option value="Khoa Sinh học - Hóa học">Khoa Sinh học - Hóa học</option>
-                     <option value="Khoa Công nghệ thông tin">Khoa Công nghệ thông tin</option>
-                     <option value="Khoa Kinh tế">Khoa Kinh tế</option>
-                     <option value="Phòng Tổ chức - Hành chính">Phòng Tổ chức - Hành chính</option>
-                     <option value="Phòng Kế hoạch - Tài chính">Phòng Kế hoạch - Tài chính</option>
-                     <option value="Phòng Đào tạo">Phòng Đào tạo</option>
-                     <option value="Phòng Công tác sinh viên">Phòng Công tác sinh viên</option>
-                     <option value="Thư viện">Thư viện</option>
-                     <option value="Trung tâm Tin học">Trung tâm Tin học</option>
-                     <option value="Trung tâm Ngoại ngữ">Trung tâm Ngoại ngữ</option>
+                     <option value="">Ch盻肱 phﾃｲng ban</option>
+                     <option value="Ban Giﾃ｡m hi盻㎡">Ban Giﾃ｡m hi盻㎡</option>
+                     <option value="Khoa Toﾃ｡n - Lﾃｽ - Hﾃｳa">Khoa Toﾃ｡n - Lﾃｽ - Hﾃｳa</option>
+                     <option value="Khoa Ng盻ｯ Vﾄハ - L盻議h S盻ｭ">Khoa Ng盻ｯ Vﾄハ - L盻議h S盻ｭ</option>
+                     <option value="Khoa Ti蘯ｿng Anh">Khoa Ti蘯ｿng Anh</option>
+                     <option value="Khoa Sinh h盻皇 - Hﾃｳa h盻皇">Khoa Sinh h盻皇 - Hﾃｳa h盻皇</option>
+                     <option value="Khoa Cﾃｴng ngh盻・thﾃｴng tin">Khoa Cﾃｴng ngh盻・thﾃｴng tin</option>
+                     <option value="Khoa Kinh t蘯ｿ">Khoa Kinh t蘯ｿ</option>
+                     <option value="Phﾃｲng T盻・ch盻ｩc - Hﾃnh chﾃｭnh">Phﾃｲng T盻・ch盻ｩc - Hﾃnh chﾃｭnh</option>
+                     <option value="Phﾃｲng K蘯ｿ ho蘯｡ch - Tﾃi chﾃｭnh">Phﾃｲng K蘯ｿ ho蘯｡ch - Tﾃi chﾃｭnh</option>
+                     <option value="Phﾃｲng ﾄ静o t蘯｡o">Phﾃｲng ﾄ静o t蘯｡o</option>
+                     <option value="Phﾃｲng Cﾃｴng tﾃ｡c sinh viﾃｪn">Phﾃｲng Cﾃｴng tﾃ｡c sinh viﾃｪn</option>
+                     <option value="Thﾆｰ vi盻㌻">Thﾆｰ vi盻㌻</option>
+                     <option value="Trung tﾃ｢m Tin h盻皇">Trung tﾃ｢m Tin h盻皇</option>
+                     <option value="Trung tﾃ｢m Ngo蘯｡i ng盻ｯ">Trung tﾃ｢m Ngo蘯｡i ng盻ｯ</option>
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lương cơ bản</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</label>
                   <input
                      type="number"
                      value={newStaffForm.salary}
                      onChange={(e) => setNewStaffForm({...newStaffForm, salary: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập lương cơ bản"
+                     placeholder="Nh蘯ｭp lﾆｰﾆ｡ng cﾆ｡ b蘯｣n"
                      min="0"
                   />
                </div>
@@ -1829,7 +1829,7 @@ const HRView = () => {
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</label>
                   <input
                      type="date"
                      value={newStaffForm.startDate}
@@ -1838,42 +1838,42 @@ const HRView = () => {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tr蘯｡ng thﾃ｡i</label>
                   <select
                      value={newStaffForm.status}
                      onChange={(e) => setNewStaffForm({...newStaffForm, status: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="ACTIVE">Đang làm việc</option>
-                     <option value="INACTIVE">Đã nghỉ việc</option>
-                     <option value="SUSPENDED">Tạm nghỉ</option>
+                     <option value="ACTIVE">ﾄ紳ng lﾃm vi盻㌘</option>
+                     <option value="INACTIVE">ﾄ静｣ ngh盻・vi盻㌘</option>
+                     <option value="SUSPENDED">T蘯｡m ngh盻・/option>
                   </select>
                </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowEditStaffModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleUpdateStaff} disabled={!newStaffForm.fullName || !newStaffForm.email || !newStaffForm.department || !newStaffForm.salary}>
-                  Cập nhật thông tin
+                  C蘯ｭp nh蘯ｭt thﾃｴng tin
                </Button>
             </div>
          </div>
       </Modal>
 
       {/* Contract Modal */}
-      <Modal isOpen={showContractModal} onClose={() => setShowContractModal(false)} title="Tạo Hợp đồng Lao động">
+      <Modal isOpen={showContractModal} onClose={() => setShowContractModal(false)} title="T蘯｡o H盻｣p ﾄ黛ｻ渡g Lao ﾄ黛ｻ冢g">
          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                   <select
                      value={contractForm.staffId}
                      onChange={(e) => setContractForm({...contractForm, staffId: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn nhân viên</option>
+                     <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                      {staffList.map(staff => (
                         <option key={staff.id} value={staff.id}>
                            {staff.fullName} - {staff.department}
@@ -1882,38 +1882,38 @@ const HRView = () => {
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Loại hợp đồng</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lo蘯｡i h盻｣p ﾄ黛ｻ渡g</label>
                   <select
                      value={contractForm.contractType}
                      onChange={(e) => setContractForm({...contractForm, contractType: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="PERMANENT">Vĩnh viễn</option>
-                     <option value="TEMPORARY">Thời vụ</option>
-                     <option value="PROBATION">Thử việc</option>
+                     <option value="PERMANENT">Vﾄｩnh vi盻・</option>
+                     <option value="TEMPORARY">Th盻拱 v盻･</option>
+                     <option value="PROBATION">Th盻ｭ vi盻㌘</option>
                   </select>
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                   <input
                      type="text"
                      value={contractForm.position}
                      onChange={(e) => setContractForm({...contractForm, position: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập chức vụ"
+                     placeholder="Nh蘯ｭp ch盻ｩc v盻･"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lương</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng</label>
                   <input
                      type="number"
                      value={contractForm.salary}
                      onChange={(e) => setContractForm({...contractForm, salary: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập lương"
+                     placeholder="Nh蘯ｭp lﾆｰﾆ｡ng"
                      min="0"
                   />
                </div>
@@ -1921,7 +1921,7 @@ const HRView = () => {
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</label>
                   <input
                      type="date"
                      value={contractForm.startDate}
@@ -1930,7 +1930,7 @@ const HRView = () => {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy k蘯ｿt thﾃｺc</label>
                   <input
                      type="date"
                      value={contractForm.endDate}
@@ -1941,51 +1941,51 @@ const HRView = () => {
             </div>
 
             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">Phúc lợi</label>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｺc l盻｣i</label>
                <textarea
                   value={contractForm.benefits}
                   onChange={(e) => setContractForm({...contractForm, benefits: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   rows={3}
-                  placeholder="Nhập các phúc lợi (bảo hiểm, phụ cấp, thưởng...)"
+                  placeholder="Nh蘯ｭp cﾃ｡c phﾃｺc l盻｣i (b蘯｣o hi盻ノ, ph盻･ c蘯･p, thﾆｰ盻殤g...)"
                />
             </div>
 
             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">Điều khoản hợp đồng</label>
+               <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ進盻「 kho蘯｣n h盻｣p ﾄ黛ｻ渡g</label>
                <textarea
                   value={contractForm.terms}
                   onChange={(e) => setContractForm({...contractForm, terms: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   rows={3}
-                  placeholder="Nhập điều khoản hợp đồng"
+                  placeholder="Nh蘯ｭp ﾄ訴盻「 kho蘯｣n h盻｣p ﾄ黛ｻ渡g"
                />
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowContractModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleAddContract} disabled={!contractForm.staffId || !contractForm.position || !contractForm.salary}>
-                  Tạo hợp đồng
+                  T蘯｡o h盻｣p ﾄ黛ｻ渡g
                </Button>
             </div>
          </div>
       </Modal>
 
       {/* Profile Modal */}
-      <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} title="Thông tin Chi tiết Nhân viên" maxWidth="max-w-2xl">
+      <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} title="Thﾃｴng tin Chi ti蘯ｿt Nhﾃ｢n viﾃｪn" maxWidth="max-w-2xl">
          {selectedStaff && (
             <div className="space-y-6">
                {/* Basic Info */}
                <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
                   <h4 className="font-semibold text-blue-800 mb-4 flex items-center gap-2">
                      <UserIcon size={20} className="text-blue-600" />
-                     Thông tin cơ bản
+                     Thﾃｴng tin cﾆ｡ b蘯｣n
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">H盻・vﾃ tﾃｪn</label>
                         <input
                            type="text"
                            value={profileForm.fullName}
@@ -2003,7 +2003,7 @@ const HRView = () => {
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">S盻・ﾄ訴盻㌻ tho蘯｡i</label>
                         <input
                            type="tel"
                            value={profileForm.phone}
@@ -2012,7 +2012,7 @@ const HRView = () => {
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                         <input
                            type="text"
                            value={profileForm.role}
@@ -2021,7 +2021,7 @@ const HRView = () => {
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phòng ban</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｲng ban</label>
                         <input
                            type="text"
                            value={profileForm.department}
@@ -2030,7 +2030,7 @@ const HRView = () => {
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Lương</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng</label>
                         <input
                            type="number"
                            value={profileForm.salary}
@@ -2046,37 +2046,36 @@ const HRView = () => {
                <div className="bg-green-50 rounded-lg p-6 border border-green-200">
                   <h4 className="font-semibold text-green-800 mb-4 flex items-center gap-2">
                      <GraduationCap size={20} className="text-green-600" />
-                     Học vấn & Chứng chỉ
-                  </h4>
+                     H盻皇 v蘯･n & Ch盻ｩng ch盻・                  </h4>
                   <div className="space-y-3">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Học vấn cao nhất</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">H盻皇 v蘯･n cao nh蘯･t</label>
                         <input
                            type="text"
                            value={profileForm.education}
                            onChange={(e) => setProfileForm({...profileForm, education: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Ví dụ: Đại học Sư phạm Hà Nội"
+                           placeholder="Vﾃｭ d盻･: ﾄ雪ｺ｡i h盻皇 Sﾆｰ ph蘯｡m Hﾃ N盻冓"
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Chứng chỉ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩng ch盻・/label>
                         <input
                            type="text"
                            value={profileForm.certifications}
                            onChange={(e) => setProfileForm({...profileForm, certifications: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Ví dụ: Giáo viên giỏi"
+                           placeholder="Vﾃｭ d盻･: Giﾃ｡o viﾃｪn gi盻淑"
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Kinh nghiệm</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Kinh nghi盻㍊</label>
                         <input
                            type="text"
                            value={profileForm.experience}
                            onChange={(e) => setProfileForm({...profileForm, experience: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Ví dụ: 5 năm giảng dạy"
+                           placeholder="Vﾃｭ d盻･: 5 nﾄノ gi蘯｣ng d蘯｡y"
                         />
                      </div>
                   </div>
@@ -2086,16 +2085,16 @@ const HRView = () => {
                <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
                   <h4 className="font-semibold text-purple-800 mb-4 flex items-center gap-2">
                      <Award size={20} className="text-purple-600" />
-                     Kỹ năng & Chuyên môn
+                     K盻ｹ nﾄハg & Chuyﾃｪn mﾃｴn
                   </h4>
                   <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Kỹ năng chuyên môn</label>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">K盻ｹ nﾄハg chuyﾃｪn mﾃｴn</label>
                      <textarea
                         value={profileForm.skills}
                         onChange={(e) => setProfileForm({...profileForm, skills: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         rows={3}
-                        placeholder="Ví dụ: Toán, Lý, Hóa, Tiếng Anh"
+                        placeholder="Vﾃｭ d盻･: Toﾃ｡n, Lﾃｽ, Hﾃｳa, Ti蘯ｿng Anh"
                      />
                   </div>
                </div>
@@ -2104,37 +2103,36 @@ const HRView = () => {
                <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
                   <h4 className="font-semibold text-orange-800 mb-4 flex items-center gap-2">
                      <Phone size={20} className="text-orange-600" />
-                     Thông tin liên hệ
-                  </h4>
+                     Thﾃｴng tin liﾃｪn h盻・                  </h4>
                   <div className="space-y-3">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ch盻・/label>
                         <input
                            type="text"
                            value={profileForm.address}
                            onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Ví dụ: 123 Nguyễn Chí Thanh, Hà Nội"
+                           placeholder="Vﾃｭ d盻･: 123 Nguy盻・ Chﾃｭ Thanh, Hﾃ N盻冓"
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Liên hệ khẩn cấp</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Liﾃｪn h盻・kh蘯ｩn c蘯･p</label>
                         <input
                            type="text"
                            value={profileForm.emergencyContact}
                            onChange={(e) => setProfileForm({...profileForm, emergencyContact: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Tên - SĐT - SĐT"
+                           placeholder="Tﾃｪn - Sﾄ慎 - Sﾄ慎"
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Tài khoản ngân hàng</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tﾃi kho蘯｣n ngﾃ｢n hﾃng</label>
                         <input
                            type="text"
                            value={profileForm.bankAccount}
                            onChange={(e) => setProfileForm({...profileForm, bankAccount: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Ngân hàng - Số tài khoản"
+                           placeholder="Ngﾃ｢n hﾃng - S盻・tﾃi kho蘯｣n"
                         />
                      </div>
                   </div>
@@ -2144,7 +2142,7 @@ const HRView = () => {
                <div className="bg-indigo-50 rounded-lg p-6 border border-indigo-200">
                   <h4 className="font-semibold text-indigo-800 mb-4 flex items-center gap-2">
                      <FileText size={20} className="text-indigo-600" />
-                     Hợp đồng Lao động
+                     H盻｣p ﾄ黛ｻ渡g Lao ﾄ黛ｻ冢g
                   </h4>
                   <div className="space-y-3">
                      {contracts
@@ -2153,18 +2151,18 @@ const HRView = () => {
                          <div key={contract.id} className="bg-white p-4 rounded-lg border border-indigo-200">
                            <div className="flex justify-between items-start mb-2">
                               <div>
-                                 <div className="font-medium text-gray-800">Hợp đồng #{contract.id}</div>
+                                 <div className="font-medium text-gray-800">H盻｣p ﾄ黛ｻ渡g #{contract.id}</div>
                                  <div className="text-sm text-gray-500">
                                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                                        contract.contractType === 'PERMANENT' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                                      }`}>
-                                       {contract.contractType === 'PERMANENT' ? 'Vĩnh viễn' : 'Thời vụ'}
+                                       {contract.contractType === 'PERMANENT' ? 'Vﾄｩnh vi盻・' : 'Th盻拱 v盻･'}
                                     </span>
-                                    {' • '}
+                                    {' 窶｢ '}
                                     <span className={`px-2 py-1 rounded text-xs font-bold ${
                                        contract.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                      }`}>
-                                       {contract.status === 'ACTIVE' ? 'Hiệu lực' : 'Hết hạn'}
+                                       {contract.status === 'ACTIVE' ? 'Hi盻㎡ l盻ｱc' : 'H蘯ｿt h蘯｡n'}
                                     </span>
                                  </div>
                               </div>
@@ -2172,35 +2170,35 @@ const HRView = () => {
                                  <button 
                                     onClick={() => handleViewContractDetail(contract)}
                                     className="text-blue-600 hover:bg-blue-50 rounded-lg p-2" 
-                                    title="Xem chi tiết"
+                                    title="Xem chi ti蘯ｿt"
                                   >
                                     <Eye size={16} />
                                   </button>
-                                 <button className="text-gray-600 hover:bg-gray-50 rounded-lg p-2" title="Tải về">
+                                 <button className="text-gray-600 hover:bg-gray-50 rounded-lg p-2" title="T蘯｣i v盻・>
                                     <Download size={16} />
                                  </button>
                               </div>
                            </div>
                            <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                 <span className="text-gray-500">Chức vụ:</span>
+                                 <span className="text-gray-500">Ch盻ｩc v盻･:</span>
                                  <div className="font-medium">{contract.position}</div>
                               </div>
                               <div>
-                                 <span className="text-gray-500">Lương:</span>
+                                 <span className="text-gray-500">Lﾆｰﾆ｡ng:</span>
                                  <div className="font-bold text-green-600">{formatCurrency(contract.salary)}</div>
                               </div>
                               <div>
-                                 <span className="text-gray-500">Thời gian:</span>
+                                 <span className="text-gray-500">Th盻拱 gian:</span>
                                  <div>{contract.startDate} - {contract.endDate}</div>
                               </div>
                            </div>
                            <div>
-                              <span className="text-gray-500">Phúc lợi:</span>
+                              <span className="text-gray-500">Phﾃｺc l盻｣i:</span>
                               <div className="text-sm text-gray-700 mt-1">{contract.benefits}</div>
                            </div>
                            <div>
-                              <span className="text-gray-500">Điều khoản:</span>
+                              <span className="text-gray-500">ﾄ進盻「 kho蘯｣n:</span>
                               <div className="text-sm text-gray-700 mt-1">{contract.terms}</div>
                            </div>
                          </div>
@@ -2208,7 +2206,7 @@ const HRView = () => {
                      {contracts.filter(contract => contract.staffId === selectedStaff?.id).length === 0 && (
                        <div className="text-center py-8 text-gray-500">
                           <FileText size={48} className="mx-auto text-gray-300 mb-4" />
-                          <p>Chưa có hợp đồng nào</p>
+                          <p>Chﾆｰa cﾃｳ h盻｣p ﾄ黛ｻ渡g nﾃo</p>
                        </div>
                      )}
                   </div>
@@ -2218,7 +2216,7 @@ const HRView = () => {
                <div className="bg-green-50 rounded-lg p-6 border border-green-200">
                   <h4 className="font-semibold text-green-800 mb-4 flex items-center gap-2">
                      <DollarSign size={20} className="text-green-600" />
-                     Bảng Lương Chi tiết
+                     B蘯｣ng Lﾆｰﾆ｡ng Chi ti蘯ｿt
                   </h4>
                   <div className="space-y-3">
                      {/* Mock payroll data for the selected staff */}
@@ -2228,14 +2226,14 @@ const HRView = () => {
                          <div key={payroll.id} className="bg-white p-4 rounded-lg border border-green-200">
                            <div className="flex justify-between items-start mb-2">
                               <div>
-                                 <div className="font-medium text-gray-800">Kỳ lương: {payroll.payPeriod}</div>
+                                 <div className="font-medium text-gray-800">K盻ｳ lﾆｰﾆ｡ng: {payroll.payPeriod}</div>
                                  <div className="text-sm text-gray-500">
                                     <span className={`px-2 py-1 rounded text-xs font-bold ${
                                        payroll.status === 'PAID' ? 'bg-green-100 text-green-700' : 
                                        payroll.status === 'APPROVED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
                                      }`}>
-                                       {payroll.status === 'PAID' ? 'Đã thanh toán' : 
-                                        payroll.status === 'APPROVED' ? 'Đã duyệt' : 'Chờ duyệt'}
+                                       {payroll.status === 'PAID' ? 'ﾄ静｣ thanh toﾃ｡n' : 
+                                        payroll.status === 'APPROVED' ? 'ﾄ静｣ duy盻㏄' : 'Ch盻・duy盻㏄'}
                                     </span>
                                  </div>
                               </div>
@@ -2243,52 +2241,52 @@ const HRView = () => {
                                  <button 
                                     onClick={() => handleViewPayrollDetail(payroll)}
                                     className="text-blue-600 hover:bg-blue-50 rounded-lg p-2" 
-                                    title="Xem chi tiết"
+                                    title="Xem chi ti蘯ｿt"
                                  >
                                     <Eye size={16} />
                                  </button>
-                                 <button className="text-gray-600 hover:bg-gray-50 rounded-lg p-2" title="In bảng lương">
+                                 <button className="text-gray-600 hover:bg-gray-50 rounded-lg p-2" title="In b蘯｣ng lﾆｰﾆ｡ng">
                                     <Download size={16} />
                                  </button>
                               </div>
                            </div>
                            <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                 <span className="text-gray-500">Lương cơ bản:</span>
+                                 <span className="text-gray-500">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n:</span>
                                  <div className="font-medium">{formatCurrency(payroll.baseSalary)}</div>
                               </div>
                               <div>
-                                 <span className="text-gray-500">Phụ cấp:</span>
+                                 <span className="text-gray-500">Ph盻･ c蘯･p:</span>
                                  <div className="font-medium text-blue-600">{formatCurrency(payroll.allowances || 0)}</div>
                               </div>
                               <div>
-                                 <span className="text-gray-500">Thưởng:</span>
+                                 <span className="text-gray-500">Thﾆｰ盻殤g:</span>
                                  <div className="font-medium text-green-600">{formatCurrency(payroll.bonuses || 0)}</div>
                               </div>
                               <div>
-                                 <span className="text-gray-500">Khấu trừ:</span>
+                                 <span className="text-gray-500">Kh蘯･u tr盻ｫ:</span>
                                  <div className="font-medium text-red-600">{formatCurrency(payroll.deductions || 0)}</div>
                               </div>
                            </div>
                            <div className="border-t pt-3 mt-3">
                               <div className="flex justify-between items-center">
-                                 <span className="text-gray-500 font-medium">Tổng thu nhập:</span>
+                                 <span className="text-gray-500 font-medium">T盻貧g thu nh蘯ｭp:</span>
                                  <span className="font-bold text-blue-600">{formatCurrency(payroll.grossSalary || 0)}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                 <span className="text-gray-500 font-medium">Thực lĩnh:</span>
+                                 <span className="text-gray-500 font-medium">Th盻ｱc lﾄｩnh:</span>
                                  <span className="font-bold text-green-600 text-lg">{formatCurrency(payroll.netSalary || 0)}</span>
                               </div>
                            </div>
                            <div className="text-xs text-gray-500 mt-2">
-                              Ngày thanh toán: {payroll.paymentDate || 'Chưa thanh toán'}
+                              Ngﾃy thanh toﾃ｡n: {payroll.paymentDate || 'Chﾆｰa thanh toﾃ｡n'}
                            </div>
                          </div>
                        ))}
                      {payrolls.filter(payroll => payroll.staffId === selectedStaff?.id).length === 0 && (
                        <div className="text-center py-8 text-gray-500">
                           <DollarSign size={48} className="mx-auto text-gray-300 mb-4" />
-                          <p>Chưa có bảng lương nào</p>
+                          <p>Chﾆｰa cﾃｳ b蘯｣ng lﾆｰﾆ｡ng nﾃo</p>
                        </div>
                      )}
                   </div>
@@ -2296,10 +2294,10 @@ const HRView = () => {
 
                <div className="flex justify-end gap-2 pt-4">
                   <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-                     Đóng
+                     ﾄ静ｳng
                   </Button>
                   <Button onClick={handleUpdateProfile}>
-                     Cập nhật
+                     C蘯ｭp nh蘯ｭt
                   </Button>
                </div>
             </div>
@@ -2307,17 +2305,17 @@ const HRView = () => {
       </Modal>
 
       {/* Contract Template Modal */}
-      <Modal isOpen={showTemplateModal} onClose={() => setShowTemplateModal(false)} title={`Tạo Hợp đồng từ Mẫu: ${selectedTemplate?.name}`} maxWidth="max-w-2xl">
+      <Modal isOpen={showTemplateModal} onClose={() => setShowTemplateModal(false)} title={`T蘯｡o H盻｣p ﾄ黛ｻ渡g t盻ｫ M蘯ｫu: ${selectedTemplate?.name}`} maxWidth="max-w-2xl">
          {selectedTemplate && (
             <div className="space-y-6">
                {/* Template Preview */}
                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h4 className="font-semibold text-gray-800 mb-3">Nội dung mẫu:</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">N盻冓 dung m蘯ｫu:</h4>
                   <div className="text-sm text-gray-600 space-y-2">
-                     <div><strong>Tiêu đề:</strong> {selectedTemplate.content.title}</div>
-                     <div><strong>Số điều khoản:</strong> {selectedTemplate.content.articles.length}</div>
+                     <div><strong>Tiﾃｪu ﾄ黛ｻ・</strong> {selectedTemplate.content.title}</div>
+                     <div><strong>S盻・ﾄ訴盻「 kho蘯｣n:</strong> {selectedTemplate.content.articles.length}</div>
                      <div className="max-h-32 overflow-y-auto">
-                        <strong>Điều khoản chính:</strong>
+                        <strong>ﾄ進盻「 kho蘯｣n chﾃｭnh:</strong>
                         <ul className="mt-1 space-y-1">
                           {selectedTemplate.content.articles.map((article: any, idx: number) => (
                             <li key={idx} className="text-xs">{article.article}</li>
@@ -2331,13 +2329,13 @@ const HRView = () => {
                <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                         <select
                            value={templateForm.staffId}
                            onChange={(e) => setTemplateForm({...templateForm, staffId: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                           <option value="">Chọn nhân viên</option>
+                           <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                            {staffList.map(staff => (
                               <option key={staff.id} value={staff.id}>
                                  {staff.fullName} - {staff.department}
@@ -2346,31 +2344,31 @@ const HRView = () => {
                         </select>
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                         <input
                            type="text"
                            value={templateForm.position}
                            onChange={(e) => setTemplateForm({...templateForm, position: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Nhập chức vụ"
+                           placeholder="Nh蘯ｭp ch盻ｩc v盻･"
                         />
                      </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Lương</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng</label>
                         <input
                            type="number"
                            value={templateForm.salary}
                            onChange={(e) => setTemplateForm({...templateForm, salary: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Nhập lương"
+                           placeholder="Nh蘯ｭp lﾆｰﾆ｡ng"
                            min="0"
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</label>
                         <input
                            type="date"
                            value={templateForm.startDate}
@@ -2382,7 +2380,7 @@ const HRView = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy k蘯ｿt thﾃｺc</label>
                         <input
                            type="date"
                            value={templateForm.endDate}
@@ -2391,35 +2389,35 @@ const HRView = () => {
                         />
                      </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phúc lợi</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｺc l盻｣i</label>
                         <input
                            type="text"
                            value={templateForm.benefits}
                            onChange={(e) => setTemplateForm({...templateForm, benefits: e.target.value})}
                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                           placeholder="Bảo hiểm, phụ cấp, thưởng..."
+                           placeholder="B蘯｣o hi盻ノ, ph盻･ c蘯･p, thﾆｰ盻殤g..."
                         />
                      </div>
                   </div>
 
                   <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Điều khoản bổ sung</label>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ進盻「 kho蘯｣n b盻・sung</label>
                      <textarea
                         value={templateForm.specialTerms}
                         onChange={(e) => setTemplateForm({...templateForm, specialTerms: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         rows={3}
-                        placeholder="Các điều khoản bổ sung theo yêu cầu..."
+                        placeholder="Cﾃ｡c ﾄ訴盻「 kho蘯｣n b盻・sung theo yﾃｪu c蘯ｧu..."
                      />
                   </div>
                </div>
 
                <div className="flex justify-end gap-2 pt-4">
                   <Button variant="secondary" onClick={() => setShowTemplateModal(false)}>
-                     Hủy
+                     H盻ｧy
                   </Button>
                   <Button onClick={handleGenerateContract} disabled={!templateForm.staffId || !templateForm.position || !templateForm.salary}>
-                     Tạo hợp đồng
+                     T蘯｡o h盻｣p ﾄ黛ｻ渡g
                   </Button>
                </div>
             </div>
@@ -2427,16 +2425,16 @@ const HRView = () => {
       </Modal>
 
       {/* Family Modal */}
-      <Modal isOpen={showFamilyModal} onClose={() => setShowFamilyModal(false)} title="Thêm Thành viên Gia đình">
+      <Modal isOpen={showFamilyModal} onClose={() => setShowFamilyModal(false)} title="Thﾃｪm Thﾃnh viﾃｪn Gia ﾄ妥ｬnh">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                   <select
                      value={familyForm.staffId}
                      onChange={(e) => setFamilyForm({...familyForm, staffId: parseInt(e.target.value)})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn nhân viên</option>
+                     <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                      {staffList.map(staff => (
                         <option key={staff.id} value={staff.id}>
                            {staff.fullName} - {staff.department}
@@ -2445,46 +2443,46 @@ const HRView = () => {
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quan hệ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Quan h盻・/label>
                   <select
                      value={familyForm.relationship}
                      onChange={(e) => setFamilyForm({...familyForm, relationship: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn quan hệ</option>
-                     <option value="Vợ">Vợ</option>
-                     <option value="Chồng">Chồng</option>
+                     <option value="">Ch盻肱 quan h盻・/option>
+                     <option value="V盻｣">V盻｣</option>
+                     <option value="Ch盻渡g">Ch盻渡g</option>
                      <option value="Con">Con</option>
-                     <option value="Bố">Bố</option>
-                     <option value="Mẹ">Mẹ</option>
+                     <option value="B盻・>B盻・/option>
+                     <option value="M蘯ｹ">M蘯ｹ</option>
                      <option value="Cha">Cha</option>
-                     <option value="Em gái">Em gái</option>
+                     <option value="Em gﾃ｡i">Em gﾃ｡i</option>
                      <option value="Anh">Anh</option>
-                     <option value="Chị">Chị</option>
-                     <option value="Khác">Khác</option>
+                     <option value="Ch盻・>Ch盻・/option>
+                     <option value="Khﾃ｡c">Khﾃ｡c</option>
                   </select>
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">H盻・vﾃ tﾃｪn</label>
                   <input
                      type="text"
                      value={familyForm.name}
                      onChange={(e) => setFamilyForm({...familyForm, name: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập họ và tên"
+                     placeholder="Nh蘯ｭp h盻・vﾃ tﾃｪn"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">S盻・ﾄ訴盻㌻ tho蘯｡i</label>
                   <input
                      type="tel"
                      value={familyForm.phone}
                      onChange={(e) => setFamilyForm({...familyForm, phone: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập số điện thoại"
+                     placeholder="Nh蘯ｭp s盻・ﾄ訴盻㌻ tho蘯｡i"
                   />
                </div>
             </div>
@@ -2497,34 +2495,34 @@ const HRView = () => {
                      value={familyForm.email}
                      onChange={(e) => setFamilyForm({...familyForm, email: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập email (nếu có)"
+                     placeholder="Nh蘯ｭp email (n蘯ｿu cﾃｳ)"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nghề nghiệp</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngh盻・nghi盻㎝</label>
                   <input
                      type="text"
                      value={familyForm.occupation}
                      onChange={(e) => setFamilyForm({...familyForm, occupation: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập nghề nghiệp"
+                     placeholder="Nh蘯ｭp ngh盻・nghi盻㎝"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ch盻・/label>
                   <input
                      type="text"
                      value={familyForm.address}
                      onChange={(e) => setFamilyForm({...familyForm, address: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập địa chỉ"
+                     placeholder="Nh蘯ｭp ﾄ黛ｻ蟻 ch盻・
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Liên hệ khẩn cấp</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Liﾃｪn h盻・kh蘯ｩn c蘯･p</label>
                   <label className="flex items-center gap-2">
                      <input
                         type="checkbox"
@@ -2532,32 +2530,32 @@ const HRView = () => {
                         onChange={(e) => setFamilyForm({...familyForm, emergencyContact: e.target.checked})}
                         className="rounded border-gray-300 text-indigo-600"
                      />
-                     <span className="text-sm text-gray-700">Đây là liên hệ khẩn cấp</span>
+                     <span className="text-sm text-gray-700">ﾄ静｢y lﾃ liﾃｪn h盻・kh蘯ｩn c蘯･p</span>
                   </label>
                </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowFamilyModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleAddFamilyMember} disabled={!familyForm.name || !familyForm.relationship || !familyForm.staffId}>
-                  Thêm thành viên
+                  Thﾃｪm thﾃnh viﾃｪn
                </Button>
             </div>
       </Modal>
 
       {/* Edit Family Member Modal */}
-      <Modal isOpen={showEditFamilyModal} onClose={() => setShowEditFamilyModal(false)} title="Chỉnh sửa Thông tin Thành viên Gia đình">
+      <Modal isOpen={showEditFamilyModal} onClose={() => setShowEditFamilyModal(false)} title="Ch盻穎h s盻ｭa Thﾃｴng tin Thﾃnh viﾃｪn Gia ﾄ妥ｬnh">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                   <select
                      value={familyForm.staffId}
                      onChange={(e) => setFamilyForm({...familyForm, staffId: parseInt(e.target.value)})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn nhân viên</option>
+                     <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                      {staffList.map(staff => (
                         <option key={staff.id} value={staff.id}>
                            {staff.fullName} - {staff.department}
@@ -2566,46 +2564,46 @@ const HRView = () => {
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quan hệ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Quan h盻・/label>
                   <select
                      value={familyForm.relationship}
                      onChange={(e) => setFamilyForm({...familyForm, relationship: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn quan hệ</option>
-                     <option value="Vợ">Vợ</option>
-                     <option value="Chồng">Chồng</option>
+                     <option value="">Ch盻肱 quan h盻・/option>
+                     <option value="V盻｣">V盻｣</option>
+                     <option value="Ch盻渡g">Ch盻渡g</option>
                      <option value="Con">Con</option>
-                     <option value="Bố">Bố</option>
-                     <option value="Mẹ">Mẹ</option>
+                     <option value="B盻・>B盻・/option>
+                     <option value="M蘯ｹ">M蘯ｹ</option>
                      <option value="Cha">Cha</option>
-                     <option value="Em gái">Em gái</option>
+                     <option value="Em gﾃ｡i">Em gﾃ｡i</option>
                      <option value="Anh">Anh</option>
-                     <option value="Chị">Chị</option>
-                     <option value="Khác">Khác</option>
+                     <option value="Ch盻・>Ch盻・/option>
+                     <option value="Khﾃ｡c">Khﾃ｡c</option>
                   </select>
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">H盻・vﾃ tﾃｪn</label>
                   <input
                      type="text"
                      value={familyForm.name}
                      onChange={(e) => setFamilyForm({...familyForm, name: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập họ và tên"
+                     placeholder="Nh蘯ｭp h盻・vﾃ tﾃｪn"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">S盻・ﾄ訴盻㌻ tho蘯｡i</label>
                   <input
                      type="tel"
                      value={familyForm.phone}
                      onChange={(e) => setFamilyForm({...familyForm, phone: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập số điện thoại"
+                     placeholder="Nh蘯ｭp s盻・ﾄ訴盻㌻ tho蘯｡i"
                   />
                </div>
             </div>
@@ -2618,34 +2616,34 @@ const HRView = () => {
                      value={familyForm.email}
                      onChange={(e) => setFamilyForm({...familyForm, email: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập email (nếu có)"
+                     placeholder="Nh蘯ｭp email (n蘯ｿu cﾃｳ)"
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nghề nghiệp</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngh盻・nghi盻㎝</label>
                   <input
                      type="text"
                      value={familyForm.occupation}
                      onChange={(e) => setFamilyForm({...familyForm, occupation: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập nghề nghiệp"
+                     placeholder="Nh蘯ｭp ngh盻・nghi盻㎝"
                   />
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ch盻・/label>
                   <input
                      type="text"
                      value={familyForm.address}
                      onChange={(e) => setFamilyForm({...familyForm, address: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                     placeholder="Nhập địa chỉ"
+                     placeholder="Nh蘯ｭp ﾄ黛ｻ蟻 ch盻・
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Liên hệ khẩn cấp</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Liﾃｪn h盻・kh蘯ｩn c蘯･p</label>
                   <label className="flex items-center gap-2">
                      <input
                         type="checkbox"
@@ -2653,23 +2651,23 @@ const HRView = () => {
                         onChange={(e) => setFamilyForm({...familyForm, emergencyContact: e.target.checked})}
                         className="rounded border-gray-300 text-indigo-600"
                      />
-                     <span className="text-sm text-gray-700">Đây là liên hệ khẩn cấp</span>
+                     <span className="text-sm text-gray-700">ﾄ静｢y lﾃ liﾃｪn h盻・kh蘯ｩn c蘯･p</span>
                   </label>
                </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowEditFamilyModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleUpdateFamilyMember} disabled={!familyForm.name || !familyForm.relationship || !familyForm.staffId}>
-                  Cập nhật thông tin
+                  C蘯ｭp nh蘯ｭt thﾃｴng tin
                </Button>
             </div>
       </Modal>
 
       {/* Advanced Contract Modal */}
-      <Modal isOpen={showAdvancedContractModal} onClose={() => setShowAdvancedContractModal(false)} title={`Tạo Hợp đồng Nâng cao: ${selectedTemplate?.name}`} maxWidth="max-w-6xl">
+      <Modal isOpen={showAdvancedContractModal} onClose={() => setShowAdvancedContractModal(false)} title={`T蘯｡o H盻｣p ﾄ黛ｻ渡g Nﾃ｢ng cao: ${selectedTemplate?.name}`} maxWidth="max-w-6xl">
          {selectedTemplate && (
             <div className="space-y-6">
                {/* Tab Navigation */}
@@ -2684,43 +2682,43 @@ const HRView = () => {
                               : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                      >
-                        {tab === 'basic' && 'Thông tin cơ bản'}
-                        {tab === 'company' && 'Doanh nghiệp'}
-                        {tab === 'employee' && 'Người lao động'}
-                        {tab === 'job' && 'Công việc'}
-                        {tab === 'payroll' && 'Lương & Phụ cấp'}
-                        {tab === 'terms' && 'Điều khoản'}
+                        {tab === 'basic' && 'Thﾃｴng tin cﾆ｡ b蘯｣n'}
+                        {tab === 'company' && 'Doanh nghi盻㎝'}
+                        {tab === 'employee' && 'Ngﾆｰ盻拱 lao ﾄ黛ｻ冢g'}
+                        {tab === 'job' && 'Cﾃｴng vi盻㌘'}
+                        {tab === 'payroll' && 'Lﾆｰﾆ｡ng & Ph盻･ c蘯･p'}
+                        {tab === 'terms' && 'ﾄ進盻「 kho蘯｣n'}
                      </button>
                   ))}
                </div>
 
                {/* Tab Content */}
                <div className="min-h-[400px]">
-                  {/* Tab 1: Thông tin cơ bản */}
+                  {/* Tab 1: Thﾃｴng tin cﾆ｡ b蘯｣n */}
                   {currentPage === 0 && (
                      <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Loại hợp đồng</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Lo蘯｡i h盻｣p ﾄ黛ｻ渡g</label>
                               <select
                                  value={templateForm.contractSubType}
                                  onChange={(e) => setTemplateForm({...templateForm, contractSubType: e.target.value})}
                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               >
-                                 <option value="PERMANENT">Chính thức</option>
-                                 <option value="PROBATION">Thử việc</option>
-                                 <option value="PART_TIME">Bán thời gian</option>
-                                 <option value="SALARY_INCREASE">Tăng lương</option>
+                                 <option value="PERMANENT">Chﾃｭnh th盻ｩc</option>
+                                 <option value="PROBATION">Th盻ｭ vi盻㌘</option>
+                                 <option value="PART_TIME">Bﾃ｡n th盻拱 gian</option>
+                                 <option value="SALARY_INCREASE">Tﾄハg lﾆｰﾆ｡ng</option>
                               </select>
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                               <select
                                  value={templateForm.staffId}
                                  onChange={(e) => setTemplateForm({...templateForm, staffId: e.target.value})}
                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               >
-                                 <option value="">Chọn nhân viên</option>
+                                 <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                                  {staffList.map(staff => (
                                     <option key={staff.id} value={staff.id}>
                                        {staff.fullName} - {staff.department}
@@ -2732,23 +2730,23 @@ const HRView = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Chức vụ</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Ch盻ｩc v盻･</label>
                               <input
                                  type="text"
                                  value={templateForm.position}
                                  onChange={(e) => setTemplateForm({...templateForm, position: e.target.value})}
                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                 placeholder="Nhập chức vụ"
+                                 placeholder="Nh蘯ｭp ch盻ｩc v盻･"
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Lương cơ bản</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</label>
                               <input
                                  type="number"
                                  value={templateForm.salary}
                                  onChange={(e) => setTemplateForm({...templateForm, salary: e.target.value})}
                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                 placeholder="Nhập lương"
+                                 placeholder="Nh蘯ｭp lﾆｰﾆ｡ng"
                                  min="0"
                               />
                            </div>
@@ -2756,7 +2754,7 @@ const HRView = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</label>
                               <input
                                  type="date"
                                  value={templateForm.startDate}
@@ -2765,7 +2763,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy k蘯ｿt thﾃｺc</label>
                               <input
                                  type="date"
                                  value={templateForm.endDate}
@@ -2776,25 +2774,25 @@ const HRView = () => {
                         </div>
 
                         <div>
-                           <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm làm việc</label>
+                           <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ﾄ訴盻ノ lﾃm vi盻㌘</label>
                            <input
                               type="text"
                               value={templateForm.workLocation}
                               onChange={(e) => setTemplateForm({...templateForm, workLocation: e.target.value})}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                              placeholder="Nhập địa điểm làm việc"
+                              placeholder="Nh蘯ｭp ﾄ黛ｻ蟻 ﾄ訴盻ノ lﾃm vi盻㌘"
                            />
                         </div>
                      </div>
                   )}
 
-                  {/* Tab 2: Thông tin doanh nghiệp */}
+                  {/* Tab 2: Thﾃｴng tin doanh nghi盻㎝ */}
                   {currentPage === 1 && (
                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Thông tin Doanh nghiệp</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Thﾃｴng tin Doanh nghi盻㎝</h3>
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Tên công ty</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Tﾃｪn cﾃｴng ty</label>
                               <input
                                  type="text"
                                  value={templateForm.companyInfo.name}
@@ -2806,7 +2804,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Mã số thuế</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Mﾃ｣ s盻・thu蘯ｿ</label>
                               <input
                                  type="text"
                                  value={templateForm.companyInfo.taxCode}
@@ -2821,7 +2819,7 @@ const HRView = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ch盻・/label>
                               <input
                                  type="text"
                                  value={templateForm.companyInfo.address}
@@ -2833,7 +2831,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ進盻㌻ tho蘯｡i</label>
                               <input
                                  type="text"
                                  value={templateForm.companyInfo.phone}
@@ -2860,7 +2858,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Người đại diện</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾆｰ盻拱 ﾄ黛ｺ｡i di盻㌻</label>
                               <input
                                  type="text"
                                  value={templateForm.companyInfo.representative}
@@ -2875,13 +2873,13 @@ const HRView = () => {
                      </div>
                   )}
 
-                  {/* Tab 3: Thông tin người lao động */}
+                  {/* Tab 3: Thﾃｴng tin ngﾆｰ盻拱 lao ﾄ黛ｻ冢g */}
                   {currentPage === 2 && (
                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Thông tin Người lao động</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Thﾃｴng tin Ngﾆｰ盻拱 lao ﾄ黛ｻ冢g</h3>
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Số CMND/CCCD</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">S盻・CMND/CCCD</label>
                               <input
                                  type="text"
                                  value={templateForm.employeeInfo.idCard}
@@ -2893,7 +2891,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày cấp</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy c蘯･p</label>
                               <input
                                  type="date"
                                  value={templateForm.employeeInfo.issueDate}
@@ -2908,7 +2906,7 @@ const HRView = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Nơi cấp</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Nﾆ｡i c蘯･p</label>
                               <input
                                  type="text"
                                  value={templateForm.employeeInfo.issuePlace}
@@ -2920,7 +2918,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ thường trú</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ雪ｻ蟻 ch盻・thﾆｰ盻拵g trﾃｺ</label>
                               <input
                                  type="text"
                                  value={templateForm.employeeInfo.address}
@@ -2935,7 +2933,7 @@ const HRView = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Số tài khoản ngân hàng</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">S盻・tﾃi kho蘯｣n ngﾃ｢n hﾃng</label>
                               <input
                                  type="text"
                                  value={templateForm.employeeInfo.bankAccount}
@@ -2947,7 +2945,7 @@ const HRView = () => {
                               />
                            </div>
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Tên ngân hàng</label>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Tﾃｪn ngﾃ｢n hﾃng</label>
                               <input
                                  type="text"
                                  value={templateForm.employeeInfo.bankName}
@@ -2962,23 +2960,23 @@ const HRView = () => {
                      </div>
                   )}
 
-                  {/* Tab 4: Nội dung công việc */}
+                  {/* Tab 4: N盻冓 dung cﾃｴng vi盻㌘ */}
                   {currentPage === 3 && (
                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Nội dung Công việc</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">N盻冓 dung Cﾃｴng vi盻㌘</h3>
                         <div>
-                           <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả công việc chi tiết</label>
+                           <label className="block text-sm font-medium text-gray-700 mb-1">Mﾃｴ t蘯｣ cﾃｴng vi盻㌘ chi ti蘯ｿt</label>
                            <textarea
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               rows={6}
-                              placeholder="Mô tả chi tiết công việc, trách nhiệm, quyền hạn..."
+                              placeholder="Mﾃｴ t蘯｣ chi ti蘯ｿt cﾃｴng vi盻㌘, trﾃ｡ch nhi盻㍊, quy盻］ h蘯｡n..."
                            />
                         </div>
 
                         {templateForm.contractSubType === 'PROBATION' && (
                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian thử việc (tháng)</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">Th盻拱 gian th盻ｭ vi盻㌘ (thﾃ｡ng)</label>
                                  <input
                                     type="number"
                                     value={templateForm.probationPeriod}
@@ -2989,7 +2987,7 @@ const HRView = () => {
                                  />
                               </div>
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Lương thử việc (%)</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">Lﾆｰﾆ｡ng th盻ｭ vi盻㌘ (%)</label>
                                  <input
                                     type="number"
                                     value="85"
@@ -3003,7 +3001,7 @@ const HRView = () => {
                         {templateForm.contractSubType === 'SALARY_INCREASE' && (
                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">% Tăng lương</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">% Tﾄハg lﾆｰﾆ｡ng</label>
                                  <input
                                     type="number"
                                     value={templateForm.salaryIncrease}
@@ -3014,7 +3012,7 @@ const HRView = () => {
                                  />
                               </div>
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Ngày áp dụng tăng lương</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy ﾃ｡p d盻･ng tﾄハg lﾆｰﾆ｡ng</label>
                                  <input
                                     type="date"
                                     value={templateForm.salaryIncreaseDate}
@@ -3027,16 +3025,16 @@ const HRView = () => {
                      </div>
                   )}
 
-                  {/* Tab 5: Bảng lương chi tiết */}
+                  {/* Tab 5: B蘯｣ng lﾆｰﾆ｡ng chi ti蘯ｿt */}
                   {currentPage === 4 && (
                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Bảng Lương Chi tiết</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">B蘯｣ng Lﾆｰﾆ｡ng Chi ti蘯ｿt</h3>
                         
                         <div className="bg-gray-50 rounded-lg p-4">
-                           <h4 className="font-medium text-gray-800 mb-3">Phụ cấp</h4>
+                           <h4 className="font-medium text-gray-800 mb-3">Ph盻･ c蘯･p</h4>
                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Ăn trưa</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">ﾄＯ trﾆｰa</label>
                                  <input
                                     type="number"
                                     value={templateForm.payrollDetails.allowances.lunch}
@@ -3051,7 +3049,7 @@ const HRView = () => {
                                  />
                               </div>
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ進盻㌻ tho蘯｡i</label>
                                  <input
                                     type="number"
                                     value={templateForm.payrollDetails.allowances.phone}
@@ -3069,10 +3067,10 @@ const HRView = () => {
                         </div>
 
                         <div className="bg-gray-50 rounded-lg p-4">
-                           <h4 className="font-medium text-gray-800 mb-3">Thưởng</h4>
+                           <h4 className="font-medium text-gray-800 mb-3">Thﾆｰ盻殤g</h4>
                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Hiệu suất</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">Hi盻㎡ su蘯･t</label>
                                  <input
                                     type="number"
                                     value={templateForm.payrollDetails.bonuses.performance}
@@ -3087,7 +3085,7 @@ const HRView = () => {
                                  />
                               </div>
                               <div>
-                                 <label className="block text-sm font-medium text-gray-700 mb-1">Chuyên cần</label>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1">Chuyﾃｪn c蘯ｧn</label>
                                  <input
                                     type="number"
                                     value={templateForm.payrollDetails.bonuses.attendance}
@@ -3105,7 +3103,7 @@ const HRView = () => {
                         </div>
 
                         <div className="bg-gray-50 rounded-lg p-4">
-                           <h4 className="font-medium text-gray-800 mb-3">Khấu trừ (%)</h4>
+                           <h4 className="font-medium text-gray-800 mb-3">Kh蘯･u tr盻ｫ (%)</h4>
                            <div className="grid grid-cols-2 gap-4">
                               <div>
                                  <label className="block text-sm font-medium text-gray-700 mb-1">BHXH (%)</label>
@@ -3142,29 +3140,29 @@ const HRView = () => {
                      </div>
                   )}
 
-                  {/* Tab 6: Điều khoản */}
+                  {/* Tab 6: ﾄ進盻「 kho蘯｣n */}
                   {currentPage === 5 && (
                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Điều khoản và Phụ lục</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">ﾄ進盻「 kho蘯｣n vﾃ Ph盻･ l盻･c</h3>
                         <div>
-                           <label className="block text-sm font-medium text-gray-700 mb-1">Điều khoản bổ sung</label>
+                           <label className="block text-sm font-medium text-gray-700 mb-1">ﾄ進盻「 kho蘯｣n b盻・sung</label>
                            <textarea
                               value={templateForm.specialTerms}
                               onChange={(e) => setTemplateForm({...templateForm, specialTerms: e.target.value})}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               rows={6}
-                              placeholder="Các điều khoản bổ sung theo yêu cầu..."
+                              placeholder="Cﾃ｡c ﾄ訴盻「 kho蘯｣n b盻・sung theo yﾃｪu c蘯ｧu..."
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-medium text-gray-700 mb-1">Phúc lợi</label>
+                           <label className="block text-sm font-medium text-gray-700 mb-1">Phﾃｺc l盻｣i</label>
                            <textarea
                               value={templateForm.benefits}
                               onChange={(e) => setTemplateForm({...templateForm, benefits: e.target.value})}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               rows={4}
-                              placeholder="Bảo hiểm, phụ cấp, thưởng, đào tạo..."
+                              placeholder="B蘯｣o hi盻ノ, ph盻･ c蘯･p, thﾆｰ盻殤g, ﾄ妥o t蘯｡o..."
                            />
                         </div>
                      </div>
@@ -3179,23 +3177,22 @@ const HRView = () => {
                         disabled={currentPage === 0}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                      >
-                        ← Trước
+                        竊・Trﾆｰ盻嫩
                      </button>
                      <button
                         onClick={() => setCurrentPage(Math.min(5, currentPage + 1))}
                         disabled={currentPage === 5}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                      >
-                        Sau →
-                     </button>
+                        Sau 竊・                     </button>
                   </div>
                   
                   <div className="flex gap-2">
                      <Button variant="secondary" onClick={() => setShowAdvancedContractModal(false)}>
-                        Hủy
+                        H盻ｧy
                      </Button>
                      <Button onClick={handleGenerateContract} disabled={!templateForm.staffId || !templateForm.position || !templateForm.salary}>
-                        Tạo hợp đồng ({currentPage + 1}/6)
+                        T蘯｡o h盻｣p ﾄ黛ｻ渡g ({currentPage + 1}/6)
                      </Button>
                   </div>
                </div>
@@ -3204,7 +3201,7 @@ const HRView = () => {
       </Modal>
 
       {/* Contract Preview Modal */}
-      <Modal isOpen={showPreviewModal} onClose={() => setShowPreviewModal(false)} title={`Xem trước: ${selectedTemplate?.name}`} maxWidth="max-w-4xl">
+      <Modal isOpen={showPreviewModal} onClose={() => setShowPreviewModal(false)} title={`Xem trﾆｰ盻嫩: ${selectedTemplate?.name}`} maxWidth="max-w-4xl">
          {selectedTemplate && (
             <div className="space-y-6">
                {/* Header */}
@@ -3213,25 +3210,25 @@ const HRView = () => {
                      {selectedTemplate.content.title}
                   </h2>
                   <div className="text-sm text-gray-500">
-                     Mẫu hợp đồng chuẩn theo pháp luật Việt Nam
+                     M蘯ｫu h盻｣p ﾄ黛ｻ渡g chu蘯ｩn theo phﾃ｡p lu蘯ｭt Vi盻㏄ Nam
                   </div>
                </div>
 
                {/* Parties */}
                <div className="grid grid-cols-2 gap-8">
                   <div className="border-l-4 border-blue-500 pl-4">
-                     <h3 className="font-semibold text-gray-800 mb-2">Bên A</h3>
+                     <h3 className="font-semibold text-gray-800 mb-2">Bﾃｪn A</h3>
                      <p className="text-gray-700">{selectedTemplate.content.parties.employer}</p>
                   </div>
                   <div className="border-l-4 border-green-500 pl-4">
-                     <h3 className="font-semibold text-gray-800 mb-2">Bên B</h3>
+                     <h3 className="font-semibold text-gray-800 mb-2">Bﾃｪn B</h3>
                      <p className="text-gray-700">{selectedTemplate.content.parties.employee}</p>
                   </div>
                </div>
 
                {/* Articles */}
                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-800 text-lg">Nội dung hợp đồng</h3>
+                  <h3 className="font-semibold text-gray-800 text-lg">N盻冓 dung h盻｣p ﾄ黛ｻ渡g</h3>
                   <div className="space-y-4">
                      {selectedTemplate.content.articles.map((article: any, idx: number) => (
                         <div key={idx} className="border-l-4 border-gray-300 pl-4">
@@ -3246,29 +3243,29 @@ const HRView = () => {
                <div className="border-t pt-4 mt-6">
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">Đã ký kết tại</p>
-                        <p className="text-sm text-gray-800 font-medium">[Địa điểm ký kết]</p>
-                        <p className="text-sm text-gray-800 font-medium">Ngày [Ngày] tháng [Tháng] năm [Năm]</p>
+                        <p className="text-sm text-gray-600">ﾄ静｣ kﾃｽ k蘯ｿt t蘯｡i</p>
+                        <p className="text-sm text-gray-800 font-medium">[ﾄ雪ｻ蟻 ﾄ訴盻ノ kﾃｽ k蘯ｿt]</p>
+                        <p className="text-sm text-gray-800 font-medium">Ngﾃy [Ngﾃy] thﾃ｡ng [Thﾃ｡ng] nﾄノ [Nﾄノ]</p>
                      </div>
                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">Đã ký kết tại</p>
-                        <p className="text-sm text-gray-800 font-medium">[Địa điểm ký kết]</p>
-                        <p className="text-sm text-gray-800 font-medium">Ngày [Ngày] tháng [Tháng] năm [Năm]</p>
+                        <p className="text-sm text-gray-600">ﾄ静｣ kﾃｽ k蘯ｿt t蘯｡i</p>
+                        <p className="text-sm text-gray-800 font-medium">[ﾄ雪ｻ蟻 ﾄ訴盻ノ kﾃｽ k蘯ｿt]</p>
+                        <p className="text-sm text-gray-800 font-medium">Ngﾃy [Ngﾃy] thﾃ｡ng [Thﾃ｡ng] nﾄノ [Nﾄノ]</p>
                      </div>
                   </div>
                   <div className="grid grid-cols-2 gap-8 mt-8">
                      <div className="text-center">
-                        <p className="text-sm text-gray-600 mb-2">Đại diện Bên A</p>
+                        <p className="text-sm text-gray-600 mb-2">ﾄ雪ｺ｡i di盻㌻ Bﾃｪn A</p>
                         <div className="border-b-2 border-gray-300 pb-2">
-                           <p className="text-gray-800 font-medium">[Chức vụ]</p>
-                           <p className="text-gray-800">[Họ và tên]</p>
+                           <p className="text-gray-800 font-medium">[Ch盻ｩc v盻･]</p>
+                           <p className="text-gray-800">[H盻・vﾃ tﾃｪn]</p>
                         </div>
                      </div>
                      <div className="text-center">
-                        <p className="text-sm text-gray-600 mb-2">Đại diện Bên B</p>
+                        <p className="text-sm text-gray-600 mb-2">ﾄ雪ｺ｡i di盻㌻ Bﾃｪn B</p>
                         <div className="border-b-2 border-gray-300 pb-2">
-                           <p className="text-gray-800 font-medium">[Chức vụ]</p>
-                           <p className="text-gray-800">[Họ và tên]</p>
+                           <p className="text-gray-800 font-medium">[Ch盻ｩc v盻･]</p>
+                           <p className="text-gray-800">[H盻・vﾃ tﾃｪn]</p>
                         </div>
                      </div>
                   </div>
@@ -3277,13 +3274,13 @@ const HRView = () => {
                {/* Actions */}
                <div className="flex justify-end gap-2 pt-4 border-t">
                   <Button variant="secondary" onClick={() => setShowPreviewModal(false)}>
-                     Đóng
+                     ﾄ静ｳng
                   </Button>
                   <Button onClick={() => {
                      setShowPreviewModal(false);
                      handleUseTemplate(selectedTemplate);
                   }}>
-                     Sử dụng mẫu này
+                     S盻ｭ d盻･ng m蘯ｫu nﾃy
                   </Button>
                </div>
             </div>
@@ -3291,7 +3288,7 @@ const HRView = () => {
       </Modal>
 
       {/* Payroll Detail Modal */}
-      <Modal isOpen={showPayrollDetailModal} onClose={() => setShowPayrollDetailModal(false)} title="Chi tiết Bảng lương" maxWidth="max-w-4xl">
+      <Modal isOpen={showPayrollDetailModal} onClose={() => setShowPayrollDetailModal(false)} title="Chi ti蘯ｿt B蘯｣ng lﾆｰﾆ｡ng" maxWidth="max-w-4xl">
          {selectedPayroll && (
             <div className="space-y-6">
                {/* Header */}
@@ -3299,24 +3296,24 @@ const HRView = () => {
                   <div className="flex justify-between items-start">
                      <div>
                         <h3 className="text-xl font-bold text-gray-800 mb-2">
-                           Bảng lương kỳ {selectedPayroll.payPeriod}
+                           B蘯｣ng lﾆｰﾆ｡ng k盻ｳ {selectedPayroll.payPeriod}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600">
                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                               selectedPayroll.status === 'PAID' ? 'bg-green-100 text-green-700' : 
                               selectedPayroll.status === 'APPROVED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
                            }`}>
-                              {selectedPayroll.status === 'PAID' ? 'Đã thanh toán' : 
-                               selectedPayroll.status === 'APPROVED' ? 'Đã duyệt' : 'Chờ duyệt'}
+                              {selectedPayroll.status === 'PAID' ? 'ﾄ静｣ thanh toﾃ｡n' : 
+                               selectedPayroll.status === 'APPROVED' ? 'ﾄ静｣ duy盻㏄' : 'Ch盻・duy盻㏄'}
                            </span>
-                           <span>Ngày tạo: {selectedPayroll.payDate}</span>
+                           <span>Ngﾃy t蘯｡o: {selectedPayroll.payDate}</span>
                         </div>
                      </div>
                      <div className="text-right">
                         <div className="text-2xl font-bold text-green-600">
                            {formatCurrency(selectedPayroll.netSalary)}
                         </div>
-                        <div className="text-sm text-gray-500">Lương thực nhận</div>
+                        <div className="text-sm text-gray-500">Lﾆｰﾆ｡ng th盻ｱc nh蘯ｭn</div>
                      </div>
                   </div>
                </div>
@@ -3327,23 +3324,23 @@ const HRView = () => {
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                      <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <TrendingUp size={18} className="text-green-600" />
-                        Thu nhập
+                        Thu nh蘯ｭp
                      </h4>
                      <div className="space-y-3">
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Lương cơ bản</span>
+                           <span className="text-gray-600">Lﾆｰﾆ｡ng cﾆ｡ b蘯｣n</span>
                            <span className="font-medium">{formatCurrency(selectedPayroll.baseSalary)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Phụ cấp</span>
+                           <span className="text-gray-600">Ph盻･ c蘯･p</span>
                            <span className="font-medium text-green-600">+{formatCurrency(selectedPayroll.allowances)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Thưởng</span>
+                           <span className="text-gray-600">Thﾆｰ盻殤g</span>
                            <span className="font-medium text-green-600">+{formatCurrency(selectedPayroll.bonuses)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 font-semibold text-lg">
-                           <span>Tổng thu nhập</span>
+                           <span>T盻貧g thu nh蘯ｭp</span>
                            <span className="text-green-600">{formatCurrency(selectedPayroll.grossSalary)}</span>
                         </div>
                      </div>
@@ -3353,27 +3350,27 @@ const HRView = () => {
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                      <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <TrendingDown size={18} className="text-red-600" />
-                        Khấu trừ
+                        Kh蘯･u tr盻ｫ
                      </h4>
                      <div className="space-y-3">
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Bảo hiểm xã hội (8%)</span>
+                           <span className="text-gray-600">B蘯｣o hi盻ノ xﾃ｣ h盻冓 (8%)</span>
                            <span className="font-medium text-red-600">-{formatCurrency(selectedPayroll.socialInsurance)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Bảo hiểm y tế (1.5%)</span>
+                           <span className="text-gray-600">B蘯｣o hi盻ノ y t蘯ｿ (1.5%)</span>
                            <span className="font-medium text-red-600">-{formatCurrency(selectedPayroll.healthInsurance)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Bảo hiểm thất nghiệp (1%)</span>
+                           <span className="text-gray-600">B蘯｣o hi盻ノ th蘯･t nghi盻㎝ (1%)</span>
                            <span className="font-medium text-red-600">-{formatCurrency(selectedPayroll.unemploymentInsurance)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
-                           <span className="text-gray-600">Thuế TNCN</span>
+                           <span className="text-gray-600">Thu蘯ｿ TNCN</span>
                            <span className="font-medium text-red-600">-{formatCurrency(selectedPayroll.incomeTax)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 font-semibold text-lg">
-                           <span>Tổng khấu trừ</span>
+                           <span>T盻貧g kh蘯･u tr盻ｫ</span>
                            <span className="text-red-600">{formatCurrency(selectedPayroll.totalDeductions)}</span>
                         </div>
                      </div>
@@ -3384,15 +3381,15 @@ const HRView = () => {
                <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6 border border-blue-200">
                   <div className="grid grid-cols-3 gap-6 text-center">
                      <div>
-                        <div className="text-sm text-gray-600 mb-1">Tổng thu nhập</div>
+                        <div className="text-sm text-gray-600 mb-1">T盻貧g thu nh蘯ｭp</div>
                         <div className="text-xl font-bold text-green-600">{formatCurrency(selectedPayroll.grossSalary)}</div>
                      </div>
                      <div>
-                        <div className="text-sm text-gray-600 mb-1">Tổng khấu trừ</div>
+                        <div className="text-sm text-gray-600 mb-1">T盻貧g kh蘯･u tr盻ｫ</div>
                         <div className="text-xl font-bold text-red-600">{formatCurrency(selectedPayroll.totalDeductions)}</div>
                      </div>
                      <div>
-                        <div className="text-sm text-gray-600 mb-1">Lương thực nhận</div>
+                        <div className="text-sm text-gray-600 mb-1">Lﾆｰﾆ｡ng th盻ｱc nh蘯ｭn</div>
                         <div className="text-2xl font-bold text-blue-600">{formatCurrency(selectedPayroll.netSalary)}</div>
                      </div>
                   </div>
@@ -3401,11 +3398,11 @@ const HRView = () => {
                {/* Actions */}
                <div className="flex justify-end gap-3 pt-4 border-t">
                   <Button variant="secondary" onClick={() => setShowPayrollDetailModal(false)}>
-                     Đóng
+                     ﾄ静ｳng
                   </Button>
                   <Button>
                      <Download size={16} className="mr-2" />
-                     In bảng lương
+                     In b蘯｣ng lﾆｰﾆ｡ng
                   </Button>
                </div>
             </div>
@@ -3413,17 +3410,17 @@ const HRView = () => {
       </Modal>
 
       {/* Add Leave Request Modal */}
-      <Modal isOpen={showAddLeaveModal} onClose={() => setShowAddLeaveModal(false)} title="Tạo Đơn Xin Phép">
+      <Modal isOpen={showAddLeaveModal} onClose={() => setShowAddLeaveModal(false)} title="T蘯｡o ﾄ脆｡n Xin Phﾃｩp">
          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nhﾃ｢n viﾃｪn</label>
                   <select
                      value={leaveForm.staffId}
                      onChange={(e) => setLeaveForm({...leaveForm, staffId: parseInt(e.target.value)})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="">Chọn nhân viên</option>
+                     <option value="">Ch盻肱 nhﾃ｢n viﾃｪn</option>
                      {staffList.map(staff => (
                         <option key={staff.id} value={staff.id}>
                            {staff.fullName} - {staff.department}
@@ -3432,26 +3429,26 @@ const HRView = () => {
                   </select>
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Loại nghỉ phép</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lo蘯｡i ngh盻・phﾃｩp</label>
                   <select
                      value={leaveForm.type}
                      onChange={(e) => setLeaveForm({...leaveForm, type: e.target.value})}
                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                     <option value="Nghỉ phép năm">Nghỉ phép năm</option>
-                     <option value="Nghỉ ốm">Nghỉ ốm</option>
-                     <option value="Nghỉ không lương">Nghỉ không lương</option>
-                     <option value="Nghỉ thai sản">Nghỉ thai sản</option>
-                     <option value="Nghỉ tang lễ">Nghỉ tang lễ</option>
-                     <option value="Nghỉ kết hôn">Nghỉ kết hôn</option>
-                     <option value="Nghỉ việc riêng">Nghỉ việc riêng</option>
+                     <option value="Ngh盻・phﾃｩp nﾄノ">Ngh盻・phﾃｩp nﾄノ</option>
+                     <option value="Ngh盻・盻僧">Ngh盻・盻僧</option>
+                     <option value="Ngh盻・khﾃｴng lﾆｰﾆ｡ng">Ngh盻・khﾃｴng lﾆｰﾆ｡ng</option>
+                     <option value="Ngh盻・thai s蘯｣n">Ngh盻・thai s蘯｣n</option>
+                     <option value="Ngh盻・tang l盻・>Ngh盻・tang l盻・/option>
+                     <option value="Ngh盻・k蘯ｿt hﾃｴn">Ngh盻・k蘯ｿt hﾃｴn</option>
+                     <option value="Ngh盻・vi盻㌘ riﾃｪng">Ngh盻・vi盻㌘ riﾃｪng</option>
                   </select>
                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy b蘯ｯt ﾄ黛ｺｧu</label>
                   <input
                      type="date"
                      value={leaveForm.startDate}
@@ -3460,7 +3457,7 @@ const HRView = () => {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngﾃy k蘯ｿt thﾃｺc</label>
                   <input
                      type="date"
                      value={leaveForm.endDate}
@@ -3479,38 +3476,38 @@ const HRView = () => {
                      onChange={(e) => setLeaveForm({...leaveForm, halfDay: e.target.checked})}
                      className="rounded border-gray-300 text-indigo-600"
                   />
-                  <span className="text-sm text-gray-700">Nghỉ nửa ngày</span>
+                  <span className="text-sm text-gray-700">Ngh盻・n盻ｭa ngﾃy</span>
                </label>
             </div>
 
             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">Lý do xin nghỉ</label>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Lﾃｽ do xin ngh盻・/label>
                <textarea
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({...leaveForm, reason: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   rows={4}
-                  placeholder="Nhập lý do xin nghỉ phép..."
+                  placeholder="Nh蘯ｭp lﾃｽ do xin ngh盻・phﾃｩp..."
                />
             </div>
 
             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">Thông tin liên hệ trong thời gian nghỉ</label>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Thﾃｴng tin liﾃｪn h盻・trong th盻拱 gian ngh盻・/label>
                <input
                   type="text"
                   value={leaveForm.contactInfo}
                   onChange={(e) => setLeaveForm({...leaveForm, contactInfo: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Số điện thoại hoặc email liên hệ khẩn cấp..."
+                  placeholder="S盻・ﾄ訴盻㌻ tho蘯｡i ho蘯ｷc email liﾃｪn h盻・kh蘯ｩn c蘯･p..."
                />
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
                <Button variant="secondary" onClick={() => setShowAddLeaveModal(false)}>
-                  Hủy
+                  H盻ｧy
                </Button>
                <Button onClick={handleAddLeaveRequest} disabled={!leaveForm.staffId || !leaveForm.startDate || !leaveForm.reason}>
-                  Gửi đơn xin phép
+                  G盻ｭi ﾄ柁｡n xin phﾃｩp
                </Button>
             </div>
          </div>

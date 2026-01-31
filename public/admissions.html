@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuyển sinh 2024-2025 - Trường THPT ABC</title>
+    <meta name="description" content="Trường THPT ABC - Tuyển sinh 2024-2025. Nâng tầm tri thức - Vươn ra thế giới">
+    <meta name="keywords" content="tuyển sinh, trường thpt, giáo dục, học tập">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Tuyển sinh 2024-2025 - Trường THPT ABC">
+    <meta property="og:description" content="Trường THPT ABC - Tuyển sinh 2024-2025. Nâng tầm tri thức - Vươn ra thế giới">
+    <meta property="og:image" content="https://via.placeholder.com/1200x600/6366f1/ffffff?text=Trường+THPT+ABC">
+    <meta property="og:type" content="website">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="relative container mx-auto px-6 py-20">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                        Chào mừng đến với
+                        <br />
+                        <span class="text-yellow-300">Trường THPT ABC</span>
+                    </h1>
+                    <p class="text-xl mb-8 text-blue-100">
+                        Nâng tầm tri thức - Vươn ra thế giới. Trường THPT ABC là cơ sở giáo dục uy tín với hơn 15 năm kinh nghiệm trong việc đào tạo và phát triển thế hệ tương lai.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="scrollToRegistration()" class="bg-yellow-400 text-blue-900 hover:bg-yellow-300 px-8 py-3 text-lg font-semibold transition">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 inline mr-2"></i>
+                            Đăng ký tuyển sinh
+                        </button>
+                        <button onclick="playVideo()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-8 py-3 text-lg font-semibold transition">
+                            <i data-lucide="play" class="w-5 h-5 inline mr-2"></i>
+                            Xem giới thiệu
+                        </button>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <img 
+                        src="https://via.placeholder.com/600x400/ffffff/6366f1?text=Trường+THPT+ABC"
+                        alt="Trường THPT ABC" 
+                        class="rounded-lg shadow-2xl"
+                    />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-16 bg-blue-600 text-white">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold">2,500+</div>
+                        <div class="text-sm text-blue-100">Học sinh</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold">98%</div>
+                        <div class="text-sm text-blue-100">Tỷ lệ tốt nghiệp</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold">150+</div>
+                        <div class="text-sm text-blue-100">Giải thưởng</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold">50+</div>
+                        <div class="text-sm text-blue-100">Khóa học</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Chương trình đào tạo
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Các chương trình được thiết kế phù hợp với từng lứa tuổi, 
+                    đảm bảo sự phát triển toàn diện về kiến thức, kỹ năng và nhân cách.
+                </p>
+            </div>
+
+            <div id="programs-container" class="grid md:grid-cols-3 gap-8">
+                <!-- Programs will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Khóa học nổi bật
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Nâng cao kiến thức và kỹ năng với các khóa học chất lượng cao
+                </p>
+            </div>
+
+            <div id="courses-container" class="grid md:grid-cols-3 gap-8">
+                <!-- Courses will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Cảm nhận từ phụ huynh và học sinh
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Những chia sẻ chân thực về hành trình giáo dục tại trường
+                </p>
+            </div>
+
+            <div id="testimonials-container" class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonials will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="registration" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                        Đăng ký tuyển sinh
+                    </h2>
+                    <p class="text-xl text-gray-600">
+                        Điền thông tin để nhận tư vấn và ưu đãi đặc biệt
+                    </p>
+                </div>
+
+                <div id="selectedProgramInfo" class="hidden mb-6 p-4 bg-blue-50 rounded-lg">
+                    <p class="text-blue-800">
+                        <strong>Chương trình đã chọn:</strong> 
+                        <span id="selectedProgramName" class="font-bold"></span>
+                    </p>
+                </div>
+
+                <form id="registrationForm" class="bg-white rounded-xl shadow-lg p-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên học sinh *</label>
+                            <input type="text" name="fullName" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nguyễn Văn A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ngày sinh *</label>
+                            <input type="date" name="dob" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" name="email" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="email@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Điện thoại *</label>
+                            <input type="tel" name="phone" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="09xxxxxxxx">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lớp dự kiến *</label>
+                            <select name="grade" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Chọn lớp</option>
+                                <option value="6">Lớp 6</option>
+                                <option value="7">Lớp 7</option>
+                                <option value="8">Lớp 8</option>
+                                <option value="9">Lớp 9</option>
+                                <option value="10">Lớp 10</option>
+                                <option value="11">Lớp 11</option>
+                                <option value="12">Lớp 12</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên phụ huynh *</label>
+                            <input type="text" name="parentName" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nguyễn Thị B">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Điện thoại phụ huynh *</label>
+                            <input type="tel" name="parentPhone" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="09xxxxxxxx">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Trường hiện tại</label>
+                            <input type="text" name="previousSchool" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Trường THCS XYZ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                            <input type="text" name="address" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="123 Nguyễn Huệ, Q.1, TP.HCM">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sở thích (Chọn nhiều)</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="hoc-thuat" class="mr-2">
+                                <span class="text-sm">Học thuật</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="the-thao" class="mr-2">
+                                <span class="text-sm">Thể thao</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="nghe-thuat" class="mr-2">
+                                <span class="text-sm">Nghệ thuật</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="cong-nghe" class="mr-2">
+                                <span class="text-sm">Công nghệ</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="nhac" class="mr-2">
+                                <span class="text-sm">Âm nhạc</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="interests" value="khac" class="mr-2">
+                                <span class="text-sm">Khác</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <button type="submit" class="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-medium transition">
+                            Gửi đăng ký
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-blue-600 text-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Liên hệ với chúng tôi
+                </h2>
+                <p class="text-xl text-blue-100 max-w-3xl mx-auto">
+                    Chúng tôi luôn sẵn sàng giải đáp mọi thắc mắc của bạn
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="phone" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Điện thoại</h3>
+                    <p id="contact-phone" class="text-blue-100">(028) 1234 5678</p>
+                    <p class="text-blue-100">Hotline: 1900-xxxx</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="mail" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Email</h3>
+                    <p id="contact-email" class="text-blue-100">tuyensinh@thptabc.edu.vn</p>
+                    <p class="text-blue-100">info@thptabc.edu.vn</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Địa chỉ</h3>
+                    <p id="contact-address" class="text-blue-100">123 Nguyễn Huệ, Q.1, TP.HCM</p>
+                    <p class="text-blue-100">Đón học sinh từ 7:00 - 17:00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Trường THPT ABC</h3>
+                    <p class="text-gray-300">Nâng tầm tri thức - Vươn ra thế giới</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Liên kết nhanh</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#programs" class="text-gray-300 hover:text-white">Chương trình</a></li>
+                        <li><a href="#courses" class="text-gray-300 hover:text-white">Khóa học</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-white">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Thông tin</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-300">Điện thoại: (028) 1234 5678</li>
+                        <li class="text-gray-300">Email: tuyensinh@thptabc.edu.vn</li>
+                        <li class="text-gray-300">Địa chỉ: 123 Nguyễn Huệ, Q.1, TP.HCM</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Theo dõi chúng tôi</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">&copy; 2024 Trường THPT ABC. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Đăng ký thành công!</h3>
+                <p class="text-gray-600 mb-6">Chúng tôi đã nhận được thông tin đăng ký của bạn và sẽ liên hệ trong thời gian sớm nhất.</p>
+                <button onclick="closeModal()" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-lg">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="admissions-data.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Load admissions data
+        let admissionsData = {};
+        let selectedProgram = '';
+        let selectedCourse = '';
+        
+        function loadPageContent() {
+            try {
+                admissionsData = window.loadAdmissionsData();
+                console.log('Loaded admissions data:', admissionsData);
+                
+                // Update hero section
+                updateHeroSection();
+                
+                // Update statistics
+                updateStatistics();
+                
+                // Update programs
+                updatePrograms();
+                
+                // Update courses
+                updateCourses();
+                
+                // Update testimonials
+                updateTestimonials();
+                
+                // Update contact info
+                updateContactInfo();
+                
+                // Update SEO meta tags
+                updateSEO();
+                
+            } catch (error) {
+                console.error('Error loading admissions data:', error);
+            }
+        }
+        
+        function updateHeroSection() {
+            const school = admissionsData.school;
+            if (school) {
+                // Update title
+                document.title = school.seo?.title || school.name;
+                
+                // Update hero content
+                const heroTitle = document.querySelector('h1');
+                if (heroTitle) {
+                    heroTitle.innerHTML = `Chào mừng đến với<br /><span class="text-yellow-300">${school.name}</span>`;
+                }
+                
+                const heroDescription = document.querySelector('.text-blue-100');
+                if (heroDescription) {
+                    heroDescription.textContent = `${school.slogan}. ${school.description}`;
+                }
+            }
+        }
+        
+        function updateStatistics() {
+            const stats = admissionsData.statistics;
+            if (stats && stats.length > 0) {
+                const statsContainer = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4.gap-6');
+                if (statsContainer) {
+                    statsContainer.innerHTML = stats.map(stat => `
+                        <div class="flex items-center gap-3">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                                <i data-lucide="${stat.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold">${stat.value}</div>
+                                <div class="text-sm text-blue-100">${stat.label}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                }
+            }
+        }
+        
+        function updatePrograms() {
+            const programs = admissionsData.programs;
+            if (programs && programs.length > 0) {
+                const container = document.getElementById('programs-container');
+                if (container) {
+                    container.innerHTML = programs.map(program => `
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition card-hover">
+                            <img 
+                                src="${program.image}"
+                                alt="${program.name}"
+                                class="w-full h-48 object-cover"
+                            />
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-gray-800">${program.name}</h3>
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                        ${program.grade}
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 mb-4">${program.description}</p>
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-500">Thời gian:</span>
+                                        <span class="font-medium">${program.duration}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-500">Học phí:</span>
+                                        <span class="font-medium text-blue-600">${program.tuition}</span>
+                                    </div>
+                                </div>
+                                <div class="mb-6">
+                                    <h4 class="font-semibold text-sm text-gray-700 mb-2">Đặc điểm nổi bật:</h4>
+                                    <ul class="space-y-1">
+                                        ${program.features.map(feature => `
+                                            <li class="flex items-center text-sm text-gray-600">
+                                                <i data-lucide="check-circle" class="w-4 h-4 text-green-500 mr-2"></i>
+                                                ${feature}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                                <button onclick="selectProgram('${program.name}')" class="w-full bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg transition flex items-center justify-center">
+                                    <i data-lucide="arrow-right" class="w-4 h-4 mr-2"></i>
+                                    Đăng ký chương trình
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                }
+            }
+        }
+        
+        function updateCourses() {
+            const courses = admissionsData.courses;
+            if (courses && courses.length > 0) {
+                const container = document.getElementById('courses-container');
+                if (container) {
+                    container.innerHTML = courses.map(course => `
+                        <div class="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    ${course.category}
+                                </span>
+                                <div class="flex items-center text-yellow-500">
+                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <span class="ml-1 text-sm font-medium">${course.rating}</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">${course.title}</h3>
+                            <p class="text-gray-600 mb-4">${course.instructor} • ${course.students} học viên</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm text-gray-500">${course.duration} • ${course.level}</span>
+                                <span class="text-lg font-bold text-blue-600">${course.price}</span>
+                            </div>
+                            <button onclick="selectCourse('${course.title}')" class="w-full bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg transition flex items-center justify-center">
+                                <i data-lucide="arrow-right" class="w-4 h-4 mr-2"></i>
+                                Đăng ký ngay
+                            </button>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                }
+            }
+        }
+        
+        function updateTestimonials() {
+            const testimonials = admissionsData.testimonials;
+            if (testimonials && testimonials.length > 0) {
+                const container = document.getElementById('testimonials-container');
+                if (container) {
+                    container.innerHTML = testimonials.map(testimonial => `
+                        <div class="bg-white rounded-xl p-6 shadow-lg">
+                            <div class="flex mb-4">
+                                ${[...Array(testimonial.rating)].map(() => `
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                `).join('')}
+                            </div>
+                            <p class="text-gray-600 mb-4 italic">"${testimonial.content}"</p>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">${testimonial.name}</h4>
+                                    <p class="text-sm text-gray-500">${testimonial.role}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                }
+            }
+        }
+        
+        function updateContactInfo() {
+            const contact = admissionsData.contact;
+            if (contact) {
+                const phoneElement = document.getElementById('contact-phone');
+                const emailElement = document.getElementById('contact-email');
+                const addressElement = document.getElementById('contact-address');
+                
+                if (phoneElement) phoneElement.textContent = contact.phone;
+                if (emailElement) emailElement.textContent = contact.email;
+                if (addressElement) addressElement.textContent = contact.address;
+            }
+        }
+        
+        function updateSEO() {
+            const seo = admissionsData.seo;
+            if (seo) {
+                // Update meta tags
+                document.title = seo.title;
+                
+                let metaDescription = document.querySelector('meta[name="description"]');
+                if (!metaDescription) {
+                    metaDescription = document.createElement('meta');
+                    metaDescription.name = 'description';
+                    document.head.appendChild(metaDescription);
+                }
+                metaDescription.content = seo.description;
+                
+                // Update Open Graph tags
+                let ogTitle = document.querySelector('meta[property="og:title"]');
+                if (!ogTitle) {
+                    ogTitle = document.createElement('meta');
+                    ogTitle.property = 'og:title';
+                    document.head.appendChild(ogTitle);
+                }
+                ogTitle.content = seo.title;
+                
+                let ogDescription = document.querySelector('meta[property="og:description"]');
+                if (!ogDescription) {
+                    ogDescription = document.createElement('meta');
+                    ogDescription.property = 'og:description';
+                    document.head.appendChild(ogDescription);
+                }
+                ogDescription.content = seo.description;
+            }
+        }
+        
+        // Registration functions
+        function selectProgram(programName) {
+            selectedProgram = programName;
+            document.getElementById('selectedProgramInfo').classList.remove('hidden');
+            document.getElementById('selectedProgramName').textContent = programName;
+            scrollToRegistration();
+        }
+        
+        function selectCourse(courseName) {
+            selectedCourse = courseName;
+            document.getElementById('selectedProgramInfo').classList.remove('hidden');
+            document.getElementById('selectedProgramName').textContent = courseName;
+            scrollToRegistration();
+        }
+        
+        function scrollToRegistration() {
+            document.getElementById('registration').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function playVideo() {
+            alert('Video giới thiệu sẽ được cập nhật sớm!');
+        }
+        
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+        
+        // Handle form submission
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Add selected program/course info
+            if (selectedProgram) data.selectedProgram = selectedProgram;
+            if (selectedCourse) data.selectedCourse = selectedCourse;
+            
+            // Get interests
+            const interests = [];
+            document.querySelectorAll('input[name="interests"]:checked').forEach(checkbox => {
+                interests.push(checkbox.value);
+            });
+            data.interests = interests;
+            
+            console.log('Registration data:', data);
+            
+            // Show success modal
+            document.getElementById('successModal').classList.remove('hidden');
+            
+            // Reset form
+            e.target.reset();
+            document.getElementById('selectedProgramInfo').classList.add('hidden');
+            selectedProgram = '';
+            selectedCourse = '';
+        });
+        
+        // Listen for data updates
+        window.addEventListener('admissionsDataUpdated', function(event) {
+            console.log('Admissions data updated:', event.detail);
+            loadPageContent();
+        });
+
+        // Load content when page is ready
+        document.addEventListener('DOMContentLoaded', loadPageContent);
+
+        // Re-initialize icons after dynamic content
+        setTimeout(() => {
+            lucide.createIcons();
+        }, 100);
+    </script>
+</body>
+</html>
