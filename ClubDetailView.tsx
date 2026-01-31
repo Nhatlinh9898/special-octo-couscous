@@ -500,6 +500,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   ]);
 
   const handleCreateSchedule = () => {
+    console.log('handleCreateSchedule called!');
+    console.log('Current club:', club);
+    console.log('Current schedules:', schedules);
+    
     setScheduleForm({
       title: '',
       description: '',
@@ -509,7 +513,9 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       location: club?.meetingRoom || '',
       color: 'blue'
     });
+    console.log('Schedule form set:', scheduleForm);
     setShowScheduleModal(true);
+    console.log('ShowScheduleModal set to true');
   };
 
   const handleSaveSchedule = () => {
@@ -1258,7 +1264,13 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
               <Clock className="text-blue-500" />
               Lịch sinh hoạt
             </h2>
-            <Button onClick={handleCreateSchedule} className="bg-blue-600 hover:bg-blue-700">
+            <Button 
+              onClick={() => {
+                console.log('Add Schedule button clicked!');
+                handleCreateSchedule();
+              }} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               <Plus size={16} className="mr-2" /> Thêm lịch
             </Button>
           </div>
@@ -1645,7 +1657,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
 
       {/* Schedule Modal */}
       {showScheduleModal && (
-        <Modal onClose={() => setShowScheduleModal(false)} title="Thêm lịch sinh hoạt">
+        <Modal onClose={() => {
+          console.log('Modal close called');
+          setShowScheduleModal(false);
+        }} title="Thêm lịch sinh hoạt">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
