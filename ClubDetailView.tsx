@@ -1633,113 +1633,137 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
         </div>
       </Modal>
 
-      {/* Schedule Modal */}
+      {/* Test Modal */}
       {showScheduleModal && (
-        <Modal onClose={() => {
-          console.log('Modal close called');
-          setShowScheduleModal(false);
-        }} title="Thêm lịch sinh hoạt">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
-              <input
-                type="text"
-                value={scheduleForm.title}
-                onChange={(e) => setScheduleForm({...scheduleForm, title: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="Nhập tiêu đề lịch sinh hoạt"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-              <textarea
-                value={scheduleForm.description}
-                onChange={(e) => setScheduleForm({...scheduleForm, description: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
-                placeholder="Mô tả chi tiết về lịch sinh hoạt"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            minWidth: '400px',
+            maxWidth: '600px'
+          }}>
+            <h2>Thêm lịch sinh hoạt</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Thứ trong tuần</label>
-                <select
-                  value={scheduleForm.dayOfWeek}
-                  onChange={(e) => setScheduleForm({...scheduleForm, dayOfWeek: e.target.value})}
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+                <input
+                  type="text"
+                  value={scheduleForm.title}
+                  onChange={(e) => setScheduleForm({...scheduleForm, title: e.target.value})}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                >
-                  <option value="1">Thứ 2</option>
-                  <option value="2">Thứ 3</option>
-                  <option value="3">Thứ 4</option>
-                  <option value="4">Thứ 5</option>
-                  <option value="5">Thứ 6</option>
-                  <option value="6">Thứ 7</option>
-                  <option value="0">Chủ nhật</option>
-                </select>
+                  placeholder="Nhập tiêu đề lịch sinh hoạt"
+                />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                <textarea
+                  value={scheduleForm.description}
+                  onChange={(e) => setScheduleForm({...scheduleForm, description: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                  placeholder="Mô tả chi tiết về lịch sinh hoạt"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Thứ trong tuần</label>
+                  <select
+                    value={scheduleForm.dayOfWeek}
+                    onChange={(e) => setScheduleForm({...scheduleForm, dayOfWeek: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="1">Thứ 2</option>
+                    <option value="2">Thứ 3</option>
+                    <option value="3">Thứ 4</option>
+                    <option value="4">Thứ 5</option>
+                    <option value="5">Thứ 6</option>
+                    <option value="6">Thứ 7</option>
+                    <option value="0">Chủ nhật</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                  <input
+                    type="time"
+                    value={scheduleForm.time}
+                    onChange={(e) => setScheduleForm({...scheduleForm, time: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tần suất</label>
+                  <select
+                    value={scheduleForm.frequency}
+                    onChange={(e) => setScheduleForm({...scheduleForm, frequency: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="weekly">Hàng tuần</option>
+                    <option value="biweekly">2 tuần/lần</option>
+                    <option value="monthly">Hàng tháng</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Màu sắc</label>
+                  <select
+                    value={scheduleForm.color}
+                    onChange={(e) => setScheduleForm({...scheduleForm, color: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="blue">Xanh dương</option>
+                    <option value="green">Xanh lá</option>
+                    <option value="purple">Tím</option>
+                    <option value="red">Đỏ</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
                 <input
-                  type="time"
-                  value={scheduleForm.time}
-                  onChange={(e) => setScheduleForm({...scheduleForm, time: e.target.value})}
+                  type="text"
+                  value={scheduleForm.location}
+                  onChange={(e) => setScheduleForm({...scheduleForm, location: e.target.value})}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="Địa điểm sinh hoạt"
                 />
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tần suất</label>
-                <select
-                  value={scheduleForm.frequency}
-                  onChange={(e) => setScheduleForm({...scheduleForm, frequency: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                >
-                  <option value="weekly">Hàng tuần</option>
-                  <option value="biweekly">2 tuần/lần</option>
-                  <option value="monthly">Hàng tháng</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Màu sắc</label>
-                <select
-                  value={scheduleForm.color}
-                  onChange={(e) => setScheduleForm({...scheduleForm, color: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                >
-                  <option value="blue">Xanh dương</option>
-                  <option value="green">Xanh lá</option>
-                  <option value="purple">Tím</option>
-                  <option value="red">Đỏ</option>
-                </select>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
-              <input
-                type="text"
-                value={scheduleForm.location}
-                onChange={(e) => setScheduleForm({...scheduleForm, location: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="Địa điểm sinh hoạt"
-              />
+            <div className="flex justify-end gap-3 mt-6">
+              <button 
+                onClick={() => setShowScheduleModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleSaveSchedule} 
+                disabled={!scheduleForm.title}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Lưu lịch
+              </button>
             </div>
           </div>
-          
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="secondary" onClick={() => setShowScheduleModal(false)}>
-              Hủy
-            </Button>
-            <Button onClick={handleSaveSchedule} disabled={!scheduleForm.title}>
-              Lưu lịch
-            </Button>
-          </div>
-        </Modal>
+        </div>
       )}
       </div>
     </div>
