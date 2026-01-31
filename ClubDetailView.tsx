@@ -1258,11 +1258,9 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
               <Clock className="text-blue-500" />
               Lịch sinh hoạt
             </h2>
-            {(isUserAdmin || isUserMember) && (
-              <Button onClick={handleCreateSchedule} className="bg-blue-600 hover:bg-blue-700">
-                <Plus size={16} className="mr-2" /> Thêm lịch
-              </Button>
-            )}
+            <Button onClick={handleCreateSchedule} className="bg-blue-600 hover:bg-blue-700">
+              <Plus size={16} className="mr-2" /> Thêm lịch
+            </Button>
           </div>
 
           {schedules.length === 0 ? (
