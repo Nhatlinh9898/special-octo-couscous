@@ -1139,20 +1139,26 @@ export const MOCK_FEEDBACKS: FeedbackItem[] = [
 
 export const MOCK_APPLICANTS: Applicant[] = [
   { id: 1, code: "TS001", fullName: "Le Van Em", dob: "2009-02-15", email: "em.le@gmail.com", phone: "0909000111", gradeApplying: 10, status: 'New', applicationDate: "2023-11-20" },
-  { id: 2, code: "TS002", fullName: "Nguyen Thi Ut", dob: "2009-05-10", email: "ut.nguyen@gmail.com", phone: "0909000222", gradeApplying: 10, status: 'Interview', applicationDate: "2023-11-15", interviewDate: "2023-11-25 09:00" },
-  { id: 3, code: "TS003", fullName: "Tran Van Teo", dob: "2009-12-01", email: "teo.tran@gmail.com", phone: "0909000333", gradeApplying: 11, status: 'Accepted', applicationDate: "2023-11-10", score: 8.5 },
+  { id: 2, code: "TS002", fullName: "Nguyen Van Teo", dob: "2009-12-01", email: "teo.tran@gmail.com", phone: "0909000333", gradeApplying: 11, status: 'Accepted', applicationDate: "2023-11-10", score: 8.5 }
 ];
 
 export const MOCK_CLUBS: Club[] = [
-  { id: 1, name: "CLB Bóng Đá", category: "Sports", presidentName: "Tran Minh Tuan", memberCount: 25, description: "Rèn luyện sức khỏe và tinh thần đồng đội.", image: "https://placehold.co/400x200/green/white?text=Football+Club", meetingDay: "Thứ 4, 17:00" },
-  { id: 2, name: "CLB Guitar", category: "Arts", presidentName: "Le Thu Ha", memberCount: 15, description: "Nơi thỏa mãn đam mê âm nhạc.", image: "https://placehold.co/400x200/orange/white?text=Guitar+Club", meetingDay: "Thứ 6, 16:30" },
-  { id: 3, name: "CLB Lập Trình", category: "Academic", presidentName: "Do Minh Duc", memberCount: 20, description: "Học lập trình Python và Web.", image: "https://placehold.co/400x200/blue/white?text=Coding+Club", meetingDay: "Thứ 7, 14:00" },
+  { id: 1, name: "CLB Tin học", category: "Academic", presidentName: "Trần Thị Bình", memberCount: 45, description: "Câu lạc bộ dành cho những ai đam mê công nghệ và lập trình", image: "https://placehold.co/400x200/blue/white?text=IT+Club", meetingDay: "Thứ 3, 15:00" },
+  { id: 2, name: "CLB Bóng đá", category: "Sports", presidentName: "Phạm Văn Hùng", memberCount: 22, description: "Câu lạc bộ bóng đá với mục tiêu phát triển thể chất và tinh thần đồng đội", image: "https://placehold.co/400x200/green/white?text=Football+Club", meetingDay: "Thứ 4, 17:00" },
+  { id: 3, name: "CLB Âm nhạc", category: "Arts", presidentName: "Trần Quang Duy", memberCount: 30, description: "Câu lạc bộ dành cho những ai yêu thích âm nhạc và muốn thể hiện tài năng", image: "https://placehold.co/400x200/purple/white?text=Music+Club", meetingDay: "Thứ 5, 16:00" },
+  { id: 4, name: "CLB Tiếng Anh", category: "Academic", presidentName: "Hoàng Văn Nam", memberCount: 38, description: "Câu lạc bộ giúp cải thiện kỹ năng tiếng Anh và giao tiếp quốc tế", image: "https://placehold.co/400x200/red/white?text=English+Club", meetingDay: "Thứ 6, 14:30" },
+  { id: 5, name: "CLB Tình nguyện", category: "Social", presidentName: "Bùi Minh Tuấn", memberCount: 55, description: "Câu lạc bộ tổ chức các hoạt động thiện nguyện và phục vụ cộng đồng", image: "https://placehold.co/400x200/yellow/white?text=Volunteer+Club", meetingDay: "Thứ 7, 10:00" }
 ];
 
 export const MOCK_CLUB_ACTIVITIES: ClubActivity[] = [
-  { id: 1, clubId: 1, title: "Giao hữu với trường THPT Chu Văn An", date: "2023-12-10", description: "Trận đấu giao hữu tại sân vận động Mỹ Đình." },
-  { id: 2, clubId: 2, title: "Biểu diễn văn nghệ Giáng Sinh", date: "2023-12-24", description: "Chuẩn bị các tiết mục cho đêm hội Noel." },
+  { id: 1, clubId: 1, title: "Workshop Python", date: "2024-01-20", description: "Workshop lập trình Python cơ bản" },
+  { id: 2, clubId: 2, title: "Tập luyện cuối tuần", date: "2024-01-21", description: "Buổi tập luyện bóng đá cuối tuần" },
+  { id: 3, clubId: 3, title: "Buổi biểu diễn", date: "2024-01-22", description: "Buổi biểu diễn âm nhạc tháng 1" },
+  { id: 4, clubId: 4, title: "English Speaking Club", date: "2024-01-23", description: "Buổi nói chuyện tiếng Anh hàng tuần" },
+  { id: 5, clubId: 5, title: "Chiến dịch tình nguyện", date: "2024-01-24", description: "Chiến dịch tình nguyện mùa xuân" }
 ];
+
+// ...
 
 export const MOCK_PROJECTS: ResearchProject[] = [
   { id: 1, title: "Hệ thống tưới cây tự động IoT", field: "Công nghệ", leaderName: "Nguyen Van A", members: 3, status: "Ongoing", budget: 5000000, startDate: "2023-09-15", progress: 60 },

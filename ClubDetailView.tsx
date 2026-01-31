@@ -100,71 +100,256 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   };
 
   const loadMockData = () => {
-    // Mock club data
-    setClub({
-      id: parseInt(clubId || '1'),
-      name: 'CLB Tin học',
-      description: 'Câu lạc bộ dành cho những ai đam mê công nghệ và lập trình',
-      category: 'Công nghệ',
-      image: '/club-tech.jpg',
-      advisor: { fullName: 'Nguyễn Văn An', email: 'an.nv@school.edu.vn' },
-      meetingRoom: 'Phòng Lab 1',
-      schedules: [],
-      _count: { members: 45, schedules: 3 }
-    });
-
-    // Mock members
-    setMembers([
-      {
+    const clubIdNum = parseInt(clubId || '1');
+    
+    // Mock data for different clubs
+    const clubDataMap: { [key: number]: any } = {
+      1: {
         id: 1,
-        fullName: 'Trần Thị Bình',
-        email: 'binh.tt@school.edu.vn',
-        role: 'president',
-        joinedDate: '2023-09-01',
-        status: 'active',
-        avatar: '/avatar1.jpg'
+        name: 'CLB Tin học',
+        description: 'Câu lạc bộ dành cho những ai đam mê công nghệ và lập trình',
+        category: 'Công nghệ',
+        image: '/club-tech.jpg',
+        advisor: { fullName: 'Nguyễn Văn An', email: 'an.nv@school.edu.vn' },
+        meetingRoom: 'Phòng Lab 1',
+        schedules: [],
+        _count: { members: 45, schedules: 3 }
       },
-      {
+      2: {
         id: 2,
-        fullName: 'Lê Văn Cường',
-        email: 'cuong.lv@school.edu.vn',
-        role: 'member',
-        joinedDate: '2023-09-15',
-        status: 'active',
-        avatar: '/avatar2.jpg'
+        name: 'CLB Bóng đá',
+        description: 'Câu lạc bộ bóng đá với mục tiêu phát triển thể chất và tinh thần đồng đội',
+        category: 'Thể thao',
+        image: '/club-soccer.jpg',
+        advisor: { fullName: 'Trần Văn B', email: 'b.tv@school.edu.vn' },
+        meetingRoom: 'Sân bóng A',
+        schedules: [],
+        _count: { members: 22, schedules: 5 }
+      },
+      3: {
+        id: 3,
+        name: 'CLB Âm nhạc',
+        description: 'Câu lạc bộ dành cho những ai yêu thích âm nhạc và muốn thể hiện tài năng',
+        category: 'Nghệ thuật',
+        image: '/club-music.jpg',
+        advisor: { fullName: 'Lê Thị C', email: 'c.lt@school.edu.vn' },
+        meetingRoom: 'Phòng nhạc',
+        schedules: [],
+        _count: { members: 30, schedules: 4 }
+      },
+      4: {
+        id: 4,
+        name: 'CLB Tiếng Anh',
+        description: 'Câu lạc bộ giúp cải thiện kỹ năng tiếng Anh và giao tiếp quốc tế',
+        category: 'Học thuật',
+        image: '/club-english.jpg',
+        advisor: { fullName: 'Phạm Văn D', email: 'd.pv@school.edu.vn' },
+        meetingRoom: 'Phòng 201',
+        schedules: [],
+        _count: { members: 38, schedules: 3 }
+      },
+      5: {
+        id: 5,
+        name: 'CLB Tình nguyện',
+        description: 'Câu lạc bộ tổ chức các hoạt động thiện nguyện và phục vụ cộng đồng',
+        category: 'Tình nguyện',
+        image: '/club-volunteer.jpg',
+        advisor: { fullName: 'Nguyễn Thị E', email: 'e.nt@school.edu.vn' },
+        meetingRoom: 'Phòng sinh hoạt chung',
+        schedules: [],
+        _count: { members: 55, schedules: 6 }
       }
-    ]);
+    };
 
-    // Mock posts
-    setPosts([
-      {
-        id: 1,
-        title: 'Workshop Lập trình Python cơ bản',
-        content: 'Chúng tôi sẽ tổ chức workshop về Python cho thành viên mới...',
-        type: 'announcement',
-        author: 'Trần Thị Bình',
-        authorAvatar: '/avatar1.jpg',
-        createdAt: '2024-01-15T10:00:00Z',
-        likes: 12,
-        comments: 5,
-        images: ['/python-workshop.jpg']
-      }
-    ]);
+    const membersDataMap: { [key: number]: any[] } = {
+      1: [
+        { id: 1, fullName: 'Trần Thị Bình', email: 'binh.tt@school.edu.vn', role: 'president', joinedDate: '2023-09-01', status: 'active', avatar: '/avatar1.jpg' },
+        { id: 2, fullName: 'Lê Văn Cường', email: 'cuong.lv@school.edu.vn', role: 'member', joinedDate: '2023-09-15', status: 'active', avatar: '/avatar2.jpg' }
+      ],
+      2: [
+        { id: 3, fullName: 'Phạm Văn Hùng', email: 'hung.pv@school.edu.vn', role: 'president', joinedDate: '2023-09-01', status: 'active', avatar: '/avatar3.jpg' },
+        { id: 4, fullName: 'Nguyễn Thị Mai', email: 'mai.nt@school.edu.vn', role: 'vice_president', joinedDate: '2023-09-10', status: 'active', avatar: '/avatar4.jpg' }
+      ],
+      3: [
+        { id: 5, fullName: 'Trần Quang Duy', email: 'duy.tq@school.edu.vn', role: 'president', joinedDate: '2023-09-01', status: 'active', avatar: '/avatar5.jpg' },
+        { id: 6, fullName: 'Lê Thu An', email: 'an.lt@school.edu.vn', role: 'member', joinedDate: '2023-09-20', status: 'active', avatar: '/avatar6.jpg' }
+      ],
+      4: [
+        { id: 7, fullName: 'Hoàng Văn Nam', email: 'nam.hv@school.edu.vn', role: 'president', joinedDate: '2023-09-01', status: 'active', avatar: '/avatar7.jpg' },
+        { id: 8, fullName: 'Đỗ Thị Lan', email: 'lan.dt@school.edu.vn', role: 'secretary', joinedDate: '2023-09-05', status: 'active', avatar: '/avatar8.jpg' }
+      ],
+      5: [
+        { id: 9, fullName: 'Bùi Minh Tuấn', email: 'tuan.bm@school.edu.vn', role: 'president', joinedDate: '2023-09-01', status: 'active', avatar: '/avatar9.jpg' },
+        { id: 10, fullName: 'Vũ Thu Hà', email: 'ha.vt@school.edu.vn', role: 'treasurer', joinedDate: '2023-09-08', status: 'active', avatar: '/avatar10.jpg' }
+      ]
+    };
 
-    // Mock events
-    setEvents([
-      {
-        id: 1,
-        title: 'Workshop Python cơ bản',
-        description: 'Học lập trình Python từ đầu',
-        date: '2024-02-01',
-        time: '14:00',
-        location: 'Phòng Lab 1',
-        maxParticipants: 30,
-        currentParticipants: 15,
-        registrationDeadline: '2024-01-30'
-      }
-    ]);
+    const postsDataMap: { [key: number]: any[] } = {
+      1: [
+        {
+          id: 1,
+          title: 'Workshop Lập trình Python cơ bản',
+          content: 'Chúng tôi sẽ tổ chức workshop về Python cho thành viên mới. Hãy tham gia để học những kiến thức cơ bản về lập trình!',
+          type: 'announcement',
+          author: 'Trần Thị Bình',
+          authorAvatar: '/avatar1.jpg',
+          createdAt: '2024-01-15T10:00:00Z',
+          likes: 12,
+          comments: 5,
+          images: ['/python-workshop.jpg'],
+          clubId: 1
+        }
+      ],
+      2: [
+        {
+          id: 2,
+          title: 'Tập luyện cuối tuần',
+          content: 'Chúng ta sẽ có buổi tập luyện vào cuối tuần này. Mọi người nhớ chuẩn bị đồ dùng cá nhân và đến đúng giờ!',
+          type: 'announcement',
+          author: 'Phạm Văn Hùng',
+          authorAvatar: '/avatar3.jpg',
+          createdAt: '2024-01-16T14:00:00Z',
+          likes: 8,
+          comments: 3,
+          images: ['/soccer-training.jpg'],
+          clubId: 2
+        }
+      ],
+      3: [
+        {
+          id: 3,
+          title: 'Buổi biểu diễn tháng 2',
+          content: 'CLB âm nhạc sẽ có buổi biểu diễn chào mừng năm mới. Các thành viên hãy đăng ký tham gia biểu diễn!',
+          type: 'event',
+          author: 'Trần Quang Duy',
+          authorAvatar: '/avatar5.jpg',
+          createdAt: '2024-01-17T09:00:00Z',
+          likes: 15,
+          comments: 7,
+          images: ['/music-performance.jpg'],
+          clubId: 3
+        }
+      ],
+      4: [
+        {
+          id: 4,
+          title: 'English Speaking Club',
+          content: 'Hàng tuần chúng ta sẽ có buổi nói chuyện tiếng Anh để cải thiện kỹ năng giao tiếp. Mọi người đều welcome!',
+          type: 'discussion',
+          author: 'Hoàng Văn Nam',
+          authorAvatar: '/avatar7.jpg',
+          createdAt: '2024-01-18T16:00:00Z',
+          likes: 20,
+          comments: 10,
+          images: ['/english-club.jpg'],
+          clubId: 4
+        }
+      ],
+      5: [
+        {
+          id: 5,
+          title: 'Chiến dịch Mùa xuân tình nguyện',
+          content: 'CLB sẽ tổ chức chiến dịch tình nguyện tại các làng xã vùng cao. Hãy cùng nhau lan tỏa yêu thương!',
+          type: 'achievement',
+          author: 'Bùi Minh Tuấn',
+          authorAvatar: '/avatar9.jpg',
+          createdAt: '2024-01-19T11:00:00Z',
+          likes: 25,
+          comments: 12,
+          images: ['/volunteer-campaign.jpg'],
+          clubId: 5
+        }
+      ]
+    };
+
+    const eventsDataMap: { [key: number]: any[] } = {
+      1: [
+        {
+          id: 1,
+          title: 'Workshop Python cơ bản',
+          description: 'Học lập trình Python từ đầu',
+          date: '2024-02-01',
+          time: '14:00',
+          location: 'Phòng Lab 1',
+          maxParticipants: 30,
+          currentParticipants: 15,
+          registrationDeadline: '2024-01-30',
+          status: 'upcoming',
+          clubId: 1,
+          createdAt: '2024-01-15T10:00:00Z'
+        }
+      ],
+      2: [
+        {
+          id: 2,
+          title: 'Trận giao hữu với CLB khác',
+          description: 'Trận đấu giao hữu để tăng cường kinh nghiệm',
+          date: '2024-02-03',
+          time: '16:00',
+          location: 'Sân bóng A',
+          maxParticipants: 22,
+          currentParticipants: 20,
+          registrationDeadline: '2024-02-01',
+          status: 'upcoming',
+          clubId: 2,
+          createdAt: '2024-01-16T14:00:00Z'
+        }
+      ],
+      3: [
+        {
+          id: 3,
+          title: 'Recital Âm nhạc',
+          description: 'Buổi biểu diễn tài năng của thành viên',
+          date: '2024-02-05',
+          time: '19:00',
+          location: 'Hội trường',
+          maxParticipants: 100,
+          currentParticipants: 75,
+          registrationDeadline: '2024-02-03',
+          status: 'upcoming',
+          clubId: 3,
+          createdAt: '2024-01-17T09:00:00Z'
+        }
+      ],
+      4: [
+        {
+          id: 4,
+          title: 'Debate Competition',
+          description: 'Cuộc thi tranh biện tiếng Anh',
+          date: '2024-02-07',
+          time: '14:30',
+          location: 'Phòng 201',
+          maxParticipants: 40,
+          currentParticipants: 32,
+          registrationDeadline: '2024-02-05',
+          status: 'upcoming',
+          clubId: 4,
+          createdAt: '2024-01-18T16:00:00Z'
+        }
+      ],
+      5: [
+        {
+          id: 5,
+          title: 'Chuyến đi tình nguyện',
+          description: 'Thăm và tặng quà cho trẻ em vùng cao',
+          date: '2024-02-10',
+          time: '07:00',
+          location: 'Huyện X',
+          maxParticipants: 25,
+          currentParticipants: 18,
+          registrationDeadline: '2024-02-08',
+          status: 'upcoming',
+          clubId: 5,
+          createdAt: '2024-01-19T11:00:00Z'
+        }
+      ]
+    };
+
+    // Set data based on clubId
+    setClub(clubDataMap[clubIdNum] || clubDataMap[1]);
+    setMembers(membersDataMap[clubIdNum] || membersDataMap[1]);
+    setPosts(postsDataMap[clubIdNum] || postsDataMap[1]);
+    setEvents(eventsDataMap[clubIdNum] || eventsDataMap[1]);
   };
 
   const loadCurrentUser = () => {
