@@ -616,7 +616,10 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   const isUserMember = members.some(m => m.email === currentUser?.email);
   const isUserAdmin = members.some(m => m.email === currentUser?.email && ['president', 'vice_president'].includes(m.role));
 
+  console.log('ClubDetailView rendering...', { clubId, club: !!club, loading });
+
   if (loading) {
+    console.log('Still loading...');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 size={48} className="animate-spin text-blue-600" />
@@ -625,6 +628,7 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   }
 
   if (!club) {
+    console.log('No club found:', clubId);
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -637,8 +641,32 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     );
   }
 
+  console.log('About to render tabs...', { 
+    activeTab, 
+    postsCount: posts.length, 
+    membersCount: members.length,
+    eventsCount: events.length 
+  });
+
   return (
     <div className="space-y-6">
+      {/* TEST COMPONENT - Remove this after debugging */}
+      <div className="bg-red-100 border-2 border-red-500 rounded-lg p-4">
+        <h3 className="text-red-700 font-bold">TEST: ClubDetailView is rendering!</h3>
+        <p>Club ID: {clubId}</p>
+        <p>Club Name: {club?.name}</p>
+        <p>Loading: {loading ? 'Yes' : 'No'}</p>
+        <p>Posts: {posts.length}</p>
+        <p>Members: {members.length}</p>
+        <p>Events: {events.length}</p>
+        <button 
+          onClick={() => alert('Test button works!')}
+          className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+        >
+          Test Button
+        </button>
+      </div>
+
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative">
@@ -688,6 +716,37 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* SIMPLE TABS TEST */}
+      <div className="bg-blue-100 border-2 border-blue-500 rounded-lg p-4">
+        <h3 className="text-blue-700 font-bold mb-2">SIMPLE TABS TEST</h3>
+        <div className="flex gap-2 mb-4">
+          <button 
+            onClick={() => setActiveTab('posts')}
+            className={`px-4 py-2 rounded ${activeTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Posts ({posts.length})
+          </button>
+          <button 
+            onClick={() => setActiveTab('members')}
+            className={`px-4 py-2 rounded ${activeTab === 'members' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Members ({members.length})
+          </button>
+          <button 
+            onClick={() => setActiveTab('events')}
+            className={`px-4 py-2 rounded ${activeTab === 'events' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Events ({events.length})
+          </button>
+        </div>
+        <div className="bg-white p-4 rounded">
+          <p>Current Tab: <strong>{activeTab}</strong></p>
+          {activeTab === 'posts' && <p>Posts content here...</p>}
+          {activeTab === 'members' && <p>Members content here...</p>}
+          {activeTab === 'events' && <p>Events content here...</p>}
         </div>
       </div>
 
