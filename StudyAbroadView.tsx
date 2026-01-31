@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Globe, Plane, GraduationCap, Clock, FileText, CheckCircle2, Loader2, Award } from 'lucide-react';
-import { api, MOCK_STUDENTS } from './data';
+import { api, MOCK_STUDENTS, MOCK_CLASSES } from './data';
 import { PartnerUniversity, ExchangeProgram, AbroadApplication, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
@@ -40,10 +40,14 @@ const StudyAbroadView = () => {
   // Update form when user changes
   useEffect(() => {
     if (user) {
+      const studentInfo = getStudentInfo(user.id);
       setApplicationForm(prev => ({
         ...prev,
-        fullName: user.fullName || '',
-        email: user.email || ''
+        fullName: studentInfo.fullName,
+        email: studentInfo.email,
+        phone: studentInfo.phone,
+        currentSchool: studentInfo.schoolName,
+        grade: studentInfo.grade
       }));
     }
   }, [user]);
@@ -75,12 +79,19 @@ const StudyAbroadView = () => {
 
   const handleApplyProgram = (program: ExchangeProgram) => {
     setSelectedProgram(program);
+    
+    // Get student information
+    const studentInfo = getStudentInfo(user?.id || 1001);
+    
     setApplicationForm(prev => ({
       ...prev,
       programId: program.id,
-      studentId: user?.id || 1001, // Use user ID or fallback
-      fullName: user?.fullName || '',
-      email: user?.email || ''
+      studentId: user?.id || 1001,
+      fullName: studentInfo.fullName,
+      email: studentInfo.email,
+      phone: studentInfo.phone,
+      currentSchool: studentInfo.schoolName,
+      grade: studentInfo.grade
     }));
     setShowApplicationModal(true);
   };
@@ -138,6 +149,45 @@ const StudyAbroadView = () => {
   }
   // Then check MOCK_STUDENTS
   return MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
+};
+
+const getStudentInfo = (userId: number) => {
+  // First check if it's the current user
+  if (user && userId === user.id) {
+    // For admin user, return default info
+    return {
+      fullName: user.fullName,
+      email: user.email,
+      phone: '',
+      className: 'Admin',
+      schoolName: 'EduManager System',
+      grade: 'Admin'
+    };
+  }
+  
+  // Then check MOCK_STUDENTS
+  const student = MOCK_STUDENTS.find(s => s.id === userId);
+  if (student) {
+    const classInfo = MOCK_CLASSES.find(c => c.id === student.classId);
+    return {
+      fullName: student.fullName,
+      email: student.email || '',
+      phone: student.phone || '',
+      className: classInfo?.name || 'Unknown Class',
+      schoolName: 'Trường THPT EduManager',
+      grade: `Lớp ${classInfo?.gradeLevel || 'Unknown'}`
+    };
+  }
+  
+  // Default fallback
+  return {
+    fullName: 'Unknown',
+    email: '',
+    phone: '',
+    className: 'Unknown',
+    schoolName: 'Unknown',
+    grade: 'Unknown'
+  };
 };
 
   const getProgramTitle = (id: number) => programs.find(p => p.id === id)?.title || "Unknown";
@@ -296,7 +346,7 @@ const StudyAbroadView = () => {
             </div>
 
             <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-              <h4 className="font-bold text-green-800 mb-2">Thông tin đăng nhập (tự động điền)</h4>
+              <h4 className="font-bold text-green-800 mb-2">Thông tin học sinh (tự động điền)</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Họ và tên:</span>
@@ -305,6 +355,14 @@ const StudyAbroadView = () => {
                 <div>
                   <span className="text-gray-600">Email:</span>
                   <span className="ml-2 font-medium">{user?.email}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Lớp:</span>
+                  <span className="ml-2 font-medium">{getStudentInfo(user?.id || 1001).className}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Trường:</span>
+                  <span className="ml-2 font-medium">{getStudentInfo(user?.id || 1001).schoolName}</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Vai trò:</span>
@@ -350,37 +408,46 @@ const StudyAbroadView = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Điện thoại *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Điện thoại * 
+                  <span className="text-xs text-green-600 ml-2">(đã điền sẵn)</span>
+                </label>
                 <input
                   type="tel"
                   required
                   value={applicationForm.phone}
                   onChange={(e) => setApplicationForm({...applicationForm, phone: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-green-50"
                   placeholder="09xxxxxxxx"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lớp *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Lớp * 
+                  <span className="text-xs text-green-600 ml-2">(đã điền sẵn)</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={applicationForm.grade}
                   onChange={(e) => setApplicationForm({...applicationForm, grade: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-green-50"
                   placeholder="Lớp 12"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Trường hiện tại *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Trường hiện tại * 
+                <span className="text-xs text-green-600 ml-2">(đã điền sẵn)</span>
+              </label>
               <input
                 type="text"
                 required
                 value={applicationForm.currentSchool}
                 onChange={(e) => setApplicationForm({...applicationForm, currentSchool: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-green-50"
                 placeholder="Trường THPT ABC"
               />
             </div>
