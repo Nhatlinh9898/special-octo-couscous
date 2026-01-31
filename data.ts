@@ -1,4 +1,4 @@
-import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage, MealSchedule, FinancialTransaction, ProfitAnalysis, BudgetPlan, Supplier, ExpenseReport } from './types';
+import { Teacher, Class, Student, Subject, LMSMaterial, ChatMessage, ScheduleItem, Invoice, Book, SchoolEvent, Exam, TransportRoute, InventoryItem, Staff, LeaveRequest, CanteenItem, DormRoom, Alumnus, MedicalRecord, HealthIncident, Survey, FeedbackItem, Applicant, Club, ClubActivity, ResearchProject, CounselingSession, PartnerUniversity, ExchangeProgram, AbroadApplication, IoTDevice, AIMessage, MealSchedule, FinancialTransaction, ProfitAnalysis, BudgetPlan, Supplier, ExpenseReport, InventoryTransaction, InventoryReport } from './types';
 
 export const MOCK_TEACHERS: Teacher[] = [
   { id: 101, fullName: "Nguyen Van A", email: "anv@school.edu.vn", phone: "0901234567", major: "Toán Học", avatar: "https://ui-avatars.com/api/?name=Nguyen+Van+A&background=e0e7ff&color=4338ca" },
@@ -735,6 +735,252 @@ export const MOCK_EXPENSE_REPORTS: ExpenseReport[] = [
       { month: 'Tháng 11', amount: 16000000 },
       { month: 'Tháng 12', amount: 17500000 },
       { month: 'Tháng 1', amount: 18000000 }
+    ]
+  }
+];
+
+// Inventory Transaction Data
+export const MOCK_INVENTORY_TRANSACTIONS: InventoryTransaction[] = [
+  {
+    id: 1,
+    inventoryItemId: 1,
+    itemName: "Thịt bò tươi",
+    transactionType: "in",
+    quantity: 20,
+    unitPrice: 180000,
+    totalValue: 3600000,
+    reference: "INV-IN-001",
+    reason: "Nhập kho định kỳ tuần 1",
+    date: "2024-01-15",
+    time: "09:30:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Công ty TNHH Thực phẩm ABC",
+    batchNumber: "BEO20240115001",
+    expiryDate: "2024-01-25",
+    notes: "Nhập kho từ nhà cung cấp uy tín, chất lượng tốt"
+  },
+  {
+    id: 2,
+    inventoryItemId: 2,
+    itemName: "Thịt heo tươi",
+    transactionType: "in",
+    quantity: 15,
+    unitPrice: 120000,
+    totalValue: 1800000,
+    reference: "INV-IN-002",
+    reason: "Nhập kho bổ sung",
+    date: "2024-01-14",
+    time: "14:15:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Công ty TNHH Thực phẩm ABC",
+    batchNumber: "HEO20240114001",
+    expiryDate: "2024-01-20",
+    notes: "Nhập kho gấp do nhu cầu tăng"
+  },
+  {
+    id: 3,
+    inventoryItemId: 5,
+    itemName: "Rau củ tươi",
+    transactionType: "out",
+    quantity: 8,
+    unitPrice: 25000,
+    totalValue: 200000,
+    reference: "INV-OUT-001",
+    reason: "Sử dụng cho bữa trưa ngày 15/01",
+    date: "2024-01-15",
+    time: "11:30:00",
+    createdBy: "Lê Thị Mai",
+    approvedBy: "Nguyễn Thị Hanh",
+    status: "completed",
+    notes: "Sử dụng cho nấu ăn học sinh"
+  },
+  {
+    id: 4,
+    inventoryItemId: 11,
+    itemName: "Nước suối đóng chai",
+    transactionType: "in",
+    quantity: 50,
+    unitPrice: 8000,
+    totalValue: 400000,
+    reference: "INV-IN-003",
+    reason: "Nhập kho định kỳ",
+    date: "2024-01-13",
+    time: "10:00:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Công ty Nước giải khát",
+    batchNumber: "NS20240113001",
+    notes: "Nhập kho nước suối cho tuần 2"
+  },
+  {
+    id: 5,
+    inventoryItemId: 11,
+    itemName: "Nước suối đóng chai",
+    transactionType: "out",
+    quantity: 25,
+    unitPrice: 8000,
+    totalValue: 200000,
+    reference: "INV-OUT-002",
+    reason: "Bán cho học sinh",
+    date: "2024-01-14",
+    time: "13:45:00",
+    createdBy: "Lê Thị Mai",
+    approvedBy: "Nguyễn Thị Hanh",
+    status: "completed",
+    notes: "Bán tại căng tin"
+  },
+  {
+    id: 6,
+    inventoryItemId: 3,
+    itemName: "Gà tươi",
+    transactionType: "in",
+    quantity: 25,
+    unitPrice: 85000,
+    totalValue: 2125000,
+    reference: "INV-IN-004",
+    reason: "Nhập kho từ nông trại",
+    date: "2024-01-12",
+    time: "08:30:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Nông trại XYZ",
+    batchNumber: "GA20240112001",
+    expiryDate: "2024-01-18",
+    notes: "Gà tươi sạch, chất lượng cao"
+  },
+  {
+    id: 7,
+    inventoryItemId: 16,
+    itemName: "Hộp xốp đựng thực phẩm",
+    transactionType: "in",
+    quantity: 100,
+    unitPrice: 1500,
+    totalValue: 150000,
+    reference: "INV-IN-005",
+    reason: "Nhập kho bao bì",
+    date: "2024-01-10",
+    time: "15:00:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Công ty Bao bì VN",
+    notes: "Nhập kho hộp xốp cho đóng gói đồ ăn"
+  },
+  {
+    id: 8,
+    inventoryItemId: 16,
+    itemName: "Hộp xốp đựng thực phẩm",
+    transactionType: "out",
+    quantity: 30,
+    unitPrice: 1500,
+    totalValue: 45000,
+    reference: "INV-OUT-003",
+    reason: "Sử dụng cho đóng gói cơm trưa",
+    date: "2024-01-13",
+    time: "10:30:00",
+    createdBy: "Lê Thị Mai",
+    approvedBy: "Nguyễn Thị Hanh",
+    status: "completed",
+    notes: "Sử dụng cho đóng gói cơm trưa học sinh"
+  },
+  {
+    id: 9,
+    inventoryItemId: 20,
+    itemName: "Dầu ăn",
+    transactionType: "in",
+    quantity: 10,
+    unitPrice: 45000,
+    totalValue: 450000,
+    reference: "INV-IN-006",
+    reason: "Nhập kho dầu ăn",
+    date: "2024-01-11",
+    time: "09:00:00",
+    createdBy: "Nguyễn Thị Hanh",
+    approvedBy: "Trần Văn Bảo",
+    status: "completed",
+    supplier: "Công ty Hóa chất ABC",
+    batchNumber: "DAU20240111001",
+    expiryDate: "2024-12-11",
+    notes: "Dầu ăn tinh khiết, dùng cho nấu ăn"
+  },
+  {
+    id: 10,
+    inventoryItemId: 20,
+    itemName: "Dầu ăn",
+    transactionType: "out",
+    quantity: 2,
+    unitPrice: 45000,
+    totalValue: 90000,
+    reference: "INV-OUT-004",
+    reason: "Sử dụng cho nấu ăn tuần 2",
+    date: "2024-01-14",
+    time: "07:30:00",
+    createdBy: "Lê Thị Mai",
+    approvedBy: "Nguyễn Thị Hanh",
+    status: "completed",
+    notes: "Sử dụng cho nấu ăn sáng và trưa"
+  }
+];
+
+export const MOCK_INVENTORY_REPORTS: InventoryReport[] = [
+  {
+    id: 1,
+    period: "Tuần 3/2024",
+    startDate: "2024-01-15",
+    endDate: "2024-01-21",
+    totalInTransactions: 6,
+    totalOutTransactions: 4,
+    totalValueIn: 8425000,
+    totalValueOut: 335000,
+    netChange: 8090000,
+    topItems: [
+      {
+        itemName: "Thịt bò tươi",
+        transactionCount: 2,
+        totalQuantity: 25,
+        totalValue: 4500000
+      },
+      {
+        itemName: "Nước suối đóng chai",
+        transactionCount: 2,
+        totalQuantity: 25,
+        totalValue: 200000
+      },
+      {
+        itemName: "Hộp xốp đựng thực phẩm",
+        transactionCount: 2,
+        totalQuantity: 70,
+        totalValue: 105000
+      }
+    ],
+    transactionsByDate: [
+      {
+        date: "2024-01-15",
+        inCount: 2,
+        outCount: 1,
+        inValue: 3800000,
+        outValue: 200000
+      },
+      {
+        date: "2024-01-14",
+        inCount: 1,
+        outCount: 2,
+        inValue: 1800000,
+        outValue: 290000
+      },
+      {
+        date: "2024-01-13",
+        inCount: 1,
+        outCount: 1,
+        inValue: 400000,
+        outValue: 45000
+      }
     ]
   }
 ];

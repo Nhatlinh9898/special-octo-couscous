@@ -6,7 +6,9 @@ import {
   MOCK_BUDGET_PLANS, 
   MOCK_SUPPLIERS, 
   MOCK_EXPENSE_REPORTS,
-  MOCK_INVENTORY 
+  MOCK_INVENTORY,
+  MOCK_INVENTORY_TRANSACTIONS,
+  MOCK_INVENTORY_REPORTS
 } from './data';
 import { 
   FinancialTransaction, 
@@ -14,12 +16,14 @@ import {
   BudgetPlan, 
   Supplier, 
   ExpenseReport, 
-  InventoryItem 
+  InventoryItem,
+  InventoryTransaction,
+  InventoryReport
 } from './types';
 import { Button, Modal } from './components';
 
 const CanteenFinanceView = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'inventory' | 'suppliers' | 'budget' | 'reports'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'inventory' | 'movements' | 'suppliers' | 'budget' | 'reports'>('overview');
   
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [profitAnalysis, setProfitAnalysis] = useState<ProfitAnalysis[]>([]);
@@ -27,6 +31,8 @@ const CanteenFinanceView = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [expenseReports, setExpenseReports] = useState<ExpenseReport[]>([]);
+  const [inventoryTransactions, setInventoryTransactions] = useState<InventoryTransaction[]>([]);
+  const [inventoryReports, setInventoryReports] = useState<InventoryReport[]>([]);
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
@@ -69,6 +75,8 @@ const CanteenFinanceView = () => {
     setSuppliers(MOCK_SUPPLIERS);
     setInventory(MOCK_INVENTORY);
     setExpenseReports(MOCK_EXPENSE_REPORTS);
+    setInventoryTransactions(MOCK_INVENTORY_TRANSACTIONS);
+    setInventoryReports(MOCK_INVENTORY_REPORTS);
   }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
@@ -377,6 +385,7 @@ const CanteenFinanceView = () => {
           { id: 'overview', label: 'Tổng quan', icon: DollarSign },
           { id: 'transactions', label: 'Giao dịch', icon: FileText },
           { id: 'inventory', label: 'Nguyên vật', icon: Package },
+          { id: 'movements', label: 'Khi suất kho', icon: ShoppingCart },
           { id: 'suppliers', label: 'Nhà cung cấp', icon: Users },
           { id: 'budget', label: 'Ngân sách', icon: Calendar },
           { id: 'reports', label: 'Báo cáo', icon: TrendingUp }
@@ -702,6 +711,199 @@ const CanteenFinanceView = () => {
                     >
                       <Trash2 size={12}/>
                     </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inventory Movements Tab */}
+      {activeTab === 'movements' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <ShoppingCart size={20} className="text-blue-500"/> Khi suất kho
+              </h3>
+              <Button variant="success">
+                <Plus size={16}/> Ghi nhận khi suất
+              </Button>
+            </div>
+            
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-green-600">Tổng nhập kho</span>
+                  <TrendingUp size={16} className="text-green-500"/>
+                </div>
+                <p className="text-2xl font-bold text-green-700">
+                  {inventoryTransactions.filter(t => t.transactionType === 'in').reduce((sum, t) => sum + t.quantity, 0)}
+                </p>
+                <p className="text-xs text-green-600">
+                  {formatCurrency(inventoryTransactions.filter(t => t.transactionType === 'in').reduce((sum, t) => sum + t.totalValue, 0))}
+                </p>
+              </div>
+              
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-red-600">Tổng xuất kho</span>
+                  <TrendingDown size={16} className="text-red-500"/>
+                </div>
+                <p className="text-2xl font-bold text-red-700">
+                  {inventoryTransactions.filter(t => t.transactionType === 'out').reduce((sum, t) => sum + t.quantity, 0)}
+                </p>
+                <p className="text-xs text-red-600">
+                  {formatCurrency(inventoryTransactions.filter(t => t.transactionType === 'out').reduce((sum, t) => sum + t.totalValue, 0))}
+                </p>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-blue-600">Net change</span>
+                  <Package size={16} className="text-blue-500"/>
+                </div>
+                <p className="text-2xl font-bold text-blue-700">
+                  {inventoryTransactions.filter(t => t.transactionType === 'in').reduce((sum, t) => sum + t.quantity, 0) - 
+                   inventoryTransactions.filter(t => t.transactionType === 'out').reduce((sum, t) => sum + t.quantity, 0)}
+                </p>
+                <p className="text-xs text-blue-600">
+                  {formatCurrency(inventoryTransactions.filter(t => t.transactionType === 'in').reduce((sum, t) => sum + t.totalValue, 0) - 
+                           inventoryTransactions.filter(t => t.transactionType === 'out').reduce((sum, t) => sum + t.totalValue, 0))}
+                </p>
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-purple-600">Tổng giao dịch</span>
+                  <FileText size={16} className="text-purple-500"/>
+                </div>
+                <p className="text-2xl font-bold text-purple-700">
+                  {inventoryTransactions.length}
+                </p>
+                <p className="text-xs text-purple-600">Trong 7 ngày gần nhất</p>
+              </div>
+            </div>
+
+            {/* Filter Options */}
+            <div className="flex gap-2 mb-4">
+              <button className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                Tất cả ({inventoryTransactions.length})
+              </button>
+              <button className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                Nhập kho ({inventoryTransactions.filter(t => t.transactionType === 'in').length})
+              </button>
+              <button className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                Xuất kho ({inventoryTransactions.filter(t => t.transactionType === 'out').length})
+              </button>
+            </div>
+
+            {/* Transactions Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Giờ</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Loại</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Đơn giá</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng giá</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lý do</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Người tạo</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {inventoryTransactions.map(transaction => (
+                    <tr key={transaction.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm">{transaction.date}</td>
+                      <td className="px-4 py-3 text-sm">{transaction.time}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.transactionType === 'in' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {transaction.transactionType === 'in' ? 'Nhập kho' : 'Xuất kho'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium">{transaction.itemName}</td>
+                      <td className="px-4 py-3 text-sm">{transaction.quantity}</td>
+                      <td className="px-4 py-3 text-sm">{formatCurrency(transaction.unitPrice)}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{formatCurrency(transaction.totalValue)}</td>
+                      <td className="px-4 py-3 text-sm">{transaction.reason}</td>
+                      <td className="px-4 py-3 text-sm">{transaction.createdBy}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.status === 'completed' 
+                            ? 'bg-green-100 text-green-800' 
+                            : transaction.status === 'pending' 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {transaction.status === 'completed' ? 'Hoàn thành' : transaction.status === 'pending' ? 'Chờ duyệt' : 'Đã hủy'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Inventory Reports */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FileText size={20} className="text-purple-500"/> Báo cáo khi suất kho
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {inventoryReports.map(report => (
+                <div key={report.id} className="border border-gray-200 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="font-bold text-gray-800">{report.period}</h4>
+                      <p className="text-sm text-gray-600">{report.startDate} - {report.endDate}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Giao dịch nhập</label>
+                      <p className="text-lg font-bold text-green-600">{report.totalInTransactions}</p>
+                      <p className="text-sm text-gray-500">{formatCurrency(report.totalValueIn)}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Giao dịch xuất</label>
+                      <p className="text-lg font-bold text-red-600">{report.totalOutTransactions}</p>
+                      <p className="text-sm text-gray-500">{formatCurrency(report.totalValueOut)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Thay đổi ròng</label>
+                    <p className={`text-lg font-bold ${report.netChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(report.netChange)}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h5 className="font-medium text-gray-700 mb-2">Sản phẩm hoạt động nhiều nhất:</h5>
+                    <div className="space-y-2">
+                      {report.topItems.map((item, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">{item.itemName}</span>
+                          <div className="text-right">
+                            <span className="font-medium">{item.transactionCount} lần</span>
+                            <span className="text-gray-500 ml-2">{item.totalQuantity} {item.totalValue > 0 && `(${formatCurrency(item.totalValue)})`}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}

@@ -298,6 +298,53 @@ export interface ExpenseReport {
   }[];
 }
 
+// Inventory Transaction Types
+export interface InventoryTransaction {
+  id: number;
+  inventoryItemId: number;
+  itemName: string;
+  transactionType: 'in' | 'out';
+  quantity: number;
+  unitPrice: number;
+  totalValue: number;
+  reference: string;
+  reason: string;
+  date: string;
+  time: string;
+  createdBy: string;
+  approvedBy?: string;
+  status: 'pending' | 'approved' | 'completed' | 'cancelled';
+  supplier?: string;
+  expiryDate?: string;
+  batchNumber?: string;
+  notes?: string;
+}
+
+export interface InventoryReport {
+  id: number;
+  period: string;
+  startDate: string;
+  endDate: string;
+  totalInTransactions: number;
+  totalOutTransactions: number;
+  totalValueIn: number;
+  totalValueOut: number;
+  netChange: number;
+  topItems: {
+    itemName: string;
+    transactionCount: number;
+    totalQuantity: number;
+    totalValue: number;
+  }[];
+  transactionsByDate: {
+    date: string;
+    inCount: number;
+    outCount: number;
+    inValue: number;
+    outValue: number;
+  }[];
+}
+
 export interface DormRoom {
   id: number;
   name: string;
