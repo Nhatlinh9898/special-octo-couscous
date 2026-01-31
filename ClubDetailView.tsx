@@ -110,6 +110,9 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   const loadMockData = () => {
     const clubIdNum = parseInt(clubId || '1');
     
+    // Try to load saved events from localStorage first
+    const savedEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+    
     // Mock data for different clubs
     const clubDataMap: { [key: number]: any } = {
       1: {
@@ -380,7 +383,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     setClub(clubDataMap[clubIdNum] || clubDataMap[1]);
     setMembers(membersDataMap[clubIdNum] || membersDataMap[1]);
     setPosts(postsDataMap[clubIdNum] || postsDataMap[1]);
-    setEvents(eventsDataMap[clubIdNum] || eventsDataMap[1]);
+    // Use saved events if available, otherwise use mock data
+    setEvents(savedEvents.length > 0 ? savedEvents : (eventsDataMap[clubIdNum] || eventsDataMap[1]));
     setChatMessages(chatMessagesMap[clubIdNum] || chatMessagesMap[1]);
   };
 
@@ -558,6 +562,15 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
 
       setShowEventModal(false);
       setEditingEvent(null);
+      
+      // Save to localStorage to persist data
+      const savedEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+      if (editingEvent) {
+        const updatedEvents = savedEvents.map((e: any) => e.id === editingEvent.id ? eventData : e);
+        localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
+      } else {
+        localStorage.setItem(`club_events_${clubId}`, JSON.stringify([eventData, ...savedEvents]));
+      }
     } catch (error) {
       console.error('Error saving event:', error);
       alert('Có lỗi xảy ra khi lưu sự kiện.');
@@ -568,6 +581,12 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     if (!confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) return;
     
     setEvents(prev => prev.filter(e => e.id !== eventId));
+    
+    // Update localStorage
+    const savedEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+    const updatedEvents = savedEvents.filter((e: any) => e.id !== eventId);
+    localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
+    
     alert('Xóa sự kiện thành công!');
   };
 
@@ -581,11 +600,15 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     }
 
     // Update participant count
-    setEvents(prev => prev.map(e => 
+    const updatedEvents = events.map(e => 
       e.id === eventId 
         ? { ...e, currentParticipants: e.currentParticipants + 1 }
         : e
-    ));
+    );
+    setEvents(updatedEvents);
+
+    // Update localStorage
+    localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
 
     alert('Đăng ký tham gia sự kiện thành công!');
   };
