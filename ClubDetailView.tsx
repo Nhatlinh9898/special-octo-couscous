@@ -68,35 +68,13 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   }, [clubId]);
 
   const loadClubData = async () => {
-    setLoading(true);
     try {
-      // Load club details
-      const clubResponse = await fetch(`/api/clubs/${clubId}`);
-      const clubData = await clubResponse.json();
-      if (clubData.success) {
-        setClub(clubData.data);
-      }
-
-      // Load members
-      const membersResponse = await fetch(`/api/clubs/${clubId}/members`);
-      const membersData = await membersResponse.json();
-      if (membersData.success) {
-        setMembers(membersData.data);
-      }
-
-      // Load posts
-      const postsResponse = await fetch(`/api/clubs/${clubId}/posts`);
-      const postsData = await postsResponse.json();
-      if (postsData.success) {
-        setPosts(postsData.data);
-      }
-
-      // Load events
-      const eventsResponse = await fetch(`/api/clubs/${clubId}/events`);
-      const eventsData = await eventsResponse.json();
-      if (eventsData.success) {
-        setEvents(eventsData.data);
-      }
+      setLoading(true);
+      console.log('Loading club data for clubId:', clubId);
+      
+      // Use only mock data for now to avoid API errors
+      loadMockData();
+      
     } catch (error) {
       console.error('Error loading club data:', error);
       // Fallback to mock data
