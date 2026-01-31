@@ -757,7 +757,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
+      <div className="bg-orange-500 border-4 border-orange-700 rounded-xl p-4">
+        <h3 className="text-white font-bold text-center mb-2">🎯 ORIGINAL TABS (ORANGE BOX)</h3>
         <div className="flex space-x-1">
           <button 
             onClick={() => {
@@ -766,8 +767,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'posts' 
-                ? 'bg-blue-50 text-blue-600' 
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-white text-orange-600' 
+                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
             }`}
           >
             Bài viết
@@ -779,8 +780,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'members' 
-                ? 'bg-blue-50 text-blue-600' 
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-white text-orange-600' 
+                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
             }`}
           >
             Thành viên ({members.length})
@@ -792,8 +793,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'events' 
-                ? 'bg-blue-50 text-blue-600' 
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-white text-orange-600' 
+                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
             }`}
           >
             Sự kiện ({events.length})
@@ -805,8 +806,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'schedule' 
-                ? 'bg-blue-50 text-blue-600' 
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-white text-orange-600' 
+                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
             }`}
           >
             Lịch sinh hoạt
@@ -818,8 +819,8 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             }}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
               activeTab === 'chat' 
-                ? 'bg-blue-50 text-blue-600' 
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-white text-orange-600' 
+                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
             }`}
           >
             Chat ({chatMessages.length})
