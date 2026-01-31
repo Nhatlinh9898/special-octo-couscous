@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, Calendar, MapPin, Clock, ArrowLeft, Plus, Edit, Trash2, 
   Heart, MessageCircle, Share2, User, Mail, Phone, Award, 
-  BookOpen, Target, Star, CheckCircle, XCircle, Loader2
+  BookOpen, Target, Star, CheckCircle, XCircle, Loader2, Send, Search
 } from 'lucide-react';
 import { Button, Modal } from './components';
 import { Club, ClubMember, ClubPost, ClubEvent } from './types';
@@ -20,12 +20,20 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   
+  // Tab navigation
+  const [activeTab, setActiveTab] = useState<'posts' | 'members' | 'events' | 'schedule' | 'chat'>('posts');
+  
   // Modal states
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingPost, setEditingPost] = useState<ClubPost | null>(null);
   const [editingEvent, setEditingEvent] = useState<ClubEvent | null>(null);
+  
+  // Chat states
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Form states
   const [joinForm, setJoinForm] = useState({
@@ -345,12 +353,56 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       ]
     };
 
+    const chatMessagesMap: { [key: number]: any[] } = {
+      1: [
+        { id: 1, sender: 'Trần Thị Bình', message: 'Chào mừng mọi người đến với CLB Tin học!', timestamp: '2024-01-15T09:00:00Z', avatar: '/avatar1.jpg' },
+        { id: 2, sender: 'Lê Văn Cường', message: 'Mọi người ơi, workshop Python tuần này có ai tham gia không?', timestamp: '2024-01-15T10:30:00Z', avatar: '/avatar2.jpg' }
+      ],
+      2: [
+        { id: 3, sender: 'Phạm Văn Hùng', message: 'Cuối tuần tập luyện nhé cả đội!', timestamp: '2024-01-16T08:00:00Z', avatar: '/avatar3.jpg' },
+        { id: 4, sender: 'Nguyễn Thị Mai', message: 'Sẵn sàng!', timestamp: '2024-01-16T08:15:00Z', avatar: '/avatar4.jpg' }
+      ],
+      3: [
+        { id: 5, sender: 'Trần Quang Duy', message: 'Ai muốn biểu diễn trong buổi recital tháng 2?', timestamp: '2024-01-17T14:00:00Z', avatar: '/avatar5.jpg' },
+        { id: 6, sender: 'Lê Thu An', message: 'Em muốn tham gia ạ!', timestamp: '2024-01-17T14:30:00Z', avatar: '/avatar6.jpg' }
+      ],
+      4: [
+        { id: 7, sender: 'Hoàng Văn Nam', message: 'Welcome to English Club!', timestamp: '2024-01-18T16:00:00Z', avatar: '/avatar7.jpg' },
+        { id: 8, sender: 'Đỗ Thị Lan', message: 'Hello everyone!', timestamp: '2024-01-18T16:05:00Z', avatar: '/avatar8.jpg' }
+      ],
+      5: [
+        { id: 9, sender: 'Bùi Minh Tuấn', message: 'Chiến dịch tình nguyện sắp tới, mọi người sẵn sàng chưa?', timestamp: '2024-01-19T11:00:00Z', avatar: '/avatar9.jpg' },
+        { id: 10, sender: 'Vũ Thu Hà', message: 'Em sẵn sàng tham gia!', timestamp: '2024-01-19T11:30:00Z', avatar: '/avatar10.jpg' }
+      ]
+    };
+
     // Set data based on clubId
     setClub(clubDataMap[clubIdNum] || clubDataMap[1]);
     setMembers(membersDataMap[clubIdNum] || membersDataMap[1]);
     setPosts(postsDataMap[clubIdNum] || postsDataMap[1]);
     setEvents(eventsDataMap[clubIdNum] || eventsDataMap[1]);
+    setChatMessages(chatMessagesMap[clubIdNum] || chatMessagesMap[1]);
   };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const message = {
+      id: Date.now(),
+      sender: currentUser?.fullName || 'Người dùng',
+      message: newMessage,
+      timestamp: new Date().toISOString(),
+      avatar: currentUser?.avatar || '/default-avatar.jpg'
+    };
+    
+    setChatMessages(prev => [...prev, message]);
+    setNewMessage('');
+  };
+
+  const filteredMembers = members.filter(member => 
+    member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const loadCurrentUser = () => {
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -577,90 +629,346 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
       {/* Navigation Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
         <div className="flex space-x-1">
-          <button className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg font-medium">
+          <button 
+            onClick={() => setActiveTab('posts')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              activeTab === 'posts' 
+                ? 'bg-blue-50 text-blue-600' 
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}
+          >
             Bài viết
           </button>
-          <button className="flex-1 py-2 px-4 hover:bg-gray-50 rounded-lg font-medium">
-            Thành viên
+          <button 
+            onClick={() => setActiveTab('members')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              activeTab === 'members' 
+                ? 'bg-blue-50 text-blue-600' 
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}
+          >
+            Thành viên ({members.length})
           </button>
-          <button className="flex-1 py-2 px-4 hover:bg-gray-50 rounded-lg font-medium">
-            Sự kiện
+          <button 
+            onClick={() => setActiveTab('events')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              activeTab === 'events' 
+                ? 'bg-blue-50 text-blue-600' 
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}
+          >
+            Sự kiện ({events.length})
           </button>
-          <button className="flex-1 py-2 px-4 hover:bg-gray-50 rounded-lg font-medium">
+          <button 
+            onClick={() => setActiveTab('schedule')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              activeTab === 'schedule' 
+                ? 'bg-blue-50 text-blue-600' 
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}
+          >
             Lịch sinh hoạt
+          </button>
+          <button 
+            onClick={() => setActiveTab('chat')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              activeTab === 'chat' 
+                ? 'bg-blue-50 text-blue-600' 
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}
+          >
+            Chat ({chatMessages.length})
           </button>
         </div>
       </div>
 
-      {/* Posts Section */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Bài viết</h2>
-          {(isUserMember || isUserAdmin) && (
-            <Button onClick={handleCreatePost}>
-              <Plus size={16} className="mr-2" /> Viết bài
-            </Button>
-          )}
-        </div>
+      {/* Tab Content */}
+      {activeTab === 'posts' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Bài viết</h2>
+            {(isUserMember || isUserAdmin) && (
+              <Button onClick={handleCreatePost}>
+                <Plus size={16} className="mr-2" /> Viết bài
+              </Button>
+            )}
+          </div>
 
-        {posts.map(post => (
-          <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-start gap-4">
-              <img src={post.authorAvatar || '/default-avatar.jpg'} alt={post.author} className="w-12 h-12 rounded-full" />
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-gray-800">{post.title}</h3>
-                    <p className="text-sm text-gray-500">{post.author} • {new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
+          {posts.map(post => (
+            <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-start gap-4">
+                <img src={post.authorAvatar || '/default-avatar.jpg'} alt={post.author} className="w-12 h-12 rounded-full" />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-bold text-gray-800">{post.title}</h3>
+                      <p className="text-sm text-gray-500">{post.author} • {new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                    {isUserAdmin && (
+                      <div className="flex gap-1">
+                        <button onClick={() => handleEditPost(post)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                          <Edit size={16} />
+                        </button>
+                        <button onClick={() => handleDeletePost(post.id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {isUserAdmin && (
-                    <div className="flex gap-1">
-                      <button onClick={() => handleEditPost(post)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                        <Edit size={16} />
-                      </button>
-                      <button onClick={() => handleDeletePost(post.id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
-                        <Trash2 size={16} />
-                      </button>
+                  
+                  <p className="text-gray-700 mb-4">{post.content}</p>
+                  
+                  {post.images && post.images.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                      {post.images.map((image, index) => (
+                        <img key={index} src={image} alt="" className="w-full h-32 object-cover rounded-lg" />
+                      ))}
                     </div>
                   )}
-                </div>
-                
-                <p className="text-gray-700 mb-4">{post.content}</p>
-                
-                {post.images && post.images.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                    {post.images.map((image, index) => (
-                      <img key={index} src={image} alt="" className="w-full h-32 object-cover rounded-lg" />
-                    ))}
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <button onClick={() => handleLikePost(post.id)} className="flex items-center gap-1 hover:text-red-600">
+                      <Heart size={16} />
+                      <span>{post.likes}</span>
+                    </button>
+                    <button className="flex items-center gap-1 hover:text-blue-600">
+                      <MessageCircle size={16} />
+                      <span>{post.comments}</span>
+                    </button>
+                    <button className="flex items-center gap-1 hover:text-green-600">
+                      <Share2 size={16} />
+                      <span>Chia sẻ</span>
+                    </button>
                   </div>
-                )}
-                
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <button onClick={() => handleLikePost(post.id)} className="flex items-center gap-1 hover:text-red-600">
-                    <Heart size={16} />
-                    <span>{post.likes}</span>
-                  </button>
-                  <button className="flex items-center gap-1 hover:text-blue-600">
-                    <MessageCircle size={16} />
-                    <span>{post.comments}</span>
-                  </button>
-                  <button className="flex items-center gap-1 hover:text-green-600">
-                    <Share2 size={16} />
-                    <span>Chia sẻ</span>
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {posts.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <BookOpen size={48} className="mx-auto mb-2 text-gray-300" />
-            <p className="text-gray-500">Chưa có bài viết nào</p>
+          {posts.length === 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+              <BookOpen size={48} className="mx-auto mb-2 text-gray-300" />
+              <p className="text-gray-500">Chưa có bài viết nào</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'members' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Thành viên ({members.length})</h2>
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Tìm thành viên..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
-        )}
-      </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredMembers.map(member => (
+              <div key={member.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <img src={member.avatar || '/default-avatar.jpg'} alt={member.fullName} className="w-16 h-16 rounded-full" />
+                  <div>
+                    <h3 className="font-bold text-gray-800">{member.fullName}</h3>
+                    <p className="text-sm text-gray-500">{member.email}</p>
+                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                      member.role === 'president' ? 'bg-purple-100 text-purple-800' :
+                      member.role === 'vice_president' ? 'bg-blue-100 text-blue-800' :
+                      member.role === 'secretary' ? 'bg-green-100 text-green-800' :
+                      member.role === 'treasurer' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {member.role === 'president' ? 'Chủ nhiệm' :
+                       member.role === 'vice_president' ? 'Phó chủ nhiệm' :
+                       member.role === 'secretary' ? 'Thư ký' :
+                       member.role === 'treasurer' ? 'Thủ quỹ' : 'Thành viên'}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500">
+                  <p>Ngày tham gia: {new Date(member.joinedDate).toLocaleDateString('vi-VN')}</p>
+                  <p>Trạng thái: <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                    member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {member.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+                  </span></p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredMembers.length === 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+              <Users size={48} className="mx-auto mb-2 text-gray-300" />
+              <p className="text-gray-500">Không tìm thấy thành viên nào</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'events' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Sự kiện ({events.length})</h2>
+            {(isUserMember || isUserAdmin) && (
+              <Button onClick={handleCreateEvent}>
+                <Plus size={16} className="mr-2" /> Tạo sự kiện
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {events.map(event => (
+              <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-bold text-gray-800">{event.title}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
+                    event.status === 'ongoing' ? 'bg-green-100 text-green-800' :
+                    event.status === 'completed' ? 'bg-gray-100 text-gray-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {event.status === 'upcoming' ? 'Sắp diễn ra' :
+                     event.status === 'ongoing' ? 'Đang diễn ra' :
+                     event.status === 'completed' ? 'Đã kết thúc' : 'Đã hủy'}
+                  </span>
+                </div>
+                
+                <div className="space-y-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={16} />
+                    <span>{new Date(event.date).toLocaleDateString('vi-VN')} • {event.time}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} />
+                    <span>{event.location}</span>
+                  </div>
+                  {event.maxParticipants && (
+                    <div className="flex items-center gap-2">
+                      <Users size={16} />
+                      <span>{event.currentParticipants}/{event.maxParticipants} người tham gia</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500">
+                      Hạn đăng ký: {new Date(event.registrationDeadline).toLocaleDateString('vi-VN')}
+                    </span>
+                    <Button size="sm" variant="secondary">
+                      Đăng ký tham gia
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {events.length === 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+              <Calendar size={48} className="mx-auto mb-2 text-gray-300" />
+              <p className="text-gray-500">Chưa có sự kiện nào</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'schedule' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Lịch sinh hoạt</h2>
+            <Button variant="secondary">
+              <Plus size={16} className="mr-2" /> Thêm lịch
+            </Button>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 border-l-4 border-blue-500 bg-blue-50">
+                <div className="text-center">
+                  <div className="text-sm text-blue-600 font-medium">Thứ 3</div>
+                  <div className="text-lg font-bold text-blue-800">15:00</div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-800">Sinh hoạt thường lệ</h4>
+                  <p className="text-sm text-gray-600">Buổi sinh hoạt hàng tuần của CLB</p>
+                </div>
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Hàng tuần</span>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 border-l-4 border-green-500 bg-green-50">
+                <div className="text-center">
+                  <div className="text-sm text-green-600 font-medium">Thứ 6</div>
+                  <div className="text-lg font-bold text-green-800">17:00</div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-800">Workshop đặc biệt</h4>
+                  <p className="text-sm text-gray-600">Workshop nâng cao cho thành viên</p>
+                </div>
+                <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">2 tuần/lần</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'chat' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Chat nội bộ</h2>
+            <span className="text-sm text-gray-500">{members.length} thành viên trực tuyến</span>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="h-96 overflow-y-auto p-4 space-y-4">
+              {chatMessages.map(message => (
+                <div key={message.id} className={`flex gap-3 ${message.sender === currentUser?.fullName ? 'flex-row-reverse' : ''}`}>
+                  <img src={message.avatar || '/default-avatar.jpg'} alt={message.sender} className="w-8 h-8 rounded-full" />
+                  <div className={`max-w-xs ${message.sender === currentUser?.fullName ? 'text-right' : ''}`}>
+                    <div className={`text-xs text-gray-500 mb-1 ${message.sender === currentUser?.fullName ? 'text-right' : ''}`}>
+                      {message.sender} • {new Date(message.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    <div className={`p-3 rounded-lg ${
+                      message.sender === currentUser?.fullName 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {message.message}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-100 p-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nhập tin nhắn..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
+                  <Send size={16} />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Join Modal */}
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} title="Đăng ký thành viên">
