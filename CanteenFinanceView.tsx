@@ -426,6 +426,232 @@ const CanteenFinanceView = () => {
     alert('Đã tạo báo cáo thành công! Báo cáo đã được lưu vào hệ thống.');
   };
 
+  const handleExportPDF = () => {
+    const reportData = {
+      period: new Date().toISOString().split('T')[0],
+      totalRevenue: calculateFinancialSummary().totalRevenue,
+      totalCost: calculateFinancialSummary().totalCost,
+      totalProfit: calculateFinancialSummary().totalProfit,
+      profitMargin: calculateFinancialSummary().profitMargin,
+      transactionCount: calculateFinancialSummary().transactionCount,
+      movementCount: calculateFinancialSummary().movementCount,
+      topProducts: calculateProductAnalytics().slice(0, 5),
+      inventoryValue: inventory.reduce((sum, item) => sum + (item.currentStock * item.unitPrice), 0),
+      outOfStockCount: inventory.filter(item => item.status === 'out_of_stock').length,
+      lowStockCount: inventory.filter(item => item.status === 'low_stock').length
+    };
+
+    // Create HTML content for PDF
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Báo cáo tài chính căng tin</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; text-align: center; }
+            h2 { color: #666; margin-top: 30px; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .summary { display: flex; justify-content: space-between; margin: 20px 0; }
+            .summary-item { background: #f9f9f9; padding: 15px; border-radius: 5px; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <h1>Báo cáo tài chính căng tin</h1>
+          <p><strong>Kỳ báo cáo:</strong> ${reportData.period}</p>
+          <p><strong>Ngày tạo:</strong> ${new Date().toLocaleDateString('vi-VN')}</p>
+          
+          <h2>Tóm tắt tài chính</h2>
+          <div class="summary">
+            <div class="summary-item">
+              <h3>Tổng Doanh thu</h3>
+              <p style="color: green; font-size: 18px; font-weight: bold;">${formatCurrency(reportData.totalRevenue)}</p>
+            </div>
+            <div class="summary-item">
+              <h3>Tổng Chi phí</h3>
+              <p style="color: red; font-size: 18px; font-weight: bold;">${formatCurrency(reportData.totalCost)}</p>
+            </div>
+            <div class="summary-item">
+              <h3>Lợi nhuận</h3>
+              <p style="color: ${reportData.totalProfit >= 0 ? 'green' : 'red'}; font-size: 18px; font-weight: bold;">${formatCurrency(reportData.totalProfit)}</p>
+            </div>
+            <div class="summary-item">
+              <h3>Biên lợi nhuận</h3>
+              <p style="color: blue; font-size: 18px; font-weight: bold;">${reportData.profitMargin}%</p>
+            </div>
+          </div>
+          
+          <h2>Sản phẩm bán chạy nhất</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Tên sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${reportData.topProducts.map(item => `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.totalQuantity}</td>
+                  <td>${formatCurrency(item.totalRevenue)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          
+          <h2>Thông tin tồn kho</h2>
+          <table>
+            <tr>
+              <td><strong>Tổng giá trị tồn kho</strong></td>
+              <td>${formatCurrency(reportData.inventoryValue)}</td>
+            </tr>
+            <tr>
+              <td><strong>Sản phẩm hết hàng</strong></td>
+              <td>${reportData.outOfStockCount}</td>
+            </tr>
+            <tr>
+              <td><strong>Sản phẩm sắp hết hàng</strong></td>
+              <td>${reportData.lowStockCount}</td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `;
+
+    // Create a new window and print
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    }
+  };
+
+  const handleExportExcel = () => {
+    const reportData = {
+      period: new Date().toISOString().split('T')[0],
+      totalRevenue: calculateFinancialSummary().totalRevenue,
+      totalCost: calculateFinancialSummary().totalCost,
+      totalProfit: calculateFinancialSummary().totalProfit,
+      profitMargin: calculateFinancialSummary().profitMargin,
+      transactionCount: calculateFinancialSummary().transactionCount,
+      movementCount: calculateFinancialSummary().movementCount,
+      topProducts: calculateProductAnalytics().slice(0, 5),
+      inventoryValue: inventory.reduce((sum, item) => sum + (item.currentStock * item.unitPrice), 0),
+      outOfStockCount: inventory.filter(item => item.status === 'out_of_stock').length,
+      lowStockCount: inventory.filter(item => item.status === 'low_stock').length
+    };
+
+    // Create CSV content
+    let csvContent = "Báo cáo tài chính căng tin\n\n";
+    csvContent += `Kỳ báo cáo,${reportData.period}\n`;
+    csvContent += `Ngày tạo,${new Date().toLocaleDateString('vi-VN')}\n\n`;
+    
+    csvContent += "Tóm tắt tài chính\n";
+    csvContent += "Chỉ số,Giá trị\n";
+    csvContent += `Tổng Doanh thu,${reportData.totalRevenue}\n`;
+    csvContent += `Tổng Chi phí,${reportData.totalCost}\n`;
+    csvContent += `Lợi nhuận,${reportData.totalProfit}\n`;
+    csvContent += `Biên lợi nhuận,${reportData.profitMargin}%\n`;
+    csvContent += `Số giao dịch,${reportData.transactionCount}\n`;
+    csvContent += `Số khi suất,${reportData.movementCount}\n\n`;
+    
+    csvContent += "Sản phẩm bán chạy nhất\n";
+    csvContent += "Tên sản phẩm,Số lượng,Doanh thu\n";
+    reportData.topProducts.forEach(item => {
+      csvContent += `"${item.name}",${item.totalQuantity},${item.totalRevenue}\n`;
+    });
+    
+    csvContent += "\nThông tin tồn kho\n";
+    csvContent += "Chỉ số,Giá trị\n";
+    csvContent += `Tổng giá trị tồn kho,${reportData.inventoryValue}\n`;
+    csvContent += `Sản phẩm hết hàng,${reportData.outOfStockCount}\n`;
+    csvContent += `Sản phẩm sắp hết hàng,${reportData.lowStockCount}\n`;
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bao-cao-tai-chinh-${reportData.period}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportCSV = () => {
+    const reportData = {
+      period: new Date().toISOString().split('T')[0],
+      totalRevenue: calculateFinancialSummary().totalRevenue,
+      totalCost: calculateFinancialSummary().totalCost,
+      totalProfit: calculateFinancialSummary().totalProfit,
+      profitMargin: calculateFinancialSummary().profitMargin,
+      transactionCount: calculateFinancialSummary().transactionCount,
+      movementCount: calculateFinancialSummary().movementCount,
+      topProducts: calculateProductAnalytics().slice(0, 5),
+      inventoryValue: inventory.reduce((sum, item) => sum + (item.currentStock * item.unitPrice), 0),
+      outOfStockCount: inventory.filter(item => item.status === 'out_of_stock').length,
+      lowStockCount: inventory.filter(item => item.status === 'low_stock').length
+    };
+
+    // Create CSV content with detailed data
+    let csvContent = "Báo cáo tài chính căng tin\n";
+    csvContent += `Kỳ báo cáo,${reportData.period}\n`;
+    csvContent += `Ngày tạo,${new Date().toLocaleDateString('vi-VN')}\n\n`;
+    
+    csvContent += "Tóm tắt tài chính\n";
+    csvContent += "Chỉ số,Giá trị\n";
+    csvContent += `Tổng Doanh thu,${reportData.totalRevenue}\n`;
+    csvContent += `Tổng Chi phí,${reportData.totalCost}\n`;
+    csvContent += `Lợi nhuận,${reportData.totalProfit}\n`;
+    csvContent += `Biên lợi nhuận,${reportData.profitMargin}%\n`;
+    csvContent += `Số giao dịch,${reportData.transactionCount}\n`;
+    csvContent += `Số khi suất,${reportData.movementCount}\n\n`;
+    
+    csvContent += "Sản phẩm bán chạy nhất\n";
+    csvContent += "Tên sản phẩm,Số lượng,Doanh thu\n";
+    reportData.topProducts.forEach(item => {
+      csvContent += `"${item.name}",${item.totalQuantity},${item.totalRevenue}\n`;
+    });
+    
+    csvContent += "\nThông tin tồn kho\n";
+    csvContent += "Chỉ số,Giá trị\n";
+    csvContent += `Tổng giá trị tồn kho,${reportData.inventoryValue}\n`;
+    csvContent += `Sản phẩm hết hàng,${reportData.outOfStockCount}\n`;
+    csvContent += `Sản phẩm sắp hết hàng,${reportData.lowStockCount}\n\n`;
+    
+    csvContent += "Chi tiết giao dịch\n";
+    csvContent += "ID,Loại,Ngày,Số tiền,Mô tả,Trạng thái\n";
+    transactions.forEach(t => {
+      csvContent += `${t.id},${t.type},${t.date},${t.amount},"${t.description}",${t.status}\n`;
+    });
+    
+    csvContent += "\nChi tiết tồn kho\n";
+    csvContent += "ID,Tên sản phẩm,Danh mục,Tồn kho hiện tại,Đơn giá,Tổng giá trị,Trạng thái\n";
+    inventory.forEach(item => {
+      csvContent += `${item.id},"${item.name}",${item.category},${item.currentStock},${item.unitPrice},${item.currentStock * item.unitPrice},${item.status}\n`;
+    });
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bao-cao-chi-tiet-${reportData.period}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Inventory CRUD functions
   const handleAddInventory = () => {
     setEditingInventory(null);
@@ -2075,15 +2301,15 @@ const CanteenFinanceView = () => {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full" onClick={handleExportPDF}>
                 <FileText size={16} className="mr-2"/>
                 Xuất PDF
               </Button>
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full" onClick={handleExportExcel}>
                 <FileText size={16} className="mr-2"/>
                 Xuất Excel
               </Button>
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full" onClick={handleExportCSV}>
                 <FileText size={16} className="mr-2"/>
                 Xuất CSV
               </Button>
