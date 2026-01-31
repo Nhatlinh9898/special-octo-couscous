@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, ShoppingCart, Utensils, ChefHat, Loader2, Clock, Calendar, Edit, Trash2, Save, X, Coffee, Sandwich, Cookie } from 'lucide-react';
+import { Plus, ShoppingCart, Utensils, ChefHat, Loader2, Clock, Calendar, Edit, Trash2, Save, X, Coffee, Sandwich, Cookie, CreditCard, Smartphone, DollarSign, QrCode } from 'lucide-react';
 import { api, MOCK_MENU, MOCK_MEAL_SCHEDULES } from './data';
 import { CanteenItem, AIAnalysisResult, MealSchedule, MenuItemForm } from './types';
 import { Button, Modal } from './components';
@@ -41,6 +41,12 @@ const CanteenView = () => {
     date: '',
     itemIds: [] as number[]
   });
+
+  // Payment
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cash' | 'transfer' | 'qr'>('cash');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
     setMenu(MOCK_MENU);
@@ -175,6 +181,57 @@ const CanteenView = () => {
     setMealSchedules(prev => prev.map(schedule => 
       schedule.id === id ? { ...schedule, isActive: !schedule.isActive } : schedule
     ));
+  };
+
+  // Payment Functions
+  const handlePayment = () => {
+    if (cart.length === 0) return;
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentMethodSelect = (method: 'cash' | 'transfer' | 'qr') => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const processPayment = async () => {
+    setIsProcessingPayment(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsProcessingPayment(false);
+    setPaymentSuccess(true);
+    
+    // Clear cart after successful payment
+    setTimeout(() => {
+      setCart([]);
+      setPaymentSuccess(false);
+      setShowPaymentModal(false);
+      setSelectedPaymentMethod('cash');
+    }, 3000);
+  };
+
+  const generateQRCode = () => {
+    // Generate QR code data (in real app, this would come from payment gateway)
+    const bankInfo = {
+      bank: "VCB",
+      accountNumber: "1234567890",
+      accountName: "TRUONG PT EDUMANAGER",
+      amount: totalAmount,
+      description: `Thanh toan don hang cang tin ${new Date().toISOString().split('T')[0]}`
+    };
+    
+    return `https://img.vietqr.io/image/${bankInfo.bank}-${bankInfo.accountNumber}-${bankInfo.accountName}-${bankInfo.amount}.png`;
+  };
+
+  const getTransferInfo = () => {
+    return {
+      bank: "Vietcombank",
+      accountNumber: "1234567890",
+      accountName: "TRUONG PT EDUMANAGER",
+      amount: totalAmount,
+      description: `Thanh toan don hang cang tin ${new Date().toISOString().split('T')[0]}`
+    };
   };
 
   const addToCart = (item: CanteenItem) => {
@@ -331,7 +388,7 @@ const CanteenView = () => {
                 <span>Tổng cộng:</span>
                 <span className="text-orange-600">{formatCurrency(totalAmount)}</span>
               </div>
-              <Button className="w-full justify-center" disabled={cart.length === 0}>
+              <Button className="w-full justify-center" disabled={cart.length === 0} onClick={handlePayment}>
                 Thanh toán ngay
               </Button>
             </div>
@@ -706,6 +763,181 @@ const CanteenView = () => {
                 <Save size={16}/> Lưu
               </Button>
             </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <Modal onClose={() => setShowPaymentModal(false)}>
+          <div className="p-6 max-w-md w-full">
+            {!paymentSuccess ? (
+              <>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <CreditCard size={20} className="text-green-500"/> Thanh toán đơn hàng
+                </h3>
+                
+                {/* Order Summary */}
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Số món:</span>
+                    <span className="font-medium">{cart.length} món</span>
+                  </div>
+                  <div className="flex justify-between items-center text-lg font-bold text-gray-800">
+                    <span>Tổng cộng:</span>
+                    <span className="text-green-600">{formatCurrency(totalAmount)}</span>
+                  </div>
+                </div>
+
+                {/* Payment Methods */}
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-medium text-gray-700 mb-2">Chọn phương thức thanh toán:</h4>
+                  
+                  {/* Cash Payment */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('cash')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'cash' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <DollarSign size={24} className={selectedPaymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Tiền mặt</p>
+                      <p className="text-sm text-gray-500">Thanh toán trực tiếp tại quầy</p>
+                    </div>
+                    {selectedPaymentMethod === 'cash' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Bank Transfer */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('transfer')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'transfer' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Smartphone size={24} className={selectedPaymentMethod === 'transfer' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Chuyển khoản</p>
+                      <p className="text-sm text-gray-500">Chuyển khoản ngân hàng</p>
+                    </div>
+                    {selectedPaymentMethod === 'transfer' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* QR Code */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('qr')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'qr' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <QrCode size={24} className={selectedPaymentMethod === 'qr' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Quét mã QR</p>
+                      <p className="text-sm text-gray-500">Quét mã QR để thanh toán</p>
+                    </div>
+                    {selectedPaymentMethod === 'qr' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+                </div>
+
+                {/* Payment Details */}
+                {selectedPaymentMethod === 'transfer' && (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                    <h4 className="font-medium text-blue-800 mb-2">Thông tin chuyển khoản:</h4>
+                    <div className="space-y-1 text-sm">
+                      <p><span className="font-medium">Ngân hàng:</span> {getTransferInfo().bank}</p>
+                      <p><span className="font-medium">Số tài khoản:</span> {getTransferInfo().accountNumber}</p>
+                      <p><span className="font-medium">Chủ tài khoản:</span> {getTransferInfo().accountName}</p>
+                      <p><span className="font-medium">Số tiền:</span> {formatCurrency(getTransferInfo().amount)}</p>
+                      <p><span className="font-medium">Nội dung:</span> {getTransferInfo().description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedPaymentMethod === 'qr' && (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6 text-center">
+                    <h4 className="font-medium text-blue-800 mb-3">Quét mã QR để thanh toán</h4>
+                    <div className="bg-white p-4 rounded-lg inline-block">
+                      <img 
+                        src={generateQRCode()} 
+                        alt="QR Code" 
+                        className="w-48 h-48 mx-auto"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">Số tiền: {formatCurrency(totalAmount)}</p>
+                  </div>
+                )}
+
+                {selectedPaymentMethod === 'cash' && (
+                  <div className="bg-green-50 rounded-lg p-4 mb-6 text-center">
+                    <DollarSign size={48} className="mx-auto text-green-500 mb-2" />
+                    <h4 className="font-medium text-green-800">Thanh toán tiền mặt</h4>
+                    <p className="text-sm text-gray-600 mt-1">Vui lòng đến quầy để thanh toán</p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={() => setShowPaymentModal(false)}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={processPayment}
+                    disabled={isProcessingPayment}
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin mr-2"/>
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={16} className="mr-2"/>
+                        Xác nhận thanh toán
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              /* Payment Success */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Thanh toán thành công!</h3>
+                <p className="text-gray-600 mb-4">Đơn hàng của bạn đã được thanh toán</p>
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-600">Số tiền đã thanh toán:</p>
+                  <p className="text-xl font-bold text-green-600">{formatCurrency(totalAmount)}</p>
+                </div>
+                <p className="text-sm text-gray-500">Đang chuyển về trang chính...</p>
+              </div>
+            )}
           </div>
         </Modal>
       )}
