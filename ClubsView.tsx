@@ -19,6 +19,24 @@ const ClubsView = () => {
   const [showClubModal, setShowClubModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // Activity Management States
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<any>(null);
+  const [activityForm, setActivityForm] = useState({
+    title: '',
+    description: '',
+    clubId: 0,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toTimeString().slice(0, 5),
+    location: '',
+    type: 'regular',
+    maxParticipants: '',
+    registrationDeadline: new Date().toISOString().split('T')[0],
+    requirements: '',
+    budget: '',
+    status: 'upcoming'
+  });
 
   useEffect(() => {
     loadClubs();
@@ -133,6 +151,102 @@ const ClubsView = () => {
     }
   };
 
+  // Activity Management Functions
+  const handleAddActivity = () => {
+    setEditingActivity(null);
+    setActivityForm({
+      title: '',
+      description: '',
+      clubId: 0,
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().slice(0, 5),
+      location: '',
+      type: 'regular',
+      maxParticipants: '',
+      registrationDeadline: new Date().toISOString().split('T')[0],
+      requirements: '',
+      budget: '',
+      status: 'upcoming'
+    });
+    setShowActivityModal(true);
+  };
+
+  const handleEditActivity = (activity: any) => {
+    setEditingActivity(activity);
+    setActivityForm({
+      title: activity.title,
+      description: activity.description,
+      clubId: activity.clubId,
+      date: activity.date,
+      time: activity.time || '09:00',
+      location: activity.location || '',
+      type: activity.type || 'regular',
+      maxParticipants: activity.maxParticipants?.toString() || '',
+      registrationDeadline: activity.registrationDeadline || activity.date,
+      requirements: activity.requirements || '',
+      budget: activity.budget?.toString() || '',
+      status: activity.status || 'upcoming'
+    });
+    setShowActivityModal(true);
+  };
+
+  const handleSaveActivity = async () => {
+    try {
+      const activityData = {
+        ...activityForm,
+        maxParticipants: activityForm.maxParticipants ? parseInt(activityForm.maxParticipants) : null,
+        budget: activityForm.budget ? parseFloat(activityForm.budget) : null,
+        id: editingActivity ? editingActivity.id : Date.now()
+      };
+
+      if (editingActivity) {
+        // Update existing activity
+        setActivities(prev => prev.map(act => act.id === editingActivity.id ? activityData : act));
+        alert('Cập nhật hoạt động thành công!');
+      } else {
+        // Create new activity
+        setActivities(prev => [...prev, activityData]);
+        alert('Tạo hoạt động mới thành công!');
+      }
+
+      setShowActivityModal(false);
+      setEditingActivity(null);
+    } catch (error) {
+      console.error('Error saving activity:', error);
+      alert('Có lỗi xảy ra khi lưu hoạt động!');
+    }
+  };
+
+  const handleDeleteActivity = (activityId: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa hoạt động này?')) return;
+    
+    setActivities(prev => prev.filter(act => act.id !== activityId));
+    alert('Xóa hoạt động thành công!');
+  };
+
+  const handleRegisterActivity = (activityId: number) => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const registration = {
+      activityId,
+      userId: currentUser.id || 1,
+      userName: currentUser.fullName || 'Người dùng',
+      registrationDate: new Date().toISOString(),
+      status: 'registered'
+    };
+
+    // Store registration in localStorage
+    const existingRegistrations = JSON.parse(localStorage.getItem('activityRegistrations') || '[]');
+    existingRegistrations.push(registration);
+    localStorage.setItem('activityRegistrations', JSON.stringify(existingRegistrations));
+
+    alert('Đăng ký tham gia hoạt động thành công!');
+  };
+
+  const getActivityRegistrations = (activityId: number) => {
+    const registrations = JSON.parse(localStorage.getItem('activityRegistrations') || '[]');
+    return registrations.filter((reg: any) => reg.activityId === activityId);
+  };
+
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
@@ -149,6 +263,13 @@ const ClubsView = () => {
            >
              {isSuggesting ? <Loader2 size={18} className="animate-spin"/> : <Sparkles size={18}/>}
              {isSuggesting ? 'AI Đang tìm...' : 'AI Gợi ý Hoạt động'}
+           </Button>
+           <Button 
+             variant="secondary" 
+             className="text-green-600 border-green-200 bg-green-50 hover:bg-green-100"
+             onClick={handleAddActivity}
+           >
+             <Plus size={18} className="mr-2"/> Tạo Hoạt động mới
            </Button>
            <Button onClick={() => setShowCreateModal(true)}><Plus size={20} className="mr-2"/> Tạo CLB mới</Button>
         </div>
@@ -212,26 +333,84 @@ const ClubsView = () => {
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mt-8">
-         <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Calendar size={20} className="text-indigo-600"/> Hoạt động sắp tới
-         </h3>
+         <div className="flex justify-between items-center mb-4">
+           <h3 className="font-bold text-gray-800 flex items-center gap-2">
+              <Calendar size={20} className="text-indigo-600"/> Hoạt động sắp tới
+           </h3>
+           <Button variant="secondary" onClick={handleAddActivity} className="text-sm">
+             <Plus size={16} className="mr-1"/> Thêm hoạt động
+           </Button>
+         </div>
          <div className="space-y-4">
             {activities.map(act => {
                const club = clubs.find(c => c.id === act.clubId);
+               const registrations = getActivityRegistrations(act.id);
                return (
                   <div key={act.id} className="flex gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition">
                      <div className="w-16 h-16 bg-indigo-50 rounded-lg flex flex-col items-center justify-center text-indigo-600 font-bold flex-shrink-0">
                         <span className="text-xs uppercase">{new Date(act.date).toLocaleString('default', { month: 'short' })}</span>
                         <span className="text-xl">{new Date(act.date).getDate()}</span>
                      </div>
-                     <div>
-                        <div className="text-xs font-bold text-indigo-600 mb-1">{club?.name}</div>
-                        <h4 className="font-bold text-gray-800">{act.title}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{act.description}</p>
+                     <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                           <div>
+                              <div className="text-xs font-bold text-indigo-600 mb-1">{club?.name}</div>
+                              <h4 className="font-bold text-gray-800">{act.title}</h4>
+                              <p className="text-sm text-gray-600 mt-1">{act.description}</p>
+                              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                 <span className="flex items-center gap-1">
+                                    <Clock size={12}/> {act.time || '09:00'}
+                                 </span>
+                                 <span className="flex items-center gap-1">
+                                    <MapPin size={12}/> {act.location || 'Chưa có địa điểm'}
+                                 </span>
+                                 <span className="flex items-center gap-1">
+                                    <Users size={12}/> {registrations.length} người đăng ký
+                                 </span>
+                                 {act.maxParticipants && (
+                                    <span className="flex items-center gap-1">
+                                       <Users size={12}/> Tối đa {act.maxParticipants}
+                                    </span>
+                                 )}
+                              </div>
+                           </div>
+                           <div className="flex gap-1">
+                              <button 
+                                onClick={() => handleRegisterActivity(act.id)}
+                                className="p-2 bg-green-50 text-green-600 rounded-full hover:bg-green-100 transition"
+                                title="Đăng ký tham gia"
+                              >
+                                 <Users size={16}/>
+                              </button>
+                              <button 
+                                onClick={() => handleEditActivity(act)}
+                                className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition"
+                                title="Chỉnh sửa"
+                              >
+                                 <Edit size={16}/>
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteActivity(act.id)}
+                                className="p-2 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition"
+                                title="Xóa hoạt động"
+                              >
+                                 <Trash2 size={16}/>
+                              </button>
+                           </div>
+                        </div>
                      </div>
                   </div>
                )
             })}
+            {activities.length === 0 && (
+               <div className="text-center py-8 text-gray-500">
+                  <Calendar size={48} className="mx-auto mb-2 text-gray-300"/>
+                  <p>Chưa có hoạt động nào</p>
+                  <Button variant="secondary" onClick={handleAddActivity} className="mt-2">
+                     <Plus size={16} className="mr-1"/> Tạo hoạt động đầu tiên
+                  </Button>
+               </div>
+            )}
          </div>
       </div>
 
@@ -270,6 +449,169 @@ const ClubsView = () => {
                onUpdate={() => loadClubSchedule(selectedClub.id)}
             />
          )}
+      </Modal>
+
+      {/* Activity Modal */}
+      <Modal isOpen={showActivityModal} onClose={() => setShowActivityModal(false)} title={editingActivity ? 'Chỉnh sửa hoạt động' : 'Tạo hoạt động mới'}>
+         <div className="p-6">
+            <div className="space-y-4">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Tên hoạt động *</label>
+                     <input
+                        type="text"
+                        value={activityForm.title}
+                        onChange={(e) => setActivityForm({...activityForm, title: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Nhập tên hoạt động"
+                     />
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Câu lạc bộ *</label>
+                     <select
+                        value={activityForm.clubId}
+                        onChange={(e) => setActivityForm({...activityForm, clubId: parseInt(e.target.value)})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     >
+                        <option value={0}>Chọn câu lạc bộ</option>
+                        {clubs.map(club => (
+                           <option key={club.id} value={club.id}>{club.name}</option>
+                        ))}
+                     </select>
+                  </div>
+               </div>
+               
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả hoạt động *</label>
+                  <textarea
+                     value={activityForm.description}
+                     onChange={(e) => setActivityForm({...activityForm, description: e.target.value})}
+                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     rows={3}
+                     placeholder="Mô tả chi tiết về hoạt động"
+                  />
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Ngày tổ chức *</label>
+                     <input
+                        type="date"
+                        value={activityForm.date}
+                        onChange={(e) => setActivityForm({...activityForm, date: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     />
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian *</label>
+                     <input
+                        type="time"
+                        value={activityForm.time}
+                        onChange={(e) => setActivityForm({...activityForm, time: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     />
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+                     <input
+                        type="text"
+                        value={activityForm.location}
+                        onChange={(e) => setActivityForm({...activityForm, location: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Nhập địa điểm tổ chức"
+                     />
+                  </div>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Loại hoạt động</label>
+                     <select
+                        value={activityForm.type}
+                        onChange={(e) => setActivityForm({...activityForm, type: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     >
+                        <option value="regular">Sinh hoạt thường lệ</option>
+                        <option value="event">Sự kiện đặc biệt</option>
+                        <option value="competition">Cuộc thi</option>
+                        <option value="workshop">Workshop</option>
+                        <option value="volunteer">Tình nguyện</option>
+                     </select>
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Số người tối đa</label>
+                     <input
+                        type="number"
+                        value={activityForm.maxParticipants}
+                        onChange={(e) => setActivityForm({...activityForm, maxParticipants: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Không giới hạn"
+                     />
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Hạn đăng ký</label>
+                     <input
+                        type="date"
+                        value={activityForm.registrationDeadline}
+                        onChange={(e) => setActivityForm({...activityForm, registrationDeadline: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     />
+                  </div>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Ngân sách (VNĐ)</label>
+                     <input
+                        type="number"
+                        value={activityForm.budget}
+                        onChange={(e) => setActivityForm({...activityForm, budget: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="0"
+                     />
+                  </div>
+                  <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                     <select
+                        value={activityForm.status}
+                        onChange={(e) => setActivityForm({...activityForm, status: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     >
+                        <option value="upcoming">Sắp diễn ra</option>
+                        <option value="ongoing">Đang diễn ra</option>
+                        <option value="completed">Đã kết thúc</option>
+                        <option value="cancelled">Đã hủy</option>
+                     </select>
+                  </div>
+               </div>
+               
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Yêu cầu tham gia</label>
+                  <textarea
+                     value={activityForm.requirements}
+                     onChange={(e) => setActivityForm({...activityForm, requirements: e.target.value})}
+                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     rows={2}
+                     placeholder="Các yêu cầu để tham gia hoạt động (nếu có)"
+                  />
+               </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-6">
+               <Button
+                  variant="secondary"
+                  onClick={() => setShowActivityModal(false)}
+               >
+                  Hủy
+               </Button>
+               <Button
+                  onClick={handleSaveActivity}
+                  disabled={!activityForm.title || !activityForm.description || !activityForm.clubId || !activityForm.date}
+               >
+                  {editingActivity ? 'Cập nhật' : 'Lưu'}
+               </Button>
+            </div>
+         </div>
       </Modal>
     </div>
   );
