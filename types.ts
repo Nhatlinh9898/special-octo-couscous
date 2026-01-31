@@ -508,6 +508,32 @@ export interface ClubActivity {
   description: string;
 }
 
+export interface ResearchFile {
+  id: number;
+  projectId: number;
+  fileName: string;
+  fileType: 'document' | 'report' | 'article' | 'presentation' | 'data' | 'other';
+  fileSize: number;
+  uploadDate: string;
+  uploadedBy: string;
+  description: string;
+  downloadUrl: string;
+  isPublic: boolean;
+}
+
+export interface ResearchProgress {
+  id: number;
+  projectId: number;
+  date: string;
+  progressPercentage: number;
+  description: string;
+  achievements: string[];
+  challenges: string[];
+  nextSteps: string[];
+  updatedBy: string;
+  files: ResearchFile[];
+}
+
 export interface ResearchProject {
   id: number;
   title: string;
@@ -517,7 +543,18 @@ export interface ResearchProject {
   status: 'Proposal' | 'Approved' | 'Ongoing' | 'Completed';
   budget: number;
   startDate: string;
+  endDate?: string;
   progress: number; // 0-100
+  description: string;
+  objectives: string[];
+  methodology: string;
+  expectedOutcomes: string[];
+  progressHistory: ResearchProgress[];
+  files: ResearchFile[];
+  reports: ResearchFile[];
+  finalFiles: ResearchFile[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CounselingSession {
