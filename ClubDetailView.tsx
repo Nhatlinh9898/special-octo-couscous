@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Users, Calendar, MapPin, Clock, ArrowLeft, Plus, Edit, Trash2, 
   Heart, MessageCircle, Share2, User, Mail, Phone, Award, 
@@ -8,10 +7,12 @@ import {
 import { Button, Modal } from './components';
 import { Club, ClubMember, ClubPost, ClubEvent } from './types';
 
-const ClubDetailView = () => {
-  const { clubId } = useParams<{ clubId: string }>();
-  const navigate = useNavigate();
-  
+interface ClubDetailViewProps {
+  clubId: string;
+  onBack: () => void;
+}
+
+const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   const [club, setClub] = useState<Club | null>(null);
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [posts, setPosts] = useState<ClubPost[]>([]);
@@ -326,7 +327,7 @@ const ClubDetailView = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Không tìm thấy câu lạc bộ</h2>
-          <Button onClick={() => navigate('/clubs')}>
+          <Button onClick={onBack}>
             <ArrowLeft size={16} className="mr-2" /> Quay lại
           </Button>
         </div>
@@ -380,7 +381,7 @@ const ClubDetailView = () => {
                   <span>Đã là thành viên</span>
                 </div>
               )}
-              <Button variant="secondary" onClick={() => navigate('/clubs')}>
+              <Button variant="secondary" onClick={onBack}>
                 <ArrowLeft size={16} className="mr-2" /> Quay lại
               </Button>
             </div>
