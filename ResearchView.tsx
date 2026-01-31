@@ -15,6 +15,7 @@ const ResearchView = () => {
   const [showProjectDetail, setShowProjectDetail] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [showFileUploadModal, setShowFileUploadModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'progress' | 'files' | 'reports'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -36,6 +37,21 @@ const ResearchView = () => {
     isPublic: true
   });
   
+  // Registration form state
+  const [registrationForm, setRegistrationForm] = useState({
+    title: '',
+    field: '',
+    description: '',
+    objectives: [''],
+    methodology: '',
+    expectedOutcomes: [''],
+    budget: '',
+    memberCount: '',
+    leaderName: '',
+    leaderEmail: '',
+    leaderPhone: ''
+  });
+  
   // AI
   const [isScanning, setIsScanning] = useState(false);
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
@@ -46,6 +62,57 @@ const ResearchView = () => {
   }, []);
 
   // Handler functions
+  const handleRegistration = () => {
+    console.log('Registration button clicked');
+    setRegistrationForm({
+      title: '',
+      field: '',
+      description: '',
+      objectives: [''],
+      methodology: '',
+      expectedOutcomes: [''],
+      budget: '',
+      memberCount: '',
+      leaderName: '',
+      leaderEmail: '',
+      leaderPhone: ''
+    });
+    setShowRegistrationModal(true);
+  };
+
+  const handleSaveRegistration = () => {
+    if (!registrationForm.title || !registrationForm.field || !registrationForm.leaderName) {
+      alert('Vui lòng điền các thông tin bắt buộc!');
+      return;
+    }
+
+    const newProject: ResearchProject = {
+      id: Date.now(),
+      title: registrationForm.title,
+      field: registrationForm.field,
+      leaderName: registrationForm.leaderName,
+      members: parseInt(registrationForm.memberCount) || 1,
+      status: 'Proposal',
+      budget: parseInt(registrationForm.budget) || 0,
+      startDate: new Date().toISOString().split('T')[0],
+      progress: 0,
+      description: registrationForm.description,
+      objectives: registrationForm.objectives.filter(obj => obj.trim()),
+      methodology: registrationForm.methodology,
+      expectedOutcomes: registrationForm.expectedOutcomes.filter(out => out.trim()),
+      progressHistory: [],
+      files: [],
+      reports: [],
+      finalFiles: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    setProjects(prev => [...prev, newProject]);
+    setShowRegistrationModal(false);
+    alert('Đã đăng ký đề tài thành công! Đề tài sẽ được xem xét và phê duyệt.');
+  };
+
   const handleViewProject = (project: ResearchProject) => {
     console.log('View project button clicked for project:', project.id);
     setSelectedProject(project);
@@ -245,6 +312,28 @@ const ResearchView = () => {
     }));
   };
 
+  // Registration form array handlers
+  const addRegistrationArrayItem = (field: 'objectives' | 'expectedOutcomes') => {
+    setRegistrationForm(prev => ({
+      ...prev,
+      [field]: [...prev[field], '']
+    }));
+  };
+
+  const removeRegistrationArrayItem = (field: 'objectives' | 'expectedOutcomes', index: number) => {
+    setRegistrationForm(prev => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateRegistrationArrayItem = (field: 'objectives' | 'expectedOutcomes', index: number, value: string) => {
+    setRegistrationForm(prev => ({
+      ...prev,
+      [field]: prev[field].map((item, i) => i === index ? value : item)
+    }));
+  };
+
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
@@ -262,7 +351,9 @@ const ResearchView = () => {
              {isScanning ? <Loader2 size={18} className="animate-spin"/> : <Microscope size={18}/>}
              {isScanning ? 'AI Đang quét...' : 'AI Xu hướng STEM'}
            </Button>
-           <Button><Plus size={20}/> Đăng ký Đề tài</Button>
+           <Button onClick={handleRegistration}>
+              <Plus size={20}/> Đăng ký Đề tài
+            </Button>
         </div>
       </div>
 
@@ -983,6 +1074,232 @@ const ResearchView = () => {
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Registration Modal */}
+      {console.log('Registration modal render check - showRegistrationModal:', showRegistrationModal)}
+      {showRegistrationModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '700px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Đăng ký Đề tài Nghiên cứu</h3>
+              <button 
+                onClick={() => setShowRegistrationModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên đề tài *</label>
+                    <input
+                      type="text"
+                      value={registrationForm.title}
+                      onChange={(e) => setRegistrationForm({...registrationForm, title: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Nhập tên đề tài"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Lĩnh vực *</label>
+                    <select
+                      value={registrationForm.field}
+                      onChange={(e) => setRegistrationForm({...registrationForm, field: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="">Chọn lĩnh vực</option>
+                      <option value="Công nghệ">Công nghệ</option>
+                      <option value="Kỹ thuật">Kỹ thuật</option>
+                      <option value="Xã hội">Xã hội</option>
+                      <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
+                      <option value="Y học">Y học</option>
+                      <option value="Giáo dục">Giáo dục</option>
+                      <option value="Môi trường">Môi trường</option>
+                      <option value="Kinh tế">Kinh tế</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả đề tài</label>
+                  <textarea
+                    value={registrationForm.description}
+                    onChange={(e) => setRegistrationForm({...registrationForm, description: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                    placeholder="Mô tả chi tiết về đề tài nghiên cứu"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Target size={16} className="inline mr-1" /> Mục tiêu nghiên cứu
+                  </label>
+                  {registrationForm.objectives.map((objective, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={objective}
+                        onChange={(e) => updateRegistrationArrayItem('objectives', index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập mục tiêu..."
+                      />
+                      {registrationForm.objectives.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => removeRegistrationArrayItem('objectives', index)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => addRegistrationArrayItem('objectives')}
+                    className="w-full"
+                  >
+                    <Plus size={14} className="mr-1" /> Thêm mục tiêu
+                  </Button>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phương pháp luận</label>
+                  <textarea
+                    value={registrationForm.methodology}
+                    onChange={(e) => setRegistrationForm({...registrationForm, methodology: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-16"
+                    placeholder="Phương pháp nghiên cứu sẽ được sử dụng"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <ChevronRight size={16} className="inline mr-1" /> Kết quả dự kiến
+                  </label>
+                  {registrationForm.expectedOutcomes.map((outcome, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={outcome}
+                        onChange={(e) => updateRegistrationArrayItem('expectedOutcomes', index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                        placeholder="Nhập kết quả dự kiến..."
+                      />
+                      {registrationForm.expectedOutcomes.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => removeRegistrationArrayItem('expectedOutcomes', index)}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => addRegistrationArrayItem('expectedOutcomes')}
+                    className="w-full"
+                  >
+                    <Plus size={14} className="mr-1" /> Thêm kết quả dự kiến
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ngân sách (VND)</label>
+                    <input
+                      type="number"
+                      value={registrationForm.budget}
+                      onChange={(e) => setRegistrationForm({...registrationForm, budget: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Số thành viên</label>
+                    <input
+                      type="number"
+                      value={registrationForm.memberCount}
+                      onChange={(e) => setRegistrationForm({...registrationForm, memberCount: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="1"
+                      min="1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Chủ nhiệm *</label>
+                    <input
+                      type="text"
+                      value={registrationForm.leaderName}
+                      onChange={(e) => setRegistrationForm({...registrationForm, leaderName: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Họ và tên chủ nhiệm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email chủ nhiệm</label>
+                    <input
+                      type="email"
+                      value={registrationForm.leaderEmail}
+                      onChange={(e) => setRegistrationForm({...registrationForm, leaderEmail: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại chủ nhiệm</label>
+                  <input
+                    type="tel"
+                    value={registrationForm.leaderPhone}
+                    onChange={(e) => setRegistrationForm({...registrationForm, leaderPhone: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="0901234567"
+                  />
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowRegistrationModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleSaveRegistration}>
+                    <Plus size={16} className="mr-1" /> Đăng ký đề tài
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* AI Modal */}
