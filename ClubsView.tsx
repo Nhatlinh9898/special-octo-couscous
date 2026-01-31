@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tent, Calendar, Users, ArrowRight, Loader2, Sparkles, Plus, Edit, Trash2, Clock, MapPin } from 'lucide-react';
-import { api } from './data';
+import { api, MOCK_CLUB_ACTIVITIES } from './data';
 import { Club, ClubActivity, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
@@ -62,26 +62,34 @@ const ClubsView = () => {
 
   const loadActivities = async () => {
     try {
-      // Load recent club schedules as activities
-      const response = await fetch('/api/clubs');
-      const data = await response.json();
-      if (data.success && data.data.clubs) {
-        const allSchedules = data.data.clubs.flatMap((club: any) => 
-          (club.schedules || []).map((schedule: any) => ({
-            ...schedule,
-            clubId: club.id,
-            clubName: club.name,
-            title: `Sinh hoạt ${club.name}`,
-            description: `${schedule.dayOfWeek} - ${schedule.startTime} đến ${schedule.endTime}`,
-            date: new Date().toISOString(),
-          }))
-        );
+      // Try to load from localStorage first
+      const savedActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
+      if (savedActivities.length > 0) {
+        setActivities(savedActivities);
+        return;
+      }
+
+      // Fallback to API
+      const response = await fetch('/api/activities');
+      if (response.ok) {
+        const data = await response.json();
+        setActivities(data.slice(0, 5));
+      } else {
+        // Fallback to mock data
+        const allSchedules = MOCK_CLUB_ACTIVITIES.map((schedule: any) => ({
+          ...schedule,
+          date: new Date().toISOString(),
+        }));
         setActivities(allSchedules.slice(0, 5));
+        localStorage.setItem('club_activities', JSON.stringify(allSchedules.slice(0, 5)));
       }
     } catch (error) {
       console.error('Error loading activities:', error);
       // Fallback to mock data
-      api.getClubActivities().then(setActivities);
+      api.getClubActivities().then((data: any) => {
+        setActivities(data);
+        localStorage.setItem('club_activities', JSON.stringify(data));
+      });
     }
   };
 
@@ -216,10 +224,25 @@ const ClubsView = () => {
         // Update existing activity
         setActivities(prev => prev.map(act => act.id === editingActivity.id ? activityData : act));
         alert('Cập nhật hoạt động thành công!');
+        
+        // Update localStorage
+        const allActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
+        const updatedActivities = allActivities.map((act: any) => act.id === editingActivity.id ? activityData : act);
+        localStorage.setItem('club_activities', JSON.stringify(updatedActivities));
+        
+        // Also update club-specific events for ClubDetailView
+        updateClubEvents(activityData.clubId, activityData, editingActivity.id);
       } else {
         // Create new activity
         setActivities(prev => [...prev, activityData]);
         alert('Tạo hoạt động mới thành công!');
+        
+        // Save to localStorage
+        const allActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
+        localStorage.setItem('club_activities', JSON.stringify([...allActivities, activityData]));
+        
+        // Also add to club-specific events for ClubDetailView
+        updateClubEvents(activityData.clubId, activityData);
       }
 
       setShowActivityModal(false);
@@ -230,10 +253,55 @@ const ClubsView = () => {
     }
   };
 
+  const updateClubEvents = (clubId: number, activityData: any, existingId?: number) => {
+    // Convert activity to event format for ClubDetailView
+    const eventData = {
+      id: existingId || activityData.id,
+      title: activityData.title,
+      description: activityData.description,
+      date: activityData.date,
+      time: activityData.time || '09:00',
+      location: activityData.location || 'Địa điểm TBD',
+      maxParticipants: activityData.maxParticipants,
+      currentParticipants: activityData.currentParticipants || 0,
+      registrationDeadline: activityData.registrationDeadline || activityData.date,
+      status: 'upcoming',
+      clubId: clubId,
+      createdAt: activityData.createdAt || new Date().toISOString()
+    };
+
+    // Get existing club events
+    const clubEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+    
+    if (existingId) {
+      // Update existing event
+      const updatedEvents = clubEvents.map((e: any) => e.id === existingId ? eventData : e);
+      localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
+    } else {
+      // Add new event
+      localStorage.setItem(`club_events_${clubId}`, JSON.stringify([eventData, ...clubEvents]));
+    }
+  };
+
   const handleDeleteActivity = (activityId: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa hoạt động này?')) return;
     
+    const activityToDelete = activities.find(act => act.id === activityId);
+    
     setActivities(prev => prev.filter(act => act.id !== activityId));
+    
+    // Update localStorage
+    const allActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
+    const updatedActivities = allActivities.filter((act: any) => act.id !== activityId);
+    localStorage.setItem('club_activities', JSON.stringify(updatedActivities));
+    
+    // Also remove from club-specific events
+    if (activityToDelete) {
+      const clubEvents = JSON.parse(localStorage.getItem(`club_events_${activityToDelete.clubId}`) || '[]');
+      const updatedClubEvents = clubEvents.filter((e: any) => e.id !== activityId);
+      localStorage.setItem(`club_events_${activityToDelete.clubId}`, JSON.stringify(updatedClubEvents));
+    }
+    
     alert('Xóa hoạt động thành công!');
   };
 
