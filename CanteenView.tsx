@@ -207,6 +207,9 @@ const CanteenView = () => {
     setIsProcessingPayment(false);
     setPaymentSuccess(true);
     
+    // Create financial transaction record
+    createCanteenTransaction();
+    
     // Clear cart after successful payment
     setTimeout(() => {
       setCart([]);
@@ -214,6 +217,56 @@ const CanteenView = () => {
       setShowPaymentModal(false);
       setSelectedPaymentMethod('cash');
     }, 3000);
+  };
+
+  const createCanteenTransaction = () => {
+    // Create transaction record for canteen sales
+    const transaction = {
+      id: Date.now(),
+      type: 'income' as 'income' | 'expense',
+      category: 'revenue' as any,
+      amount: totalAmount,
+      description: `Doanh thu bán đồ ăn căng tin - ${cart.length} sản phẩm`,
+      date: new Date().toISOString().split('T')[0],
+      reference: `CANTEEN-${Date.now()}`,
+      status: 'completed' as 'completed' | 'pending' | 'cancelled',
+      paymentMethod: selectedPaymentMethod as 'cash' | 'transfer' | 'qr',
+      createdBy: 'Nguyễn Thị Hanh',
+      createdAt: new Date().toISOString()
+    };
+
+    // Store transaction in localStorage for CanteenFinanceView to access
+    const existingTransactions = JSON.parse(localStorage.getItem('canteenFinancialTransactions') || '[]');
+    existingTransactions.push(transaction);
+    localStorage.setItem('canteenFinancialTransactions', JSON.stringify(existingTransactions));
+
+    // Also store inventory movements for items sold
+    cart.forEach(cartItem => {
+      const movement = {
+        id: Date.now() + cartItem.item.id,
+        inventoryItemId: cartItem.item.id,
+        itemName: cartItem.item.name,
+        transactionType: 'out' as 'in' | 'out',
+        quantity: cartItem.qty,
+        unitPrice: cartItem.item.price,
+        totalValue: cartItem.qty * cartItem.item.price,
+        reference: `SALE-${Date.now()}`,
+        reason: `Bán cho khách hàng - ${cartItem.qty} sản phẩm`,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toTimeString().slice(0, 5),
+        createdBy: 'Nguyễn Thị Hanh',
+        approvedBy: 'Nguyễn Thị Hanh',
+        status: 'completed' as 'pending' | 'approved' | 'completed' | 'cancelled',
+        notes: `Thanh toán qua ${selectedPaymentMethod === 'cash' ? 'tiền mặt' : selectedPaymentMethod === 'transfer' ? 'chuyển khoản' : 'quét mã QR'}`
+      };
+
+      const existingMovements = JSON.parse(localStorage.getItem('canteenInventoryMovements') || '[]');
+      existingMovements.push(movement);
+      localStorage.setItem('canteenInventoryMovements', JSON.stringify(existingMovements));
+    });
+
+    console.log('Created canteen transaction:', transaction);
+    console.log('Created inventory movements for cart items');
   };
 
   const generateQRCode = () => {

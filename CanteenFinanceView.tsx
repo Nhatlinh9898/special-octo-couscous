@@ -80,6 +80,7 @@ const CanteenFinanceView = () => {
   });
 
   useEffect(() => {
+    // Load mock data
     setTransactions(MOCK_FINANCIAL_TRANSACTIONS);
     setProfitAnalysis(MOCK_PROFIT_ANALYSIS);
     setBudgetPlans(MOCK_BUDGET_PLANS);
@@ -88,6 +89,16 @@ const CanteenFinanceView = () => {
     setExpenseReports(MOCK_EXPENSE_REPORTS);
     setInventoryTransactions(MOCK_INVENTORY_TRANSACTIONS);
     setInventoryReports(MOCK_INVENTORY_REPORTS);
+
+    // Load canteen transactions from localStorage
+    refreshDataFromLocalStorage();
+
+    // Set up interval to refresh data every 5 seconds
+    const interval = setInterval(() => {
+      refreshDataFromLocalStorage();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
@@ -97,6 +108,24 @@ const CanteenFinanceView = () => {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
+
+  // Function to refresh data from localStorage
+  const refreshDataFromLocalStorage = () => {
+    const canteenTransactions = JSON.parse(localStorage.getItem('canteenFinancialTransactions') || '[]');
+    const canteenMovements = JSON.parse(localStorage.getItem('canteenInventoryMovements') || '[]');
+    
+    // Reload transactions
+    setTransactions(MOCK_FINANCIAL_TRANSACTIONS);
+    if (canteenTransactions.length > 0) {
+      setTransactions(prev => [...prev, ...canteenTransactions]);
+    }
+    
+    // Reload inventory movements
+    setInventoryTransactions(MOCK_INVENTORY_TRANSACTIONS);
+    if (canteenMovements.length > 0) {
+      setInventoryTransactions(prev => [...prev, ...canteenMovements]);
+    }
   };
 
   const handleAddTransaction = () => {
@@ -635,9 +664,14 @@ const CanteenFinanceView = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">Lịch sử giao dịch</h3>
-              <Button onClick={handleAddTransaction}>
-                <Plus size={16}/> Thêm giao dịch
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={refreshDataFromLocalStorage}>
+                  <Download size={16}/> Làm mới
+                </Button>
+                <Button onClick={handleAddTransaction}>
+                  <Plus size={16}/> Thêm giao dịch
+                </Button>
+              </div>
             </div>
             
             <table className="w-full">
@@ -884,6 +918,9 @@ const CanteenFinanceView = () => {
                 <ShoppingCart size={20} className="text-blue-500"/> Khi suất kho
               </h3>
               <div className="flex gap-2">
+                <Button variant="secondary" onClick={refreshDataFromLocalStorage}>
+                  <Download size={16}/> Làm mới
+                </Button>
                 <Button variant="success" onClick={handleOpenMovementQRScanner}>
                   <QrCode size={16}/> Quét mã khi suất
                 </Button>
