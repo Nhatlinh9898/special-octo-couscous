@@ -398,6 +398,34 @@ const CanteenFinanceView = () => {
     }
   };
 
+  const handleGenerateReport = () => {
+    const reportData = {
+      period: new Date().toISOString().split('T')[0],
+      totalRevenue: calculateFinancialSummary().totalRevenue,
+      totalCost: calculateFinancialSummary().totalCost,
+      totalProfit: calculateFinancialSummary().totalProfit,
+      profitMargin: calculateFinancialSummary().profitMargin,
+      transactionCount: calculateFinancialSummary().transactionCount,
+      movementCount: calculateFinancialSummary().movementCount,
+      topProducts: calculateProductAnalytics().slice(0, 5),
+      inventoryValue: inventory.reduce((sum, item) => sum + (item.currentStock * item.unitPrice), 0),
+      outOfStockCount: inventory.filter(item => item.status === 'out_of_stock').length,
+      lowStockCount: inventory.filter(item => item.status === 'low_stock').length
+    };
+
+    // Save report to localStorage
+    const existingReports = JSON.parse(localStorage.getItem('canteenReports') || '[]');
+    existingReports.push({
+      id: Date.now(),
+      ...reportData,
+      createdAt: new Date().toISOString(),
+      createdBy: 'Nguyễn Thị Hanh'
+    });
+    localStorage.setItem('canteenReports', JSON.stringify(existingReports));
+
+    alert('Đã tạo báo cáo thành công! Báo cáo đã được lưu vào hệ thống.');
+  };
+
   // Inventory CRUD functions
   const handleAddInventory = () => {
     setEditingInventory(null);
@@ -1819,9 +1847,105 @@ const CanteenFinanceView = () => {
       {activeTab === 'reports' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FileText size={20} className="text-purple-500"/> Báo cáo tài chính
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <FileText size={20} className="text-purple-500"/> Báo cáo tài chính
+              </h3>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => window.print()}>
+                  <Download size={16}/> In báo cáo
+                </Button>
+                <Button variant="success" onClick={handleGenerateReport}>
+                  <Plus size={16}/> Tạo báo cáo mới
+                </Button>
+              </div>
+            </div>
+            
+            {/* Report Period Selector */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Loại báo cáo</label>
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="monthly">Báo cáo tháng</option>
+                  <option value="quarterly">Báo cáo quý</option>
+                  <option value="yearly">Báo cáo năm</option>
+                  <option value="custom">Tùy chỉnh</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
+                <input
+                  type="date"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  defaultValue={new Date(new Date().setDate(1)).toISOString().split('T')[0]}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
+                <input
+                  type="date"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  defaultValue={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-green-600">Tổng Doanh thu</span>
+                  <TrendingUp size={16} className="text-green-500"/>
+                </div>
+                <p className="text-2xl font-bold text-green-700">
+                  {formatCurrency(calculateFinancialSummary().totalRevenue)}
+                </p>
+                <p className="text-xs text-green-600">
+                  {calculateFinancialSummary().transactionCount} giao dịch
+                </p>
+              </div>
+              
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-red-600">Tổng Chi phí</span>
+                  <TrendingDown size={16} className="text-red-500"/>
+                </div>
+                <p className="text-2xl font-bold text-red-700">
+                  {formatCurrency(calculateFinancialSummary().totalCost)}
+                </p>
+                <p className="text-xs text-red-600">
+                  {calculateFinancialSummary().movementCount} khi suất
+                </p>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-blue-600">Lợi nhuận</span>
+                  <Package size={16} className="text-blue-500"/>
+                </div>
+                <p className={`text-2xl font-bold ${calculateFinancialSummary().totalProfit >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  {formatCurrency(calculateFinancialSummary().totalProfit)}
+                </p>
+                <p className="text-xs text-blue-600">
+                  Biên lợi nhuận: {calculateFinancialSummary().profitMargin}%
+                </p>
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-purple-600">Hiệu quả</span>
+                  <CheckCircle size={16} className="text-purple-500"/>
+                </div>
+                <p className="text-2xl font-bold text-purple-700">
+                  {parseFloat(calculateFinancialSummary().profitMargin) > 20 ? 'Tốt' : 
+                   parseFloat(calculateFinancialSummary().profitMargin) > 10 ? 'Khá tốt' : 
+                   parseFloat(calculateFinancialSummary().profitMargin) > 0 ? 'Trung bình' : 'Cần cải thiện'}
+                </p>
+                <p className="text-xs text-purple-600">
+                  Dựa trên biên lợi nhuận
+                </p>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="border border-gray-200 rounded-lg p-6">
@@ -1868,6 +1992,101 @@ const CanteenFinanceView = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Detailed Reports */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <TrendingUp size={20} className="text-indigo-500"/> Báo cáo chi tiết
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Inventory Report */}
+              <div className="border border-gray-200 rounded-lg p-6">
+                <h4 className="font-medium text-gray-800 mb-4">Báo cáo tồn kho</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Tổng giá trị tồn kho:</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {formatCurrency(inventory.reduce((sum, item) => sum + (item.currentStock * item.unitPrice), 0))}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Số lượng sản phẩm:</span>
+                    <span className="text-lg font-bold text-gray-800">{inventory.length}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Sản phẩm hết hàng:</span>
+                    <span className="text-lg font-bold text-red-600">
+                      {inventory.filter(item => item.status === 'out_of_stock').length}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Sản phẩm sắp hết:</span>
+                    <span className="text-lg font-bold text-yellow-600">
+                      {inventory.filter(item => item.status === 'low_stock').length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Transaction Report */}
+              <div className="border border-gray-200 rounded-lg p-6">
+                <h4 className="font-medium text-gray-800 mb-4">Báo cáo giao dịch</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Tổng giao dịch:</span>
+                    <span className="text-lg font-bold text-gray-800">{transactions.length}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Giao dịch thành công:</span>
+                    <span className="text-lg font-bold text-green-600">
+                      {transactions.filter(t => t.status === 'completed').length}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Giao dịch chờ duyệt:</span>
+                    <span className="text-lg font-bold text-yellow-600">
+                      {transactions.filter(t => t.status === 'pending').length}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Giao dịch bị hủy:</span>
+                    <span className="text-lg font-bold text-red-600">
+                      {transactions.filter(t => t.status === 'cancelled').length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Export Options */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <Download size={20} className="text-orange-500"/> Xuất báo cáo
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button variant="secondary" className="w-full">
+                <FileText size={16} className="mr-2"/>
+                Xuất PDF
+              </Button>
+              <Button variant="secondary" className="w-full">
+                <FileText size={16} className="mr-2"/>
+                Xuất Excel
+              </Button>
+              <Button variant="secondary" className="w-full">
+                <FileText size={16} className="mr-2"/>
+                Xuất CSV
+              </Button>
             </div>
           </div>
         </div>
