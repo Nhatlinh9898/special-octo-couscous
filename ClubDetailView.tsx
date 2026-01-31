@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Users, Calendar, MapPin, Clock, ArrowLeft, Plus, Edit, Trash2, 
-  Heart, MessageCircle, Share2, User, Mail, Phone, Award, 
-  BookOpen, Target, Star, CheckCircle, XCircle, Loader2, Send, Search
+  ArrowLeft, Users, Calendar, MapPin, User, Plus, Edit, Trash2, Clock, Send, CheckCircle, XCircle, MessageSquare, Heart, Share2, Search, Filter, ChevronDown, Star, Award, Target, BookOpen, Lightbulb, Coffee, Gamepad2, Music, Palette, Camera, Mic, Globe, Code, Dumbbell, Trophy, Loader2, MessageCircle
 } from 'lucide-react';
+import { api } from './data';
+import { Club, ClubMember, ClubPost, ClubEvent, ClubActivity, ClubAdminRole, ClubMembership } from './types';
 import { Button, Modal } from './components';
-import { Club, ClubMember, ClubPost, ClubEvent } from './types';
 
 interface ClubDetailViewProps {
   clubId: string;
@@ -409,24 +408,51 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
     // Add to members list
     const application = allApplications.find((app: any) => app.id === applicationId);
     if (application) {
+      // Check if this is the first member (creator) or assign appropriate role
+      const currentMembersCount = members.length;
+      let assignedRole: ClubAdminRole = 'member';
+      
+      if (currentMembersCount === 0) {
+        // First member becomes president
+        assignedRole = 'president';
+      } else if (currentMembersCount < 4) {
+        // Early members get leadership roles
+        const leadershipRoles: ClubAdminRole[] = ['vice_president', 'secretary', 'treasurer'];
+        assignedRole = leadershipRoles[currentMembersCount - 1];
+      }
+      
       const newMember = {
         id: Date.now(),
         fullName: application.fullName,
         email: application.email,
-        role: 'member',
+        role: assignedRole,
         joinedDate: new Date().toISOString().split('T')[0],
         status: 'active',
-        avatar: '/default-avatar.jpg'
+        avatar: '/default-avatar.jpg',
+        phone: application.phone,
+        class: application.class,
+        grade: application.grade
       };
       setMembers(prev => [...prev, newMember]);
       
       // Save to localStorage
-      const savedEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
-      localStorage.setItem(`club_events_${clubId}`, JSON.stringify(savedEvents));
+      const clubMemberships = JSON.parse(localStorage.getItem(`club_memberships_${clubId}`) || '[]');
+      clubMemberships.push({
+        id: Date.now(),
+        userId: application.userId,
+        clubId: parseInt(clubId || '1'),
+        role: assignedRole,
+        status: 'approved',
+        joinedDate: new Date().toISOString().split('T')[0],
+        applicationDate: application.submittedDate,
+        approvedBy: currentUser?.id || 1,
+        approvedDate: new Date().toISOString()
+      });
+      localStorage.setItem(`club_memberships_${clubId}`, JSON.stringify(clubMemberships));
+      
+      loadApplications();
+      alert(`Đã phê duyệt đơn đăng ký! ${application.fullName} đã được thêm vào CLB với vai trò: ${assignedRole}`);
     }
-    
-    loadApplications();
-    alert('Đã phê duyệt đơn đăng ký!');
   };
 
   const handleRejectApplication = (applicationId: number) => {
@@ -671,7 +697,19 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   };
 
   const isUserMember = members.some(m => m.email === currentUser?.email);
-  const isUserAdmin = members.some(m => m.email === currentUser?.email && ['president', 'vice_president'].includes(m.role));
+  const isUserAdmin = (() => {
+    // Super admin (system admin)
+    if (currentUser?.role === 'ADMIN') return true;
+    
+    // Teacher can admin any club
+    if (currentUser?.role === 'TEACHER') return true;
+    
+    // Check club-specific admin roles
+    const userMembership = members.find(m => m.email === currentUser?.email);
+    if (!userMembership) return false;
+    
+    return ['president', 'vice_president', 'secretary', 'treasurer'].includes(userMembership.role);
+  })();
 
   console.log('ClubDetailView rendering...', { clubId, club: !!club, loading });
 
@@ -919,9 +957,68 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
         Chat Messages: {chatMessages.length}<br/>
         <strong>Current User:</strong> {currentUser?.fullName || 'Not logged in'}<br/>
         <strong>User Email:</strong> {currentUser?.email || 'No email'}<br/>
+        <strong>User Role:</strong> {currentUser?.role || 'No role'}<br/>
         <strong>Is User Member:</strong> {isUserMember ? '✅ YES' : '❌ NO'}<br/>
         <strong>Is User Admin:</strong> {isUserAdmin ? '✅ YES' : '❌ NO'}<br/>
         <strong>Can Write Posts:</strong> {(isUserMember || isUserAdmin) ? '✅ YES' : '❌ NO - Need to join club first'}
+        
+        <div className="mt-4 space-y-2">
+          <strong>Testing Admin Roles:</strong><br/>
+          <button 
+            onClick={() => {
+              const adminUser = {
+                id: 999,
+                fullName: 'Admin Test',
+                email: 'admin@test.com',
+                role: 'ADMIN' as const,
+                avatar: '/default-avatar.jpg'
+              };
+              localStorage.setItem('currentUser', JSON.stringify(adminUser));
+              window.location.reload();
+            }}
+            className="bg-purple-600 text-white px-3 py-1 rounded text-xs mr-2"
+          >
+            Set as Super Admin
+          </button>
+          
+          <button 
+            onClick={() => {
+              const teacherUser = {
+                id: 998,
+                fullName: 'Teacher Test',
+                email: 'teacher@test.com',
+                role: 'TEACHER' as const,
+                department: 'Computer Science',
+                position: 'Teacher',
+                avatar: '/default-avatar.jpg'
+              };
+              localStorage.setItem('currentUser', JSON.stringify(teacherUser));
+              window.location.reload();
+            }}
+            className="bg-blue-600 text-white px-3 py-1 rounded text-xs mr-2"
+          >
+            Set as Teacher
+          </button>
+          
+          <button 
+            onClick={() => {
+              const studentUser = {
+                id: 997,
+                fullName: 'Student Test',
+                email: 'student@test.com',
+                role: 'STUDENT' as const,
+                grade: '12',
+                class: '12A1',
+                avatar: '/default-avatar.jpg'
+              };
+              localStorage.setItem('currentUser', JSON.stringify(studentUser));
+              window.location.reload();
+            }}
+            className="bg-green-600 text-white px-3 py-1 rounded text-xs"
+          >
+            Set as Student
+          </button>
+        </div>
       </div>
 
       {/* Tab Content */}

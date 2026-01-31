@@ -1,5 +1,7 @@
 export type Role = 'ADMIN' | 'TEACHER' | 'STUDENT';
 
+export type ClubAdminRole = 'president' | 'vice_president' | 'secretary' | 'treasurer' | 'member';
+
 export interface User {
   id: number;
   fullName: string;
@@ -8,6 +10,31 @@ export interface User {
   avatar?: string;
   phone?: string;
   address?: string;
+  grade?: string;
+  class?: string;
+  department?: string; // For teachers
+  position?: string; // For teachers
+}
+
+export interface ClubAdmin {
+  userId: number;
+  clubId: number;
+  role: ClubAdminRole;
+  assignedBy: number; // Who assigned this role
+  assignedDate: string;
+  isActive: boolean;
+}
+
+export interface ClubMembership {
+  id: number;
+  userId: number;
+  clubId: number;
+  role: ClubAdminRole;
+  status: 'pending' | 'approved' | 'rejected';
+  joinedDate?: string;
+  applicationDate: string;
+  approvedBy?: number;
+  approvedDate?: string;
 }
 
 export interface Class {
