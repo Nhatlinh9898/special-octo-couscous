@@ -48,15 +48,48 @@ const ClubsView = () => {
 
   const loadClubs = async () => {
     try {
-      const response = await fetch('/api/clubs');
-      const data = await response.json();
-      if (data.success) {
-        setClubs(data.data.clubs || []);
+      console.log('Loading clubs...');
+      
+      // Try to load from localStorage first
+      const savedClubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+      console.log('Saved clubs from localStorage:', savedClubs);
+      
+      if (savedClubs.length > 0) {
+        setClubs(savedClubs);
+        console.log('Clubs loaded from localStorage:', savedClubs.length);
+        return;
       }
+
+      console.log('No clubs in localStorage, trying API...');
+      
+      // Try API
+      const response = await fetch('/api/clubs');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const apiClubs = data.data.clubs || [];
+          setClubs(apiClubs);
+          localStorage.setItem('clubs', JSON.stringify(apiClubs));
+          console.log('Clubs loaded from API:', apiClubs.length);
+          return;
+        }
+      }
+      
+      console.log('API failed, trying mock data...');
+      
+      // Fallback to mock data
+      const mockClubs = await api.getClubs();
+      setClubs(mockClubs);
+      localStorage.setItem('clubs', JSON.stringify(mockClubs));
+      console.log('Clubs loaded from mock data:', mockClubs.length);
     } catch (error) {
       console.error('Error loading clubs:', error);
-      // Fallback to mock data
-      api.getClubs().then(setClubs);
+      // Final fallback to mock data
+      api.getClubs().then((mockClubs) => {
+        setClubs(mockClubs);
+        localStorage.setItem('clubs', JSON.stringify(mockClubs));
+        console.log('Clubs loaded from mock data (fallback):', mockClubs.length);
+      });
     }
   };
 
@@ -595,6 +628,9 @@ const ClubsView = () => {
                            <option key={club.id} value={club.id}>{club.name}</option>
                         ))}
                      </select>
+                     {clubs.length === 0 && (
+                        <p className="text-xs text-red-500 mt-1">Đang tải danh sách câu lạc bộ...</p>
+                     )}
                   </div>
                </div>
                
