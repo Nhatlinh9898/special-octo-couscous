@@ -573,11 +573,8 @@ const CanteenView = () => {
 
       {/* Add/Edit Item Modal */}
       {showAddItemModal && (
-        <Modal onClose={() => setShowAddItemModal(false)}>
+        <Modal isOpen={showAddItemModal} onClose={() => setShowAddItemModal(false)} title={editingItem ? 'Chỉnh sửa món ăn' : 'Thêm món ăn mới'}>
           <div className="p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
-              {editingItem ? 'Chỉnh sửa món ăn' : 'Thêm món ăn mới'}
-            </h3>
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -689,11 +686,8 @@ const CanteenView = () => {
 
       {/* Add/Edit Schedule Modal */}
       {showScheduleModal && (
-        <Modal onClose={() => setShowScheduleModal(false)}>
+        <Modal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title={editingSchedule ? 'Chỉnh sửa lịch trình' : 'Thêm lịch trình mới'}>
           <div className="p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
-              {editingSchedule ? 'Chỉnh sửa lịch trình' : 'Thêm lịch trình mới'}
-            </h3>
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -787,14 +781,10 @@ const CanteenView = () => {
 
       {/* Payment Modal */}
       {showPaymentModal && (
-        <Modal onClose={() => setShowPaymentModal(false)}>
+        <Modal isOpen={showPaymentModal} onClose={() => setShowPaymentModal(false)} title="Thanh toán đơn hàng">
           <div className="p-6 max-w-md w-full">
             {!paymentSuccess ? (
               <>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <CreditCard size={20} className="text-green-500"/> Thanh toán đơn hàng
-                </h3>
-                
                 {/* Order Summary */}
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
                   <div className="flex justify-between items-center mb-2">
@@ -962,11 +952,8 @@ const CanteenView = () => {
 
       {/* AI Modal */}
       {showAIModal && aiResult && (
-        <Modal onClose={() => setShowAIModal(false)}>
+        <Modal isOpen={showAIModal} onClose={() => setShowAIModal(false)} title="AI Tối ưu Thực đơn">
           <div className="p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <ChefHat size={20} className="text-orange-500"/> AI Tối ưu Thực đơn
-            </h3>
             <div className="prose prose-sm max-w-none">
               <p className="text-gray-700">{aiResult.recommendation}</p>
             </div>
