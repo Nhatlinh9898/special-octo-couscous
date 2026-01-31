@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Globe, Plane, GraduationCap, Clock, FileText, CheckCircle2, Loader2, Award } from 'lucide-react';
 import { api, MOCK_STUDENTS } from './data';
 import { PartnerUniversity, ExchangeProgram, AbroadApplication, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
+import { AppContext } from './context';
 
 const StudyAbroadView = () => {
+  const { user } = useContext(AppContext);
   const [partners, setPartners] = useState<PartnerUniversity[]>([]);
   const [programs, setPrograms] = useState<ExchangeProgram[]>([]);
   const [applications, setApplications] = useState<AbroadApplication[]>([]);
@@ -22,8 +24,8 @@ const StudyAbroadView = () => {
   const [applicationForm, setApplicationForm] = useState({
     studentId: 1001, // Default student
     programId: 0,
-    fullName: '',
-    email: '',
+    fullName: user?.fullName || '',
+    email: user?.email || '',
     phone: '',
     currentSchool: '',
     grade: '',
@@ -34,6 +36,17 @@ const StudyAbroadView = () => {
     achievements: '',
     additionalInfo: ''
   });
+
+  // Update form when user changes
+  useEffect(() => {
+    if (user) {
+      setApplicationForm(prev => ({
+        ...prev,
+        fullName: user.fullName || '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     console.log('Loading study abroad data...');
@@ -64,7 +77,10 @@ const StudyAbroadView = () => {
     setSelectedProgram(program);
     setApplicationForm(prev => ({
       ...prev,
-      programId: program.id
+      programId: program.id,
+      studentId: user?.id || 1001, // Use user ID or fallback
+      fullName: user?.fullName || '',
+      email: user?.email || ''
     }));
     setShowApplicationModal(true);
   };
@@ -115,7 +131,15 @@ const StudyAbroadView = () => {
     alert('Hồ sơ ứng tuyển đã được gửi thành công!');
   };
 
-  const getStudentName = (id: number) => MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
+  const getStudentName = (id: number) => {
+  // First check if it's the current user
+  if (user && id === user.id) {
+    return user.fullName;
+  }
+  // Then check MOCK_STUDENTS
+  return MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
+};
+
   const getProgramTitle = (id: number) => programs.find(p => p.id === id)?.title || "Unknown";
 
   return (
@@ -271,26 +295,54 @@ const StudyAbroadView = () => {
               </div>
             </div>
 
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h4 className="font-bold text-green-800 mb-2">Thông tin đăng nhập (tự động điền)</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Họ và tên:</span>
+                  <span className="ml-2 font-medium">{user?.fullName}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Email:</span>
+                  <span className="ml-2 font-medium">{user?.email}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Vai trò:</span>
+                  <span className="ml-2 font-medium">{user?.role}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">User ID:</span>
+                  <span className="ml-2 font-medium">{user?.id}</span>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Họ và tên * 
+                  <span className="text-xs text-green-600 ml-2">(đã điền sẵn)</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={applicationForm.fullName}
                   onChange={(e) => setApplicationForm({...applicationForm, fullName: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-green-50"
                   placeholder="Nguyễn Văn A"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email * 
+                  <span className="text-xs text-green-600 ml-2">(đã điền sẵn)</span>
+                </label>
                 <input
                   type="email"
                   required
                   value={applicationForm.email}
                   onChange={(e) => setApplicationForm({...applicationForm, email: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-green-50"
                   placeholder="email@example.com"
                 />
               </div>
