@@ -750,6 +750,12 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
         </div>
       </div>
 
+      {/* ORIGINAL TABS LOCATION MARKER */}
+      <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4">
+        <h3 className="text-green-700 font-bold">📍 ORIGINAL TABS SHOULD BE BELOW THIS GREEN BOX</h3>
+        <p>If you don't see tabs below, there's a rendering issue</p>
+      </div>
+
       {/* Navigation Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
         <div className="flex space-x-1">
@@ -819,6 +825,12 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
             Chat ({chatMessages.length})
           </button>
         </div>
+      </div>
+
+      {/* TABS CONFIRMATION MARKER */}
+      <div className="bg-purple-100 border-2 border-purple-500 rounded-lg p-4">
+        <h3 className="text-purple-700 font-bold">📍 TABS SHOULD BE ABOVE THIS PURPLE BOX</h3>
+        <p>If you see this but no tabs above, the tabs component is not rendering</p>
       </div>
 
       {/* Debug Info */}
