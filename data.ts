@@ -169,17 +169,47 @@ export const MOCK_PARTNERS: PartnerUniversity[] = [
   { id: 1, name: "Harvard University", country: "USA", ranking: 1, image: "https://placehold.co/300x200/a51c30/fff?text=Harvard", description: "Hợp tác trao đổi học thuật và nghiên cứu.", website: "https://harvard.edu" },
   { id: 2, name: "University of Oxford", country: "UK", ranking: 5, image: "https://placehold.co/300x200/002147/fff?text=Oxford", description: "Chương trình trại hè ngôn ngữ và văn hóa.", website: "https://ox.ac.uk" },
   { id: 3, name: "National University of Singapore", country: "Singapore", ranking: 11, image: "https://placehold.co/300x200/ff7f00/fff?text=NUS", description: "Học bổng du học toàn phần cho học sinh xuất sắc.", website: "https://nus.edu.sg" },
+  { id: 4, name: "Stanford University", country: "USA", ranking: 3, image: "https://placehold.co/300x200/840a2f/fff?text=Stanford", description: "Chương trình đổi mới sáng tạo và khởi nghiệp.", website: "https://stanford.edu" },
+  { id: 5, name: "MIT", country: "USA", ranking: 2, image: "https://placehold.co/300x200/a31f34/fff?text=MIT", description: "Học bổng kỹ thuật và công nghệ hàng đầu thế giới.", website: "https://mit.edu" },
+  { id: 6, name: "University of Cambridge", country: "UK", ranking: 4, image: "https://placehold.co/300x200/f3e5ab/000?text=Cambridge", description: "Chương trình trao đổi học thuật và nghiên cứu khoa học.", website: "https://cam.ac.uk" },
+  { id: 7, name: "ETH Zurich", country: "Switzerland", ranking: 8, image: "https://placehold.co/300x200/0066b3/fff?text=ETH", description: "Học bổng kỹ thuật và công nghệ Thụy Sĩ.", website: "https://ethz.ch" },
+  { id: 8, name: "University of Tokyo", country: "Japan", ranking: 9, image: "https://placehold.co/300x200/00205b/fff?text=Tokyo", description: "Chương trình trao đổi văn hóa và ngôn ngữ Nhật Bản.", website: "https://u-tokyo.ac.jp" },
+  { id: 9, name: "University of Melbourne", country: "Australia", ranking: 15, image: "https://placehold.co/300x200/0055a4/fff?text=Melbourne", description: "Học bổng du học Úc với nhiều ngành học đa dạng.", website: "https://unimelb.edu.au" },
+  { id: 10, name: "University of Toronto", country: "Canada", ranking: 18, image: "https://placehold.co/300x200/002147/fff?text=Toronto", description: "Chương trình trao đổi học thuật Canada.", website: "https://utoronto.ca" },
+  { id: 11, name: "Seoul National University", country: "South Korea", ranking: 29, image: "https://placehold.co/300x200/8b0000/fff?text=SNU", description: "Học bổng K-POP và văn hóa Hàn Quốc.", website: "https://snu.ac.kr" },
+  { id: 12, name: "Technical University of Munich", country: "Germany", ranking: 50, image: "https://placehold.co/300x200/0066b3/fff?text=TUM", description: "Học bổng kỹ thuật và công nghệ Đức.", website: "https://tum.de" },
+  { id: 13, name: "University of Amsterdam", country: "Netherlands", ranking: 58, image: "https://placehold.co/300x200/00843d/fff?text=Amsterdam", description: "Chương trình kinh doanh và quản lý quốc tế.", website: "https://uva.nl" },
+  { id: 14, name: "Tsinghua University", country: "China", ranking: 14, image: "https://placehold.co/300x200/7f1418/fff?text=Tsinghua", description: "Học bổng trao đổi Trung Quốc và công nghệ.", website: "https://tsinghua.edu.cn" },
+  { id: 15, name: "University of Auckland", country: "New Zealand", ranking: 85, image: "https://placehold.co/300x200/0055a4/fff?text=Auckland", description: "Chương trình du học New Zealand với môi trường học tập tuyệt vời.", website: "https://auckland.ac.nz" },
 ];
 
 export const MOCK_PROGRAMS: ExchangeProgram[] = [
   { id: 1, partnerId: 1, title: "Harvard Summer Leadership Camp", type: "Summer Camp", duration: "2 tuần", cost: 5000, deadline: "2024-03-01", slots: 5 },
   { id: 2, partnerId: 2, title: "Oxford Cultural Exchange", type: "Semester Exchange", duration: "1 kỳ học", cost: 15000, deadline: "2024-04-15", slots: 3 },
   { id: 3, partnerId: 3, title: "NUS ASEAN Scholarship", type: "Scholarship", duration: "4 năm", cost: 0, deadline: "2024-02-28", slots: 2 },
+  { id: 4, partnerId: 4, title: "Stanford Innovation Bootcamp", type: "Summer Camp", duration: "3 tuần", cost: 7500, deadline: "2024-03-15", slots: 4 },
+  { id: 5, partnerId: 5, title: "MIT Research Internship", type: "Research", duration: "2 tháng", cost: 8000, deadline: "2024-02-20", slots: 2 },
+  { id: 6, partnerId: 6, title: "Cambridge Science Exchange", type: "Semester Exchange", duration: "1 kỳ học", cost: 18000, deadline: "2024-04-01", slots: 3 },
+  { id: 7, partnerId: 7, title: "ETH Zurich Engineering Scholarship", type: "Scholarship", duration: "3 năm", cost: 0, deadline: "2024-03-10", slots: 3 },
+  { id: 8, partnerId: 8, title: "Tokyo Language & Culture Program", type: "Summer Camp", duration: "4 tuần", cost: 4000, deadline: "2024-03-25", slots: 6 },
+  { id: 9, partnerId: 9, title: "Melbourne Business Exchange", type: "Semester Exchange", duration: "1 kỳ học", cost: 12000, deadline: "2024-04-10", slots: 4 },
+  { id: 10, partnerId: 10, title: "Toronto STEM Scholarship", type: "Scholarship", duration: "4 năm", cost: 0, deadline: "2024-02-15", slots: 2 },
+  { id: 11, partnerId: 11, title: "SNU K-Pop & Culture Camp", type: "Summer Camp", duration: "3 tuần", cost: 3500, deadline: "2024-03-20", slots: 8 },
+  { id: 12, partnerId: 12, title: "TUM German Engineering Exchange", type: "Semester Exchange", duration: "1 kỳ học", cost: 10000, deadline: "2024-04-05", slots: 3 },
+  { id: 13, partnerId: 13, title: "Amsterdam Business School", type: "Semester Exchange", duration: "1 kỳ học", cost: 13000, deadline: "2024-04-12", slots: 4 },
+  { id: 14, partnerId: 14, title: "Tsinghua Tech Innovation", type: "Research", duration: "3 tháng", cost: 6000, deadline: "2024-02-25", slots: 3 },
+  { id: 15, partnerId: 15, title: "Auckland Environmental Studies", type: "Summer Camp", duration: "2 tuần", cost: 3000, deadline: "2024-03-30", slots: 5 },
 ];
 
 export const MOCK_ABROAD_APPS: AbroadApplication[] = [
   { id: 1, studentId: 1001, programId: 1, status: "Under Review", submissionDate: "2023-11-01" },
   { id: 2, studentId: 1002, programId: 3, status: "Submitted", submissionDate: "2023-11-10" },
+  { id: 3, studentId: 1003, programId: 5, status: "Accepted", submissionDate: "2023-10-15" },
+  { id: 4, studentId: 1004, programId: 7, status: "Interview", submissionDate: "2023-11-05" },
+  { id: 5, studentId: 1005, programId: 11, status: "Under Review", submissionDate: "2023-11-12" },
+  { id: 6, studentId: 1006, programId: 14, status: "Submitted", submissionDate: "2023-11-18" },
+  { id: 7, studentId: 1007, programId: 4, status: "Rejected", submissionDate: "2023-10-20" },
+  { id: 8, studentId: 1008, programId: 9, status: "Accepted", submissionDate: "2023-10-25" },
 ];
 
 // Mock Smart Campus Data

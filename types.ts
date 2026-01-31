@@ -307,7 +307,7 @@ export interface ExchangeProgram {
   id: number;
   partnerId: number;
   title: string;
-  type: 'Semester Exchange' | 'Summer Camp' | 'Scholarship';
+  type: 'Semester Exchange' | 'Summer Camp' | 'Scholarship' | 'Research';
   duration: string;
   cost: number;
   deadline: string;

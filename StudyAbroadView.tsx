@@ -86,7 +86,8 @@ const StudyAbroadView = () => {
                <div key={prog.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-6 hover:shadow-md transition">
                   <div className={`p-4 rounded-xl flex flex-col items-center justify-center w-24 h-24 flex-shrink-0 ${
                      prog.type === 'Summer Camp' ? 'bg-orange-100 text-orange-600' :
-                     prog.type === 'Scholarship' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                     prog.type === 'Scholarship' ? 'bg-green-100 text-green-600' :
+                     prog.type === 'Research' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
                   }`}>
                      <Plane size={32} className="mb-1"/>
                      <span className="text-[10px] font-bold text-center leading-tight">{prog.type}</span>
@@ -131,9 +132,13 @@ const StudyAbroadView = () => {
                            <span className={`px-2 py-1 rounded text-xs font-bold ${
                               app.status === 'Accepted' ? 'bg-green-100 text-green-700' :
                               app.status === 'Submitted' ? 'bg-blue-100 text-blue-700' : 
-                              app.status === 'Under Review' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                              app.status === 'Under Review' ? 'bg-yellow-100 text-yellow-700' :
+                              app.status === 'Interview' ? 'bg-purple-100 text-purple-700' : 'bg-red-100 text-red-700'
                            }`}>
-                              {app.status === 'Under Review' ? 'Đang xét duyệt' : app.status === 'Accepted' ? 'Đã trúng tuyển' : app.status}
+                              {app.status === 'Under Review' ? 'Đang xét duyệt' : 
+                               app.status === 'Accepted' ? 'Đã trúng tuyển' : 
+                               app.status === 'Interview' ? 'Phỏng vấn' :
+                               app.status === 'Rejected' ? 'Bị từ chối' : app.status}
                            </span>
                         </td>
                         <td className="p-4 text-right">
