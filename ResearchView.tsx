@@ -130,7 +130,21 @@ const ResearchView = () => {
     alert('Đã tải lên file thành công!');
   };
 
+  const handleDownloadFile = (file: ResearchFile) => {
+    console.log('Download file clicked:', file.fileName);
+    // Create a temporary download link
+    const link = document.createElement('a');
+    link.href = file.downloadUrl;
+    link.download = file.fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert(`Đã tải xuống file: ${file.fileName}`);
+  };
+
   const handleDeleteFile = (fileId: number) => {
+    console.log('Delete file clicked:', fileId);
     if (!selectedProject) return;
     
     if (!confirm('Bạn có chắc chắn muốn xóa file này?')) return;
@@ -870,7 +884,11 @@ const ResearchView = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="secondary">
+                            <Button 
+                              size="sm" 
+                              variant="secondary"
+                              onClick={() => handleDownloadFile(file)}
+                            >
                               <Download size={14} />
                             </Button>
                             <Button 
@@ -928,10 +946,18 @@ const ResearchView = () => {
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button size="sm" variant="secondary">
+                              <Button 
+                                size="sm" 
+                                variant="secondary"
+                                onClick={() => handleDownloadFile(report)}
+                              >
                                 <Eye size={14} />
                               </Button>
-                              <Button size="sm" variant="secondary">
+                              <Button 
+                                size="sm" 
+                                variant="secondary"
+                                onClick={() => handleDownloadFile(report)}
+                              >
                                 <Download size={14} />
                               </Button>
                               <Button 
