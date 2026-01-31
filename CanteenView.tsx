@@ -185,7 +185,12 @@ const CanteenView = () => {
 
   // Payment Functions
   const handlePayment = () => {
-    if (cart.length === 0) return;
+    console.log('Payment button clicked, cart length:', cart.length);
+    console.log('Cart items:', cart);
+    if (cart.length === 0) {
+      alert('Vui lòng thêm món ăn vào giỏ hàng trước khi thanh toán!');
+      return;
+    }
     setShowPaymentModal(true);
   };
 
@@ -235,12 +240,17 @@ const CanteenView = () => {
   };
 
   const addToCart = (item: CanteenItem) => {
+    console.log('Adding to cart:', item);
     setCart(prev => {
        const existing = prev.find(i => i.item.id === item.id);
        if (existing) {
-          return prev.map(i => i.item.id === item.id ? {...i, qty: i.qty + 1} : i);
+          const newCart = prev.map(i => i.item.id === item.id ? {...i, qty: i.qty + 1} : i);
+          console.log('Updated cart (existing item):', newCart);
+          return newCart;
        }
-       return [...prev, { item, qty: 1 }];
+       const newCart = [...prev, { item, qty: 1 }];
+       console.log('Updated cart (new item):', newCart);
+       return newCart;
     });
   };
 
@@ -384,12 +394,20 @@ const CanteenView = () => {
             </div>
 
             <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-600">Số món:</span>
+                <span className="font-medium text-orange-600">{cart.length} món</span>
+              </div>
               <div className="flex justify-between items-center mb-4 text-lg font-bold text-gray-800">
                 <span>Tổng cộng:</span>
                 <span className="text-orange-600">{formatCurrency(totalAmount)}</span>
               </div>
-              <Button className="w-full justify-center" disabled={cart.length === 0} onClick={handlePayment}>
-                Thanh toán ngay
+              <Button 
+                className="w-full justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3" 
+                disabled={cart.length === 0} 
+                onClick={handlePayment}
+              >
+                {cart.length === 0 ? 'Chưa có món nào' : 'Thanh toán ngay'}
               </Button>
             </div>
           </div>
