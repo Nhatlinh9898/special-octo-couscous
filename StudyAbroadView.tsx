@@ -36,9 +36,19 @@ const StudyAbroadView = () => {
   });
 
   useEffect(() => {
-    api.getPartners().then(setPartners);
-    api.getPrograms().then(setPrograms);
-    api.getAbroadApps().then(setApplications);
+    console.log('Loading study abroad data...');
+    api.getPartners().then(data => {
+      console.log('Partners loaded:', data);
+      setPartners(data);
+    });
+    api.getPrograms().then(data => {
+      console.log('Programs loaded:', data);
+      setPrograms(data);
+    });
+    api.getAbroadApps().then(data => {
+      console.log('Applications loaded:', data);
+      setApplications(data);
+    });
   }, []);
 
   const handleAIMatch = async () => {
@@ -71,8 +81,17 @@ const StudyAbroadView = () => {
       submissionDate: new Date().toISOString().split('T')[0]
     };
     
+    console.log('New application created:', newApplication);
+    console.log('Current applications:', applications);
+    
     // Add to applications list
-    setApplications([...applications, newApplication]);
+    const updatedApplications = [...applications, newApplication];
+    setApplications(updatedApplications);
+    
+    console.log('Updated applications:', updatedApplications);
+    
+    // Auto-switch to applications tab
+    setActiveTab('applications');
     
     // Reset form and close modal
     setApplicationForm({
@@ -176,7 +195,9 @@ const StudyAbroadView = () => {
       )}
 
       {activeTab === 'applications' && (
-         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+         <>
+           {console.log('Rendering applications tab, applications:', applications)}
+           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <table className="w-full text-left">
                <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
                   <tr>
@@ -214,6 +235,7 @@ const StudyAbroadView = () => {
                </tbody>
             </table>
          </div>
+         </>
       )}
 
       {/* Application Modal */}
