@@ -24,6 +24,7 @@ import InventoryView from './InventoryView';
 import SettingsView from './SettingsView';
 import HRView from './HRView';
 import CanteenView from './CanteenView';
+import CanteenFinanceView from './CanteenFinanceView';
 import DormitoryView from './DormitoryView';
 import AlumniView from './AlumniView';
 import HealthView from './HealthView';
@@ -67,6 +68,7 @@ const AppContent: React.FC = () => {
       case 'inventory': return <InventoryView />;
       case 'hr': return <HRView />; 
       case 'canteen': return <CanteenView />; 
+      case 'canteen_finance': return <CanteenFinanceView />; 
       case 'dormitory': return <DormitoryView />;
       case 'alumni': return <AlumniView />;
       case 'health': return <HealthView />; 

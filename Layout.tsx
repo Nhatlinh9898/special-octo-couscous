@@ -58,6 +58,7 @@ export const Sidebar: React.FC<{ mobile?: boolean }> = ({ mobile }) => {
     { id: 'admissions_admin', label: 'Admin Tuyển Sinh', icon: <Settings size={20} /> }, 
     { id: 'study_abroad', label: 'Du Học & Quốc Tế', icon: <Globe size={20} /> }, 
     { id: 'canteen', label: 'Căng Tin', icon: <Utensils size={20} /> }, 
+    { id: 'canteen_finance', label: 'Tài Chính Căng Tin', icon: <CreditCard size={20} /> }, 
     { id: 'clubs', label: 'CLB & Sự Kiện', icon: <Tent size={20} /> }, 
     { id: 'research', label: 'Nghiên Cứu KH', icon: <FlaskConical size={20} /> }, 
     { id: 'counseling', label: 'Tư Vấn Tâm Lý', icon: <HeartHandshake size={20} /> }, 
