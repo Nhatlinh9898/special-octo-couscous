@@ -744,352 +744,204 @@ const ClubDetailView: React.FC<ClubDetailViewProps> = ({ clubId, onBack }) => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* TEST COMPONENT - Remove this after debugging */}
-      <div className="bg-red-100 border-2 border-red-500 rounded-lg p-4">
-        <h3 className="text-red-700 font-bold">TEST: ClubDetailView is rendering!</h3>
-        <p>Club ID: {clubId}</p>
-        <p>Club Name: {club?.name}</p>
-        <p>Loading: {loading ? 'Yes' : 'No'}</p>
-        <p>Posts: {posts.length}</p>
-        <p>Members: {members.length}</p>
-        <p>Events: {events.length}</p>
-        <button 
-          onClick={() => alert('Test button works!')}
-          className="bg-red-500 text-white px-4 py-2 rounded mt-2"
-        >
-          Test Button
-        </button>
-      </div>
-
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative">
-          <img src={club.image || '/default-club.jpg'} alt={club.name} className="w-full h-full object-cover opacity-80" />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <div className="text-center text-white">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+        <div className="h-64 bg-gradient-to-r from-blue-600 to-purple-700 relative">
+          <img src={club.image || '/default-club.jpg'} alt={club.name} className="w-full h-full object-cover opacity-70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent flex items-end">
+            <div className="p-8 text-white">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+                  {club.category}
+                </div>
+                <div className="px-3 py-1 bg-green-500/80 backdrop-blur-sm rounded-full text-sm font-medium flex items-center gap-1">
+                  <Users size={14} />
+                  {members.length} thành viên
+                </div>
+              </div>
               <h1 className="text-4xl font-bold mb-2">{club.name}</h1>
-              <p className="text-lg opacity-90">{club.category}</p>
+              <p className="text-lg opacity-90 max-w-3xl">{club.description}</p>
             </div>
           </div>
         </div>
         
         <div className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1">
-              <p className="text-gray-600 mb-4">{club.description}</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <Users size={16} />
-                  <span>{club._count?.members || 0} thành viên</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin size={16} />
-                  <span>{club.meetingRoom || 'Chưa có địa điểm cố định'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <User size={16} />
-                  <span>Cố vấn: {club.advisor?.fullName || 'Chưa có'}</span>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <MapPin size={20} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Phòng họp</p>
+                <p className="font-semibold text-gray-800">{club.meetingRoom}</p>
               </div>
             </div>
             
-            <div className="flex gap-2">
-              {!isUserMember ? (
-                <Button 
-                  onClick={handleJoinClub} 
-                  className="bg-green-600 hover:bg-green-700 text-lg px-6 py-3"
-                >
-                  <Users size={16} className="mr-2" /> ĐĂNG KÝ THÀNH VIÊN ĐỂ VIẾT BÀI
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2 text-green-600 bg-green-100 px-4 py-2 rounded-lg">
-                  <CheckCircle size={16} />
-                  <span className="font-medium">✅ Đã là thành viên - Có thể viết bài!</span>
-                </div>
-              )}
-              <Button variant="secondary" onClick={onBack}>
-                <ArrowLeft size={16} className="mr-2" /> Quay lại
-              </Button>
+            <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
+              <div className="p-2 bg-purple-500 rounded-lg">
+                <User size={20} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Cố vấn</p>
+                <p className="font-semibold text-gray-800">{club.advisor?.fullName || 'Chưa có'}</p>
+              </div>
             </div>
+            
+            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
+              <div className="p-2 bg-green-500 rounded-lg">
+                <Calendar size={20} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Hoạt động</p>
+                <p className="font-semibold text-gray-800">{events.length} sự kiện</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-3">
+            {!isUserMember ? (
+              <Button 
+                onClick={handleJoinClub} 
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-lg px-8 py-3 shadow-lg transform transition hover:scale-105"
+              >
+                <Users size={18} className="mr-2" /> Đăng ký thành viên
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2 px-6 py-3 bg-green-100 border border-green-300 rounded-lg">
+                <CheckCircle size={18} className="text-green-600" />
+                <span className="font-medium text-green-800">Đã là thành viên</span>
+              </div>
+            )}
+            <Button variant="secondary" onClick={onBack} className="px-6 py-3">
+              <ArrowLeft size={16} className="mr-2" /> Quay lại
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* SIMPLE TABS TEST */}
-      <div className="bg-blue-100 border-2 border-blue-500 rounded-lg p-4">
-        <h3 className="text-blue-700 font-bold mb-2">SIMPLE TABS TEST</h3>
-        <div className="flex gap-2 mb-4">
-          <button 
-            onClick={() => setActiveTab('posts')}
-            className={`px-4 py-2 rounded ${activeTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Posts ({posts.length})
-          </button>
-          <button 
-            onClick={() => setActiveTab('members')}
-            className={`px-4 py-2 rounded ${activeTab === 'members' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Members ({members.length})
-          </button>
-          <button 
-            onClick={() => setActiveTab('events')}
-            className={`px-4 py-2 rounded ${activeTab === 'events' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Events ({events.length})
-          </button>
-        </div>
-        <div className="bg-white p-4 rounded">
-          <p>Current Tab: <strong>{activeTab}</strong></p>
-          {activeTab === 'posts' && <p>Posts content here...</p>}
-          {activeTab === 'members' && <p>Members content here...</p>}
-          {activeTab === 'events' && <p>Events content here...</p>}
-        </div>
-      </div>
-
-      {/* ORIGINAL TABS LOCATION MARKER */}
-      <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4">
-        <h3 className="text-green-700 font-bold">📍 ORIGINAL TABS SHOULD BE BELOW THIS GREEN BOX</h3>
-        <p>If you don't see tabs below, there's a rendering issue</p>
-      </div>
-
       {/* Navigation Tabs */}
-      <div className="bg-orange-500 border-4 border-orange-700 rounded-xl p-4">
-        <h3 className="text-white font-bold text-center mb-2">🎯 ORIGINAL TABS (ORANGE BOX)</h3>
-        <div className="flex space-x-1">
-          <button 
-            onClick={() => {
-              console.log('Clicking posts tab');
-              setActiveTab('posts');
-            }}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              activeTab === 'posts' 
-                ? 'bg-white text-orange-600' 
-                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-            }`}
-          >
-            Bài viết
-          </button>
-          <button 
-            onClick={() => {
-              console.log('Clicking members tab');
-              setActiveTab('members');
-            }}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              activeTab === 'members' 
-                ? 'bg-white text-orange-600' 
-                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-            }`}
-          >
-            Thành viên ({members.length})
-          </button>
-          <button 
-            onClick={() => {
-              console.log('Clicking events tab');
-              setActiveTab('events');
-            }}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              activeTab === 'events' 
-                ? 'bg-white text-orange-600' 
-                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-            }`}
-          >
-            Sự kiện ({events.length})
-          </button>
-          <button 
-            onClick={() => {
-              console.log('Clicking schedule tab');
-              setActiveTab('schedule');
-            }}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              activeTab === 'schedule' 
-                ? 'bg-white text-orange-600' 
-                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-            }`}
-          >
-            Lịch sinh hoạt
-          </button>
-          <button 
-            onClick={() => {
-              console.log('Clicking chat tab');
-              setActiveTab('chat');
-            }}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              activeTab === 'chat' 
-                ? 'bg-white text-orange-600' 
-                : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-            }`}
-          >
-            Chat ({chatMessages.length})
-          </button>
-          {isUserAdmin && (
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+        <div className="border-b border-gray-200">
+          <div className="flex space-x-1 p-1">
             <button 
-              onClick={() => {
-                console.log('Clicking approval tab');
-                setActiveTab('approval');
-              }}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                activeTab === 'approval' 
-                  ? 'bg-white text-orange-600' 
-                  : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+              onClick={() => setActiveTab('posts')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'posts' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
               }`}
             >
-              Xét duyệt ({applications.filter(app => app.status === 'pending').length})
+              <div className="flex items-center justify-center gap-2">
+                <MessageCircle size={18} />
+                <span>Bài viết</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-white/20">
+                  {posts.length}
+                </span>
+              </div>
             </button>
-          )}
-        </div>
-      </div>
-
-      {/* TABS CONFIRMATION MARKER */}
-      <div className="bg-purple-100 border-2 border-purple-500 rounded-lg p-4">
-        <h3 className="text-purple-700 font-bold">📍 TABS SHOULD BE ABOVE THIS PURPLE BOX</h3>
-        <p>If you see this but no tabs above, the tabs component is not rendering</p>
-      </div>
-
-      {/* Debug Info */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
-        <strong>Debug Info:</strong><br/>
-        Active Tab: {activeTab}<br/>
-        Posts: {posts.length}<br/>
-        Members: {members.length}<br/>
-        Events: {events.length}<br/>
-        Chat Messages: {chatMessages.length}<br/>
-        <strong>Current User:</strong> {currentUser?.fullName || 'Not logged in'}<br/>
-        <strong>User Email:</strong> {currentUser?.email || 'No email'}<br/>
-        <strong>User Role:</strong> {currentUser?.role || 'No role'}<br/>
-        <strong>Is User Member:</strong> {isUserMember ? '✅ YES' : '❌ NO'}<br/>
-        <strong>Is User Admin:</strong> {isUserAdmin ? '✅ YES' : '❌ NO'}<br/>
-        <strong>Can Write Posts:</strong> {(isUserMember || isUserAdmin) ? '✅ YES' : '❌ NO - Need to join club first'}
-        
-        <div className="mt-4 space-y-2">
-          <strong>Testing Admin Roles:</strong><br/>
-          <button 
-            onClick={() => {
-              const adminUser = {
-                id: 999,
-                fullName: 'Admin Test',
-                email: 'admin@test.com',
-                role: 'ADMIN' as const,
-                avatar: '/default-avatar.jpg'
-              };
-              localStorage.setItem('currentUser', JSON.stringify(adminUser));
-              window.location.reload();
-            }}
-            className="bg-purple-600 text-white px-3 py-1 rounded text-xs mr-2"
-          >
-            Set as Super Admin
-          </button>
-          
-          <button 
-            onClick={() => {
-              const teacherUser = {
-                id: 998,
-                fullName: 'Teacher Test',
-                email: 'teacher@test.com',
-                role: 'TEACHER' as const,
-                department: 'Computer Science',
-                position: 'Teacher',
-                avatar: '/default-avatar.jpg'
-              };
-              localStorage.setItem('currentUser', JSON.stringify(teacherUser));
-              window.location.reload();
-            }}
-            className="bg-blue-600 text-white px-3 py-1 rounded text-xs mr-2"
-          >
-            Set as Teacher
-          </button>
-          
-          <button 
-            onClick={() => {
-              const studentUser = {
-                id: 997,
-                fullName: 'Student Test',
-                email: 'student@test.com',
-                role: 'STUDENT' as const,
-                grade: '12',
-                class: '12A1',
-                avatar: '/default-avatar.jpg'
-              };
-              localStorage.setItem('currentUser', JSON.stringify(studentUser));
-              window.location.reload();
-            }}
-            className="bg-green-600 text-white px-3 py-1 rounded text-xs"
-          >
-            Set as Student
-          </button>
+            <button 
+              onClick={() => setActiveTab('members')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'members' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Users size={18} />
+                <span>Thành viên</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-white/20">
+                  {members.length}
+                </span>
+              </div>
+            </button>
+            <button 
+              onClick={() => setActiveTab('events')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'events' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Calendar size={18} />
+                <span>Sự kiện</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-white/20">
+                  {events.length}
+                </span>
+              </div>
+            </button>
+            <button 
+              onClick={() => setActiveTab('schedule')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'schedule' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Clock size={18} />
+                <span>Lịch sinh hoạt</span>
+              </div>
+            </button>
+            <button 
+              onClick={() => setActiveTab('chat')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'chat' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <MessageSquare size={18} />
+                <span>Chat</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-white/20">
+                  {chatMessages.length}
+                </span>
+              </div>
+            </button>
+            {isUserAdmin && (
+              <button 
+                onClick={() => setActiveTab('approval')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'approval' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <CheckCircle size={18} />
+                  <span>Xét duyệt</span>
+                  <span className="px-2 py-1 text-xs rounded-full bg-white/20">
+                    {applications.filter(app => app.status === 'pending').length}
+                  </span>
+                </div>
+              </button>
         </div>
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'posts' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800">Bài viết</h2>
-            {(isUserMember || isUserAdmin) && (
-              <Button onClick={handleCreatePost}>
-                <Plus size={16} className="mr-2" /> Viết bài
-              </Button>
-            )}
-          </div>
-
-          {posts.map(post => (
-            <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-start gap-4">
-                <img src={post.authorAvatar || '/default-avatar.jpg'} alt={post.author} className="w-12 h-12 rounded-full" />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-bold text-gray-800">{post.title}</h3>
-                      <p className="text-sm text-gray-500">{post.author} • {new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
-                    </div>
-                    {isUserAdmin && (
-                      <div className="flex gap-1">
-                        <button onClick={() => handleEditPost(post)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                          <Edit size={16} />
-                        </button>
-                        <button onClick={() => handleDeletePost(post.id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <p className="text-gray-700 mb-4">{post.content}</p>
-                  
-                  {post.images && post.images.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                      {post.images.map((image, index) => (
-                        <img key={index} src={image} alt="" className="w-full h-32 object-cover rounded-lg" />
-                      ))}
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <button onClick={() => handleLikePost(post.id)} className="flex items-center gap-1 hover:text-red-600">
-                      <Heart size={16} />
-                      <span>{post.likes}</span>
-                    </button>
-                    <button className="flex items-center gap-1 hover:text-blue-600">
-                      <MessageCircle size={16} />
-                      <span>{post.comments}</span>
-                    </button>
-                    <button className="flex items-center gap-1 hover:text-green-600">
-                      <Share2 size={16} />
-                      <span>Chia sẻ</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        {activeTab === 'posts' && (
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <MessageCircle className="text-blue-500" />
+                Bài viết
+              </h2>
+              {(isUserMember || isUserAdmin) && (
+                <Button onClick={handleCreatePost} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus size={16} className="mr-2" /> Viết bài
+                </Button>
+              )}
             </div>
-          ))}
 
-          {posts.length === 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-              <BookOpen size={48} className="mx-auto mb-2 text-gray-300" />
-              <p className="text-gray-500">Chưa có bài viết nào</p>
-            </div>
-          )}
+            {posts.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageCircle size={48} className="mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-medium text-gray-600 mb-2">Chưa có bài viết nào</h3>
+                <p className="text-gray-500">Hãy là người đầu tiên chia sẻ điều thú vị!</p>
         </div>
       )}
 
