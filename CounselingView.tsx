@@ -1,9 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2 } from 'lucide-react';
+import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { api, MOCK_STUDENTS } from './data';
 import { CounselingSession, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
+
+// Counselor interface
+interface Counselor {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  specializations: ('Psychological' | 'Career')[];
+  workingSchedule: {
+    monday: { start: string; end: string; available: boolean };
+    tuesday: { start: string; end: string; available: boolean };
+    wednesday: { start: string; end: string; available: boolean };
+    thursday: { start: string; end: string; available: boolean };
+    friday: { start: string; end: string; available: boolean };
+    saturday: { start: string; end: string; available: boolean };
+    sunday: { start: string; end: string; available: boolean };
+  };
+  maxSessionsPerDay: number;
+  currentSessions: number;
+  status: 'Available' | 'Busy' | 'Unavailable';
+}
+
+// Mock counselors data
+const MOCK_COUNSELORS: Counselor[] = [
+  {
+    id: 1,
+    name: "Ts. Nguyễn Thị An",
+    email: "annta@school.edu.vn",
+    phone: "0901234567",
+    specializations: ['Psychological', 'Career'],
+    workingSchedule: {
+      monday: { start: '08:00', end: '17:00', available: true },
+      tuesday: { start: '08:00', end: '17:00', available: true },
+      wednesday: { start: '08:00', end: '17:00', available: true },
+      thursday: { start: '08:00', end: '17:00', available: true },
+      friday: { start: '08:00', end: '17:00', available: true },
+      saturday: { start: '09:00', end: '12:00', available: true },
+      sunday: { start: '00:00', end: '00:00', available: false }
+    },
+    maxSessionsPerDay: 6,
+    currentSessions: 3,
+    status: 'Available'
+  },
+  {
+    id: 2,
+    name: "Ths. Trần Văn Bình",
+    email: "bintv@school.edu.vn",
+    phone: "0909876543",
+    specializations: ['Career'],
+    workingSchedule: {
+      monday: { start: '09:00', end: '18:00', available: true },
+      tuesday: { start: '09:00', end: '18:00', available: true },
+      wednesday: { start: '09:00', end: '18:00', available: true },
+      thursday: { start: '09:00', end: '18:00', available: true },
+      friday: { start: '09:00', end: '18:00', available: true },
+      saturday: { start: '00:00', end: '00:00', available: false },
+      sunday: { start: '00:00', end: '00:00', available: false }
+    },
+    maxSessionsPerDay: 8,
+    currentSessions: 5,
+    status: 'Available'
+  },
+  {
+    id: 3,
+    name: "Chuyên gia tâm lý Lê Thị Cúc",
+    email: "cuclt@school.edu.vn",
+    phone: "0912345678",
+    specializations: ['Psychological'],
+    workingSchedule: {
+      monday: { start: '13:00', end: '20:00', available: true },
+      tuesday: { start: '13:00', end: '20:00', available: true },
+      wednesday: { start: '13:00', end: '20:00', available: true },
+      thursday: { start: '13:00', end: '20:00', available: true },
+      friday: { start: '13:00', end: '20:00', available: true },
+      saturday: { start: '10:00', end: '16:00', available: true },
+      sunday: { start: '00:00', end: '00:00', available: false }
+    },
+    maxSessionsPerDay: 5,
+    currentSessions: 2,
+    status: 'Available'
+  }
+];
 
 const CounselingView = () => {
   const [sessions, setSessions] = useState<CounselingSession[]>([]);
@@ -15,6 +97,12 @@ const CounselingView = () => {
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
   const [showAIModal, setShowAIModal] = useState(false);
   
+  // Auto-scheduling state
+  const [availableCounselors, setAvailableCounselors] = useState<Counselor[]>([]);
+  const [selectedCounselor, setSelectedCounselor] = useState<Counselor | null>(null);
+  const [suggestedSlots, setSuggestedSlots] = useState<{date: string; time: string; counselor: Counselor}[]>([]);
+  const [autoScheduleEnabled, setAutoScheduleEnabled] = useState(true);
+  
   // Booking form state
   const [bookingForm, setBookingForm] = useState({
     studentId: '',
@@ -23,7 +111,9 @@ const CounselingView = () => {
     date: '',
     time: '',
     room: '',
-    notes: ''
+    notes: '',
+    preferredDate: '',
+    preferredTime: ''
   });
 
   useEffect(() => {
@@ -48,15 +138,97 @@ const CounselingView = () => {
       date: '',
       time: '',
       room: '',
-      notes: ''
+      notes: '',
+      preferredDate: '',
+      preferredTime: ''
     });
+    
+    // Filter counselors by specialization
+    const filteredCounselors = MOCK_COUNSELORS.filter(counselor => 
+      counselor.specializations.includes('Psychological') && counselor.status === 'Available'
+    );
+    setAvailableCounselors(filteredCounselors);
+    
+    // Generate suggested slots
+    generateSuggestedSlots(filteredCounselors);
+    
     setShowBookingModal(true);
+  };
+
+  const generateSuggestedSlots = (counselors: Counselor[]) => {
+    const slots: {date: string; time: string; counselor: Counselor}[] = [];
+    const today = new Date();
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    
+    // Generate slots for next 7 days
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayName = dayNames[date.getDay()];
+      
+      counselors.forEach(counselor => {
+        const schedule = counselor.workingSchedule[dayName as keyof typeof counselor.workingSchedule];
+        
+        if (schedule.available && counselor.currentSessions < counselor.maxSessionsPerDay) {
+          // Generate hourly slots
+          const startHour = parseInt(schedule.start.split(':')[0]);
+          const endHour = parseInt(schedule.end.split(':')[0]);
+          
+          for (let hour = startHour; hour < endHour; hour++) {
+            const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+            slots.push({
+              date: dateStr,
+              time: timeStr,
+              counselor: counselor
+            });
+          }
+        }
+      });
+    }
+    
+    // Sort by date and time, then by counselor availability
+    slots.sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.time.localeCompare(b.time);
+    });
+    
+    // Return top 10 suggestions
+    setSuggestedSlots(slots.slice(0, 10));
+  };
+
+  const selectCounselor = (counselor: Counselor) => {
+    setSelectedCounselor(counselor);
+    setBookingForm(prev => ({
+      ...prev,
+      counselorName: counselor.name,
+      room: `Phòng tư vấn ${counselor.id}`
+    }));
+  };
+
+  const selectTimeSlot = (slot: {date: string; time: string; counselor: Counselor}) => {
+    selectCounselor(slot.counselor);
+    setBookingForm(prev => ({
+      ...prev,
+      date: slot.date,
+      time: slot.time
+    }));
   };
 
   const handleSaveBooking = () => {
     if (!bookingForm.studentId || !bookingForm.counselorName || !bookingForm.date || !bookingForm.time) {
       alert('Vui lòng điền các thông tin bắt buộc!');
       return;
+    }
+
+    // Update counselor sessions count
+    const counselor = MOCK_COUNSELORS.find(c => c.name === bookingForm.counselorName);
+    if (counselor) {
+      counselor.currentSessions++;
+      if (counselor.currentSessions >= counselor.maxSessionsPerDay) {
+        counselor.status = 'Busy';
+      }
     }
 
     const newSession: CounselingSession = {
@@ -73,7 +245,7 @@ const CounselingView = () => {
 
     setSessions(prev => [...prev, newSession]);
     setShowBookingModal(false);
-    alert('Đã đặt lịch tư vấn thành công! Chúng tôi sẽ liên hệ để xác nhận.');
+    alert(`Đã đặt lịch tư vấn thành công với ${bookingForm.counselorName} vào ${bookingForm.date} lúc ${bookingForm.time}!`);
   };
 
   const handleArticles = () => {
@@ -226,79 +398,204 @@ const CounselingView = () => {
               </button>
             </div>
             <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Học sinh *</label>
-                    <select
-                      value={bookingForm.studentId}
-                      onChange={(e) => setBookingForm({...bookingForm, studentId: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              <div className="space-y-6">
+                {/* Auto-scheduling toggle */}
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-blue-800 flex items-center gap-2">
+                        <Calendar size={16} />
+                        Đặt lịch tự động
+                      </h4>
+                      <p className="text-blue-600 text-sm mt-1">
+                        Hệ thống sẽ tự động tìm chuyên gia và thời gian phù hợp nhất
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setAutoScheduleEnabled(!autoScheduleEnabled)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        autoScheduleEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
                     >
-                      <option value="">Chọn học sinh</option>
-                      {MOCK_STUDENTS.map(student => (
-                        <option key={student.id} value={student.id}>
-                          {student.fullName} - Lớp {student.classId}
-                        </option>
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          autoScheduleEnabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Student selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Học sinh *</label>
+                  <select
+                    value={bookingForm.studentId}
+                    onChange={(e) => setBookingForm({...bookingForm, studentId: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="">Chọn học sinh</option>
+                    {MOCK_STUDENTS.map(student => (
+                      <option key={student.id} value={student.id}>
+                        {student.fullName} - Lớp {student.classId}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Counseling type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Loại tư vấn *</label>
+                  <select
+                    value={bookingForm.type}
+                    onChange={(e) => {
+                      const newType = e.target.value as 'Psychological' | 'Career';
+                      setBookingForm({...bookingForm, type: newType});
+                      
+                      // Re-filter counselors when type changes
+                      const filteredCounselors = MOCK_COUNSELORS.filter(counselor => 
+                        counselor.specializations.includes(newType) && counselor.status === 'Available'
+                      );
+                      setAvailableCounselors(filteredCounselors);
+                      generateSuggestedSlots(filteredCounselors);
+                    }}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
+                    <option value="Psychological">Tư vấn tâm lý</option>
+                    <option value="Career">Tư vấn hướng nghiệp</option>
+                  </select>
+                </div>
+
+                {/* Auto-scheduling suggestions */}
+                {autoScheduleEnabled && suggestedSlots.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <CheckCircle size={16} className="inline mr-1" />
+                      Thời gian gợi ý (chọn để đặt lịch)
+                    </label>
+                    <div className="grid gap-2 max-h-48 overflow-y-auto">
+                      {suggestedSlots.map((slot, index) => (
+                        <div
+                          key={index}
+                          onClick={() => selectTimeSlot(slot)}
+                          className="border border-gray-200 rounded-lg p-3 hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-800">
+                                {slot.date} lúc {slot.time}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {slot.counselor.name}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                slot.counselor.status === 'Available' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-yellow-100 text-yellow-700'
+                              }`}>
+                                {slot.counselor.status === 'Available' ? 'Rảnh' : 'Bận'}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {slot.counselor.currentSessions}/{slot.counselor.maxSessionsPerDay} buổi
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       ))}
-                    </select>
+                    </div>
                   </div>
+                )}
+
+                {/* Manual counselor selection */}
+                {!autoScheduleEnabled && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại tư vấn *</label>
-                    <select
-                      value={bookingForm.type}
-                      onChange={(e) => setBookingForm({...bookingForm, type: e.target.value as 'Psychological' | 'Career'})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="Psychological">Tư vấn tâm lý</option>
-                      <option value="Career">Tư vấn hướng nghiệp</option>
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chuyên gia tư vấn *</label>
+                    <div className="grid gap-3">
+                      {availableCounselors.map(counselor => (
+                        <div
+                          key={counselor.id}
+                          onClick={() => selectCounselor(counselor)}
+                          className={`border rounded-lg p-3 cursor-pointer transition ${
+                            selectedCounselor?.id === counselor.id
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-800">{counselor.name}</div>
+                              <div className="text-sm text-gray-600">
+                                {counselor.specializations.join(', ')}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {counselor.email} • {counselor.phone}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                counselor.status === 'Available' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : counselor.status === 'Busy'
+                                  ? 'bg-yellow-100 text-yellow-700'
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {counselor.status === 'Available' ? 'Rảnh' : 
+                                 counselor.status === 'Busy' ? 'Bận' : 'Không có mặt'}
+                              </span>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {counselor.currentSessions}/{counselor.maxSessionsPerDay} buổi
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Chuyên gia tư vấn *</label>
-                  <input
-                    type="text"
-                    value={bookingForm.counselorName}
-                    onChange={(e) => setBookingForm({...bookingForm, counselorName: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập tên chuyên gia"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ngày hẹn *</label>
-                    <input
-                      type="date"
-                      value={bookingForm.date}
-                      onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                )}
+
+                {/* Manual date/time selection */}
+                {!autoScheduleEnabled && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ngày hẹn *</label>
+                      <input
+                        type="date"
+                        value={bookingForm.date}
+                        onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Giờ hẹn *</label>
+                      <input
+                        type="time"
+                        value={bookingForm.time}
+                        onChange={(e) => setBookingForm({...bookingForm, time: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Giờ hẹn *</label>
-                    <input
-                      type="time"
-                      value={bookingForm.time}
-                      onChange={(e) => setBookingForm({...bookingForm, time: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    />
+                )}
+
+                {/* Selected info display */}
+                {selectedCounselor && (
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                    <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                      <CheckCircle size={16} />
+                      Thông tin đặt lịch
+                    </h4>
+                    <div className="text-sm text-green-700 space-y-1">
+                      <div><strong>Chuyên gia:</strong> {selectedCounselor.name}</div>
+                      <div><strong>Ngày:</strong> {bookingForm.date || 'Chưa chọn'}</div>
+                      <div><strong>Giờ:</strong> {bookingForm.time || 'Chưa chọn'}</div>
+                      <div><strong>Phòng:</strong> {bookingForm.room || 'Chưa phân bổ'}</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phòng tư vấn</label>
-                  <input
-                    type="text"
-                    value={bookingForm.room}
-                    onChange={(e) => setBookingForm({...bookingForm, room: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Phòng tư vấn 1"
-                  />
-                </div>
-                
+                )}
+
+                {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
                   <textarea
@@ -313,7 +610,7 @@ const CounselingView = () => {
                   <Button variant="secondary" onClick={() => setShowBookingModal(false)}>
                     Hủy
                   </Button>
-                  <Button onClick={handleSaveBooking}>
+                  <Button onClick={handleSaveBooking} disabled={!selectedCounselor || !bookingForm.date || !bookingForm.time}>
                     <Plus size={16} className="mr-1" /> Đặt lịch
                   </Button>
                 </div>
