@@ -213,17 +213,23 @@ const ClubsView = () => {
 
   const handleSaveActivity = async () => {
     try {
+      // Validation
+      if (!activityForm.title || !activityForm.description || !activityForm.date || !activityForm.clubId) {
+        alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+        return;
+      }
+
       const activityData = {
         ...activityForm,
         maxParticipants: activityForm.maxParticipants ? parseInt(activityForm.maxParticipants) : null,
         budget: activityForm.budget ? parseFloat(activityForm.budget) : null,
-        id: editingActivity ? editingActivity.id : Date.now()
+        id: editingActivity ? editingActivity.id : Date.now(),
+        createdAt: editingActivity ? editingActivity.createdAt : new Date().toISOString()
       };
 
       if (editingActivity) {
         // Update existing activity
         setActivities(prev => prev.map(act => act.id === editingActivity.id ? activityData : act));
-        alert('Cập nhật hoạt động thành công!');
         
         // Update localStorage
         const allActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
@@ -231,18 +237,29 @@ const ClubsView = () => {
         localStorage.setItem('club_activities', JSON.stringify(updatedActivities));
         
         // Also update club-specific events for ClubDetailView
-        updateClubEvents(activityData.clubId, activityData, editingActivity.id);
+        try {
+          updateClubEvents(activityData.clubId, activityData, editingActivity.id);
+        } catch (syncError) {
+          console.warn('Failed to sync with club detail view:', syncError);
+        }
+        
+        alert('Cập nhật hoạt động thành công!');
       } else {
         // Create new activity
         setActivities(prev => [...prev, activityData]);
-        alert('Tạo hoạt động mới thành công!');
         
         // Save to localStorage
         const allActivities = JSON.parse(localStorage.getItem('club_activities') || '[]');
         localStorage.setItem('club_activities', JSON.stringify([...allActivities, activityData]));
         
         // Also add to club-specific events for ClubDetailView
-        updateClubEvents(activityData.clubId, activityData);
+        try {
+          updateClubEvents(activityData.clubId, activityData);
+        } catch (syncError) {
+          console.warn('Failed to sync with club detail view:', syncError);
+        }
+        
+        alert('Tạo hoạt động mới thành công!');
       }
 
       setShowActivityModal(false);
@@ -254,32 +271,43 @@ const ClubsView = () => {
   };
 
   const updateClubEvents = (clubId: number, activityData: any, existingId?: number) => {
-    // Convert activity to event format for ClubDetailView
-    const eventData = {
-      id: existingId || activityData.id,
-      title: activityData.title,
-      description: activityData.description,
-      date: activityData.date,
-      time: activityData.time || '09:00',
-      location: activityData.location || 'Địa điểm TBD',
-      maxParticipants: activityData.maxParticipants,
-      currentParticipants: activityData.currentParticipants || 0,
-      registrationDeadline: activityData.registrationDeadline || activityData.date,
-      status: 'upcoming',
-      clubId: clubId,
-      createdAt: activityData.createdAt || new Date().toISOString()
-    };
+    try {
+      // Validation
+      if (!clubId || !activityData || !activityData.id) {
+        console.warn('Invalid data for updateClubEvents:', { clubId, activityData });
+        return;
+      }
 
-    // Get existing club events
-    const clubEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
-    
-    if (existingId) {
-      // Update existing event
-      const updatedEvents = clubEvents.map((e: any) => e.id === existingId ? eventData : e);
-      localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
-    } else {
-      // Add new event
-      localStorage.setItem(`club_events_${clubId}`, JSON.stringify([eventData, ...clubEvents]));
+      // Convert activity to event format for ClubDetailView
+      const eventData = {
+        id: existingId || activityData.id,
+        title: activityData.title || 'Hoạt động mới',
+        description: activityData.description || '',
+        date: activityData.date,
+        time: activityData.time || '09:00',
+        location: activityData.location || 'Địa điểm TBD',
+        maxParticipants: activityData.maxParticipants,
+        currentParticipants: activityData.currentParticipants || 0,
+        registrationDeadline: activityData.registrationDeadline || activityData.date,
+        status: 'upcoming',
+        clubId: clubId,
+        createdAt: activityData.createdAt || new Date().toISOString()
+      };
+
+      // Get existing club events
+      const clubEvents = JSON.parse(localStorage.getItem(`club_events_${clubId}`) || '[]');
+      
+      if (existingId) {
+        // Update existing event
+        const updatedEvents = clubEvents.map((e: any) => e.id === existingId ? eventData : e);
+        localStorage.setItem(`club_events_${clubId}`, JSON.stringify(updatedEvents));
+      } else {
+        // Add new event
+        localStorage.setItem(`club_events_${clubId}`, JSON.stringify([eventData, ...clubEvents]));
+      }
+    } catch (error) {
+      console.error('Error in updateClubEvents:', error);
+      throw error; // Re-throw to be caught by parent
     }
   };
 
