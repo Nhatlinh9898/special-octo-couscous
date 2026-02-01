@@ -959,11 +959,40 @@ const KtxView = () => {
 
   // Handle detailed view of meter reading
   const handleViewReadingDetails = (roomNumber: string, reading: any, index: number) => {
-    console.log('handleViewReadingDetails called:', { roomNumber, reading, index });
-    console.log('meterHistory:', meterHistory);
+    console.log('=== DETAIL VIEW DEBUG ===');
+    console.log('handleViewReadingDetails called with:', { roomNumber, reading, index });
+    console.log('Current selectedReading state:', selectedReading);
     
-    setSelectedReading({ roomNumber, reading, index });
-    console.log('selectedReading set to:', { roomNumber, reading, index });
+    // Validate inputs
+    if (!roomNumber) {
+      console.error('❌ No roomNumber provided');
+      return;
+    }
+    
+    if (!reading) {
+      console.error('❌ No reading provided');
+      return;
+    }
+    
+    if (typeof index !== 'number') {
+      console.error('❌ Invalid index:', index);
+      return;
+    }
+    
+    console.log('✅ All inputs validated');
+    
+    // Set the selected reading
+    const newSelectedReading = { roomNumber, reading, index };
+    console.log('Setting selectedReading to:', newSelectedReading);
+    
+    setSelectedReading(newSelectedReading);
+    
+    // Force a re-render by logging after state update
+    setTimeout(() => {
+      console.log('State after update:', selectedReading);
+    }, 100);
+    
+    console.log('=== END DETAIL VIEW DEBUG ===');
   };
 
   const handleCloseDetailModal = () => {
@@ -2529,7 +2558,23 @@ const KtxView = () => {
       )}
 
       {/* Meter Reading Detail Modal */}
-      {selectedReading && (
+      {(() => {
+        console.log('=== MODAL RENDER DEBUG ===');
+        console.log('selectedReading:', selectedReading);
+        console.log('selectedReading truthy:', !!selectedReading);
+        
+        if (selectedReading) {
+          console.log('✅ Modal should render');
+          console.log('Room number:', selectedReading.roomNumber);
+          console.log('Reading data:', selectedReading.reading);
+          console.log('Index:', selectedReading.index);
+        } else {
+          console.log('❌ Modal should NOT render');
+        }
+        
+        console.log('=== END MODAL RENDER DEBUG ===');
+        return selectedReading;
+      })() && (
         <Modal isOpen={true} onClose={handleCloseDetailModal} title={`Chi tiết công-tơ phòng ${selectedReading.roomNumber}`}>
           <div className="space-y-4">
             {/* Reading Information */}
