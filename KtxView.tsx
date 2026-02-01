@@ -86,6 +86,17 @@ const KtxView = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterArea, setFilterArea] = useState<'all' | 'A' | 'B'>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  
+  // Room form state
+  const [roomForm, setRoomForm] = useState({
+    roomNumber: '',
+    area: 'A' as 'A' | 'B',
+    floor: 1,
+    capacity: 4,
+    type: 'Standard' as 'Standard' | 'Premium' | 'VIP',
+    price: 1200000,
+    facilities: ['Điều hòa', 'Tủ lạnh']
+  });
 
   // Initialize mock data
   useEffect(() => {
@@ -251,6 +262,64 @@ const KtxView = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleAddRoom = () => {
+    // Generate new room ID
+    const newId = Math.max(...rooms.map(r => r.id)) + 1;
+    
+    // Create new room object
+    const newRoom: Room = {
+      id: newId,
+      roomNumber: roomForm.roomNumber || `${roomForm.area}${roomForm.floor.toString().padStart(2, '0')}01`,
+      area: roomForm.area,
+      floor: roomForm.floor,
+      capacity: roomForm.capacity,
+      currentOccupancy: 0,
+      type: roomForm.type,
+      status: 'Available',
+      price: roomForm.price,
+      facilities: roomForm.facilities,
+      students: []
+    };
+    
+    // Add to rooms array
+    setRooms([...rooms, newRoom]);
+    
+    // Reset form and close modal
+    setRoomForm({
+      roomNumber: '',
+      area: 'A',
+      floor: 1,
+      capacity: 4,
+      type: 'Standard',
+      price: 1200000,
+      facilities: ['Điều hòa', 'Tủ lạnh']
+    });
+    setShowRoomModal(false);
+    
+    alert('Đã thêm phòng mới thành công!');
+  };
+
+  const handleEditRoom = (room: Room) => {
+    setSelectedRoom(room);
+    setRoomForm({
+      roomNumber: room.roomNumber,
+      area: room.area,
+      floor: room.floor,
+      capacity: room.capacity,
+      type: room.type,
+      price: room.price,
+      facilities: room.facilities
+    });
+    setShowRoomModal(true);
+  };
+
+  const handleDeleteRoom = (roomId: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
+      setRooms(rooms.filter(r => r.id !== roomId));
+      alert('Đã xóa phòng thành công!');
+    }
   };
 
   const handleAutoAssign = () => {
@@ -513,13 +582,22 @@ const KtxView = () => {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
-                          <button className="text-blue-600 hover:text-blue-800">
+                          <button 
+                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => handleEditRoom(room)}
+                          >
                             <Eye size={16} />
                           </button>
-                          <button className="text-green-600 hover:text-green-800">
+                          <button 
+                            className="text-green-600 hover:text-green-800"
+                            onClick={() => handleEditRoom(room)}
+                          >
                             <Edit size={16} />
                           </button>
-                          <button className="text-red-600 hover:text-red-800">
+                          <button 
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => handleDeleteRoom(room.id)}
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -645,6 +723,119 @@ const KtxView = () => {
               >
                 Chọn file
               </label>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Room Modal */}
+      {showRoomModal && (
+        <Modal isOpen={showRoomModal} onClose={() => setShowRoomModal(false)} title={selectedRoom ? "Chỉnh sửa Phòng" : "Thêm Phòng Mới"}>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số phòng</label>
+                <input
+                  type="text"
+                  value={roomForm.roomNumber}
+                  onChange={(e) => setRoomForm({...roomForm, roomNumber: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  placeholder="A0101"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Khu</label>
+                <select
+                  value={roomForm.area}
+                  onChange={(e) => setRoomForm({...roomForm, area: e.target.value as 'A' | 'B'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="A">Khu A</option>
+                  <option value="B">Khu B</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tầng</label>
+                <input
+                  type="number"
+                  value={roomForm.floor}
+                  onChange={(e) => setRoomForm({...roomForm, floor: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="1"
+                  max="10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sức chứa</label>
+                <input
+                  type="number"
+                  value={roomForm.capacity}
+                  onChange={(e) => setRoomForm({...roomForm, capacity: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="1"
+                  max="8"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Loại phòng</label>
+                <select
+                  value={roomForm.type}
+                  onChange={(e) => setRoomForm({...roomForm, type: e.target.value as 'Standard' | 'Premium' | 'VIP'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="Standard">Standard</option>
+                  <option value="Premium">Premium</option>
+                  <option value="VIP">VIP</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Giá phòng (VNĐ)</label>
+                <input
+                  type="number"
+                  value={roomForm.price}
+                  onChange={(e) => setRoomForm({...roomForm, price: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="0"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tiện ích</label>
+              <div className="space-y-2">
+                {['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo', 'WiFi'].map(facility => (
+                  <label key={facility} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={roomForm.facilities.includes(facility)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setRoomForm({...roomForm, facilities: [...roomForm.facilities, facility]});
+                        } else {
+                          setRoomForm({...roomForm, facilities: roomForm.facilities.filter(f => f !== facility)});
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    {facility}
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="secondary" onClick={() => setShowRoomModal(false)}>
+                Hủy
+              </Button>
+              <Button onClick={handleAddRoom}>
+                {selectedRoom ? 'Cập nhật' : 'Thêm'}
+              </Button>
             </div>
           </div>
         </Modal>
