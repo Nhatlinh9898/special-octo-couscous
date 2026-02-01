@@ -608,10 +608,35 @@ const KtxView = () => {
 
   const handleAddUtilityBill = () => {
     console.log('Adding utility bill:', utilityForm);
+    console.log('Room selected:', utilityForm.roomId, utilityForm.roomNumber);
+    console.log('Form data:', {
+      electricity: utilityForm.electricity,
+      water: utilityForm.water,
+      month: utilityForm.month,
+      year: utilityForm.year
+    });
+    
+    // Validate required fields
+    if (!utilityForm.roomId || !utilityForm.roomNumber) {
+      alert('❌ Vui lòng chọn phòng!');
+      return;
+    }
+    
+    if (!utilityForm.month) {
+      alert('❌ Vui lòng chọn kỳ billing!');
+      return;
+    }
+    
+    if (utilityForm.electricity === 0 && utilityForm.water === 0) {
+      alert('❌ Vui lòng nhập số điện hoặc số nước đã dùng!');
+      return;
+    }
     
     // Calculate total amount
     const totalAmount = (utilityForm.electricity * utilityForm.electricityCost) + 
                        (utilityForm.water * utilityForm.waterCost);
+    
+    console.log('Calculated total amount:', totalAmount);
     
     const newBill: UtilityBill = {
       id: utilityBills.length + 1,
@@ -626,7 +651,11 @@ const KtxView = () => {
       dueDate: new Date(utilityForm.year, new Date(utilityForm.month).getMonth() + 1, 5).toISOString().split('T')[0]
     };
     
+    console.log('New bill created:', newBill);
+    
     setUtilityBills([...utilityBills, newBill]);
+    console.log('Updated utility bills:', [...utilityBills, newBill]);
+    
     alert(`Đã tạo hóa đơn thành công!\n\nPhòng: ${utilityForm.roomNumber}\nTháng: ${utilityForm.month}/${utilityForm.year}\nTiền điện: ${utilityForm.electricity} kWh × ${utilityForm.electricityCost.toLocaleString()}đ = ${(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ\nTiền nước: ${utilityForm.water} m³ × ${utilityForm.waterCost.toLocaleString()}đ = ${(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ\nTổng cộng: ${totalAmount.toLocaleString()}đ`);
     
     // Reset form and close modal
@@ -643,6 +672,7 @@ const KtxView = () => {
       status: 'Unpaid'
     });
     setShowUtilityModal(false);
+    console.log('Form reset and modal closed');
   };
 
   const handleCloseUtilityModal = () => {
