@@ -153,6 +153,31 @@ const KtxView = () => {
     waterImage: ''
   });
 
+  // Meter reading history for each room
+  const [meterHistory, setMeterHistory] = useState<{[key: string]: Array<{
+    date: string;
+    electricityReading: number;
+    waterReading: number;
+    electricityImage?: string;
+    waterImage?: string;
+    notes?: string;
+  }>}>({
+    // Mock history for some rooms
+    'A0101': [
+      { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1125, waterReading: 212, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1250, waterReading: 225, notes: 'Cuối kỳ' }
+    ],
+    'A0102': [
+      { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
+      { date: '2024-02-01', electricityReading: 1048, waterReading: 188, notes: 'Cuối kỳ' }
+    ],
+    'B0101': [
+      { date: '2024-01-01', electricityReading: 1100, waterReading: 220, notes: 'Đầu kỳ' },
+      { date: '2024-02-01', electricityReading: 1235, waterReading: 237, notes: 'Cuối kỳ' }
+    ]
+  });
+
   // Mock current user state (in real app, this would come from authentication)
   const [currentUser] = useState({
     id: 'SV2024001',
@@ -632,47 +657,131 @@ const KtxView = () => {
 
   // Handle image capture and meter reading
   const handleImageCapture = (meterType: 'electricity' | 'water') => {
-    // In a real app, this would open camera or file picker
-    // For demo, we'll simulate with random numbers
-    if (meterType === 'electricity') {
-      const previousReading = meterReadings.previousElectricity || Math.floor(Math.random() * 1000);
-      const currentReading = previousReading + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
-      
-      setMeterReadings(prev => ({
-        ...prev,
-        previousElectricity: previousReading,
-        currentElectricity: currentReading,
-        electricityImage: `electricity_meter_${Date.now()}.jpg`
-      }));
-      
-      // Update utility form with calculated usage
-      const usage = currentReading - previousReading;
-      setUtilityForm(prev => ({
-        ...prev,
-        electricity: usage
-      }));
-      
-      alert(`📸 Đã chụp công-tơ điện!\n\nChỉ số trước: ${previousReading} kWh\nChỉ số hiện tại: ${currentReading} kWh\nTiêu thụ: ${usage} kWh\n\nSố liệu đã được tự động cập nhật!`);
-    } else {
-      const previousReading = meterReadings.previousWater || Math.floor(Math.random() * 100);
-      const currentReading = previousReading + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
-      
-      setMeterReadings(prev => ({
-        ...prev,
-        previousWater: previousReading,
-        currentWater: currentReading,
-        waterImage: `water_meter_${Date.now()}.jpg`
-      }));
-      
-      // Update utility form with calculated usage
-      const usage = currentReading - previousReading;
-      setUtilityForm(prev => ({
-        ...prev,
-        water: usage
-      }));
-      
-      alert(`📸 Đã chụp đồng hồ nước!\n\nChỉ số trước: ${previousReading} m³\nChỉ số hiện tại: ${currentReading} m³\nTiêu thụ: ${usage} m³\n\nSố liệu đã được tự động cập nhật!`);
+    const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+    if (!selectedRoom) {
+      alert('❌ Vui lòng chọn phòng trước khi chụp công-tơ!');
+      return;
     }
+
+    const roomNumber = selectedRoom.roomNumber;
+    const roomHistory = meterHistory[roomNumber] || [];
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    // Get last reading from history
+    const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+    const previousElectricity = lastReading ? lastReading.electricityReading : 0;
+    const previousWater = lastReading ? lastReading.waterReading : 0;
+    
+    // Simulate current reading (in real app, this would come from image OCR)
+    let currentElectricity, currentWater;
+    
+    if (meterType === 'electricity') {
+      currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
+      currentWater = previousWater || 0;
+      
+      // Update meter readings state
+      setMeterReadings(prev => ({
+        ...prev,
+        previousElectricity,
+        currentElectricity,
+        electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`
+      }));
+      
+      // Update history
+      const newReading = {
+        date: currentDate,
+        electricityReading: currentElectricity,
+        waterReading: previousWater,
+        electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`,
+        notes: `Chụp ngày ${currentDate}`
+      };
+      
+      setMeterHistory(prev => ({
+        ...prev,
+        [roomNumber]: [...(prev[roomNumber] || []), newReading]
+      }));
+      
+      // Update utility form with calculated usage
+      const usage = currentElectricity - previousElectricity;
+      setUtilityForm(prev => ({
+        ...prev,
+        electricity: Math.max(0, usage)
+      }));
+      
+      alert(`📸 Đã chụp công-tơ điện phòng ${roomNumber}!\n\nChỉ số trước: ${previousElectricity} kWh\nChỉ số hiện tại: ${currentElectricity} kWh\nTiêu thụ kỳ này: ${usage} kWh\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
+      
+    } else {
+      currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
+      currentElectricity = previousElectricity || 0;
+      
+      // Update meter readings state
+      setMeterReadings(prev => ({
+        ...prev,
+        previousWater,
+        currentWater,
+        waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`
+      }));
+      
+      // Update history
+      const newReading = {
+        date: currentDate,
+        electricityReading: previousElectricity,
+        waterReading: currentWater,
+        waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`,
+        notes: `Chụp ngày ${currentDate}`
+      };
+      
+      setMeterHistory(prev => ({
+        ...prev,
+        [roomNumber]: [...(prev[roomNumber] || []), newReading]
+      }));
+      
+      // Update utility form with calculated usage
+      const usage = currentWater - previousWater;
+      setUtilityForm(prev => ({
+        ...prev,
+        water: Math.max(0, usage)
+      }));
+      
+      alert(`📸 Đã chụp đồng hồ nước phòng ${roomNumber}!\n\nChỉ số trước: ${previousWater} m³\nChỉ số hiện tại: ${currentWater} m³\nTiêu thụ kỳ này: ${usage} m³\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
+    }
+  };
+
+  // Get last reading for selected room
+  const getLastReading = () => {
+    const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+    if (!selectedRoom) return null;
+    
+    const roomHistory = meterHistory[selectedRoom.roomNumber] || [];
+    return roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+  };
+
+  // Calculate usage based on billing period
+  const calculateUsageForPeriod = () => {
+    const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+    if (!selectedRoom || !utilityForm.month) return;
+    
+    const roomHistory = meterHistory[selectedRoom.roomNumber] || [];
+    const billingPeriod = utilityForm.month; // e.g., "2024-02"
+    
+    // Find readings within the billing period
+    const periodReadings = roomHistory.filter(reading => 
+      reading.date.startsWith(billingPeriod)
+    );
+    
+    if (periodReadings.length < 2) return;
+    
+    const firstReading = periodReadings[0];
+    const lastReading = periodReadings[periodReadings.length - 1];
+    
+    const electricityUsage = lastReading.electricityReading - firstReading.electricityReading;
+    const waterUsage = lastReading.waterReading - firstReading.waterReading;
+    
+    setUtilityForm(prev => ({
+      ...prev,
+      electricity: Math.max(0, electricityUsage),
+      water: Math.max(0, waterUsage)
+    }));
   };
 
   // Calculate usage from meter readings
@@ -693,6 +802,13 @@ const KtxView = () => {
       calculateUsage();
     }
   }, [meterReadings.currentElectricity, meterReadings.previousElectricity, meterReadings.currentWater, meterReadings.previousWater]);
+
+  // Auto-calculate when room or month changes
+  useEffect(() => {
+    if (utilityForm.roomId && utilityForm.month) {
+      calculateUsageForPeriod();
+    }
+  }, [utilityForm.roomId, utilityForm.month]);
 
   const handleDeleteRoom = (roomId: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
@@ -2046,6 +2162,38 @@ const KtxView = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Meter History Section */}
+            {utilityForm.roomNumber && meterHistory[utilityForm.roomNumber] && (
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                <h4 className="font-semibold text-purple-800 mb-3">📊 Lịch sử dụng công-tơ phòng {utilityForm.roomNumber}</h4>
+                <div className="max-h-48 overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-purple-100">
+                      <tr>
+                        <th className="text-left py-2 px-2">Ngày</th>
+                        <th className="text-left py-2 px-2">Điện (kWh)</th>
+                        <th className="text-left py-2 px-2">Nước (m³)</th>
+                        <th className="text-left py-2 px-2">Ghi chú</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {meterHistory[utilityForm.roomNumber].map((reading, index) => (
+                        <tr key={index} className="border-b border-purple-200">
+                          <td className="py-2 px-2">{reading.date}</td>
+                          <td className="py-2 px-2">{reading.electricityReading}</td>
+                          <td className="py-2 px-2">{reading.waterReading}</td>
+                          <td className="py-2 px-2 text-xs text-gray-600">{reading.notes}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-2 p-2 bg-purple-100 rounded text-xs text-purple-700">
+                  📈 <strong>Thông tin:</strong> Hiển thị {meterHistory[utilityForm.roomNumber].length} lần ghi chỉ số
+                </div>
+              </div>
+            )}
             
             {/* Smart Meter Reading Section */}
             <div className="bg-green-50 p-4 rounded-lg border border-green-100">
