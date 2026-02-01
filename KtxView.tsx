@@ -362,6 +362,36 @@ const KtxView = () => {
     setShowRoomModal(true);
   };
 
+  const handleAddRoomClick = () => {
+    // Reset form to default values when opening add modal
+    setSelectedRoom(null);
+    setRoomForm({
+      roomNumber: '',
+      area: 'A',
+      floor: 1,
+      capacity: 4,
+      type: 'Standard',
+      price: 1200000,
+      facilities: ['Điều hòa', 'Tủ lạnh']
+    });
+    setShowRoomModal(true);
+  };
+
+  const handleCloseRoomModal = () => {
+    // Reset form when closing modal
+    setSelectedRoom(null);
+    setRoomForm({
+      roomNumber: '',
+      area: 'A',
+      floor: 1,
+      capacity: 4,
+      type: 'Standard',
+      price: 1200000,
+      facilities: ['Điều hòa', 'Tủ lạnh']
+    });
+    setShowRoomModal(false);
+  };
+
   const handleDeleteRoom = (roomId: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
       setRooms(rooms.filter(r => r.id !== roomId));
@@ -542,7 +572,7 @@ const KtxView = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Quản lý phòng</h3>
-              <Button onClick={() => setShowRoomModal(true)}>
+              <Button onClick={handleAddRoomClick}>
                 <Plus size={20}/> Thêm phòng
               </Button>
             </div>
@@ -777,7 +807,7 @@ const KtxView = () => {
 
       {/* Room Modal */}
       {showRoomModal && (
-        <Modal isOpen={showRoomModal} onClose={() => setShowRoomModal(false)} title={selectedRoom ? "Chỉnh sửa Phòng" : "Thêm Phòng Mới"}>
+        <Modal isOpen={showRoomModal} onClose={handleCloseRoomModal} title={selectedRoom ? "Chỉnh sửa Phòng" : "Thêm Phòng Mới"}>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -905,7 +935,7 @@ const KtxView = () => {
             </div>
             
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="secondary" onClick={() => setShowRoomModal(false)}>
+              <Button variant="secondary" onClick={handleCloseRoomModal}>
                 Hủy
               </Button>
               <Button onClick={handleAddRoom}>
