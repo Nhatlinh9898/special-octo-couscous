@@ -153,6 +153,13 @@ const KtxView = () => {
     waterImage: ''
   });
 
+  // Selected reading for detailed view
+  const [selectedReading, setSelectedReading] = useState<{
+    roomNumber: string;
+    reading: any;
+    index: number;
+  } | null>(null);
+
   // Meter reading history for each room
   const [meterHistory, setMeterHistory] = useState<{[key: string]: Array<{
     date: string;
@@ -832,6 +839,52 @@ const KtxView = () => {
       setRooms(rooms.filter(r => r.id !== roomId));
       alert('Đã xóa phòng thành công!');
     }
+  };
+
+  // Handle detailed view of meter reading
+  const handleViewReadingDetails = (roomNumber: string, reading: any, index: number) => {
+    setSelectedReading({ roomNumber, reading, index });
+  };
+
+  const handleCloseDetailModal = () => {
+    setSelectedReading(null);
+  };
+
+  // Calculate usage between two readings
+  const calculateUsageBetweenReadings = (reading1: any, reading2: any) => {
+    const electricityUsage = reading2.electricityReading - reading1.electricityReading;
+    const waterUsage = reading2.waterReading - reading1.waterReading;
+    const daysBetween = Math.ceil((new Date(reading2.date).getTime() - new Date(reading1.date).getTime()) / (1000 * 60 * 60 * 24));
+    
+    return {
+      electricityUsage,
+      waterUsage,
+      daysBetween,
+      avgElectricityPerDay: daysBetween > 0 ? electricityUsage / daysBetween : 0,
+      avgWaterPerDay: daysBetween > 0 ? waterUsage / daysBetween : 0
+    };
+  };
+
+  // Get usage statistics for a room
+  const getRoomUsageStats = (roomNumber: string) => {
+    const roomHistory = meterHistory[roomNumber] || [];
+    if (roomHistory.length < 2) return null;
+    
+    const firstReading = roomHistory[0];
+    const lastReading = roomHistory[roomHistory.length - 1];
+    
+    const totalElectricity = lastReading.electricityReading - firstReading.electricityReading;
+    const totalWater = lastReading.waterReading - firstReading.waterReading;
+    const daysBetween = Math.ceil((new Date(lastReading.date).getTime() - new Date(firstReading.date).getTime()) / (1000 * 60 * 60 * 24));
+    
+    return {
+      totalElectricity,
+      totalWater,
+      daysBetween,
+      avgElectricityPerDay: daysBetween > 0 ? totalElectricity / daysBetween : 0,
+      avgWaterPerDay: daysBetween > 0 ? totalWater / daysBetween : 0,
+      readingsCount: roomHistory.length
+    };
   };
 
   const handleAutoAssign = () => {
@@ -2196,11 +2249,20 @@ const KtxView = () => {
                     </thead>
                     <tbody>
                       {meterHistory[utilityForm.roomNumber].map((reading, index) => (
-                        <tr key={index} className="border-b border-purple-200">
+                        <tr key={index} className="border-b border-purple-200 hover:bg-purple-50">
                           <td className="py-2 px-2">{reading.date}</td>
                           <td className="py-2 px-2">{reading.electricityReading}</td>
                           <td className="py-2 px-2">{reading.waterReading}</td>
                           <td className="py-2 px-2 text-xs text-gray-600">{reading.notes}</td>
+                          <td className="py-2 px-2">
+                            <button
+                              onClick={() => handleViewReadingDetails(utilityForm.roomNumber, reading, index)}
+                              className="text-purple-600 hover:text-purple-800"
+                              title="Xem chi tiết"
+                            >
+                              <Eye size={14} />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -2316,6 +2378,155 @@ const KtxView = () => {
               </Button>
               <Button onClick={handleAddUtilityBill}>
                 Tạo hóa đơn
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Meter Reading Detail Modal */}
+      {selectedReading && (
+        <Modal isOpen={true} onClose={handleCloseDetailModal} title={`Chi tiết công-tơ phòng ${selectedReading.roomNumber}`}>
+          <div className="space-y-4">
+            {/* Reading Information */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-semibold text-blue-800 mb-3">📊 Thông tin ghi chỉ số</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Phòng:</span>
+                  <span className="ml-2 font-medium">{selectedReading.roomNumber}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Ngày ghi:</span>
+                  <span className="ml-2 font-medium">{selectedReading.reading.date}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Ghi chú:</span>
+                  <span className="ml-2 font-medium">{selectedReading.reading.notes || 'Không có'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">STT:</span>
+                  <span className="ml-2 font-medium">#{selectedReading.index + 1}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Current Reading Values */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                <h5 className="font-semibold text-green-800 mb-2">⚡ Công-tơ điện</h5>
+                <div className="text-2xl font-bold text-green-700">{selectedReading.reading.electricityReading} kWh</div>
+                <div className="text-sm text-green-600">
+                  Chỉ số công-tơ điện tại thời điểm ghi
+                </div>
+                {selectedReading.reading.electricityImage && (
+                  <div className="mt-2 text-xs text-green-600">
+                    📸 Ảnh: {selectedReading.reading.electricityImage}
+                  </div>
+                )}
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <h5 className="font-semibold text-blue-800 mb-2">💧 Đồng hồ nước</h5>
+                <div className="text-2xl font-bold text-blue-700">{selectedReading.reading.waterReading} m³</div>
+                <div className="text-sm text-blue-600">
+                  Chỉ số đồng hồ nước tại thời điểm ghi
+                </div>
+                {selectedReading.reading.waterImage && (
+                  <div className="mt-2 text-xs text-blue-600">
+                    📸 Ảnh: {selectedReading.reading.waterImage}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Usage Analysis */}
+            {selectedReading.index > 0 && (
+              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                <h4 className="font-semibold text-yellow-800 mb-3">📈 Phân tích tiêu thụ</h4>
+                {(() => {
+                  const previousReading = meterHistory[selectedReading.roomNumber][selectedReading.index - 1];
+                  const usage = calculateUsageBetweenReadings(previousReading, selectedReading.reading);
+                  return (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Khoảng cách:</span>
+                        <span className="font-medium">{usage.daysBetween} ngày</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tiêu thụ điện:</span>
+                        <span className="font-medium">{usage.electricityUsage} kWh</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tiêu thụ nước:</span>
+                        <span className="font-medium">{usage.waterUsage} m³</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Trung bình/ngày (điện):</span>
+                        <span className="font-medium">{usage.avgElectricityPerDay.toFixed(2)} kWh</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="t-gray-600">Trung bình/ngày (nước):</span>
+                        <span className="font-medium">{usage.avgWaterPerDay.toFixed(2)} m³</span>
+                      </div>
+                      <div className="flex justify-between font-bold border-t pt-2">
+                        <span className="text-gray-700">Tổng chi phí dự kiến:</span>
+                        <span className="text-green-700">
+                          {(usage.electricityUsage * 3000 + usage.waterUsage * 25000).toLocaleString()}đ
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* Room Statistics */}
+            {getRoomUsageStats(selectedReading.roomNumber) && (
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                <h4 className="font-semibold text-purple-800 mb-3">📊 Thống kê tiêu thụ phòng {selectedReading.roomNumber}</h4>
+                {(() => {
+                  const stats = getRoomUsageStats(selectedReading.roomNumber);
+                  return (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng số lần ghi:</span>
+                        <span className="font-medium">{stats?.readingsCount || 0} lần</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Khoảng cách theo dõi:</span>
+                        <span className="font-medium">{stats?.daysBetween || 0} ngày</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng tiêu thụ điện:</span>
+                        <span className="font-medium">{stats?.totalElectricity || 0} kWh</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng tiêu thụ nước:</span>
+                        <span className="font-medium">{stats?.totalWater || 0} m³</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Trung bình/ngày (điện):</span>
+                        <span className="font-medium">{stats?.avgElectricityPerDay.toFixed(2)} kWh</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Trung bình/ngày (nước):</span>
+                        <span className="font-medium">{stats?.avgWaterPerDay.toFixed(2)} m³</span>
+                      </div>
+                      <div className="flex justify-between font-bold border-t pt-2">
+                        <span className="text-gray-700">Tổng chi phí dự kiến:</span>
+                        <span className="text-purple-700">
+                          {(stats?.totalElectricity * 3000 + stats?.totalWater * 25000).toLocaleString()}đ
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="secondary" onClick={handleCloseDetailModal}>
+                Đóng
               </Button>
             </div>
           </div>
