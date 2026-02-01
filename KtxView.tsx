@@ -1,0 +1,623 @@
+import React, { useState, useEffect } from 'react';
+import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { Button, Modal } from './components';
+
+// Interfaces
+interface Student {
+  id: number;
+  code: string;
+  fullName: string;
+  classId: number;
+  gender: 'Nam' | 'Nữ';
+  phone: string;
+  email: string;
+  address: string;
+  idCard: string;
+}
+
+interface Room {
+  id: number;
+  roomNumber: string;
+  area: 'A' | 'B';
+  floor: number;
+  capacity: number;
+  currentOccupancy: number;
+  type: 'Standard' | 'Premium' | 'VIP';
+  status: 'Available' | 'Occupied' | 'Maintenance' | 'Reserved';
+  price: number;
+  facilities: string[];
+  students: Student[];
+}
+
+interface Registration {
+  id: number;
+  studentId: number;
+  roomId: number;
+  registrationDate: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Cancelled';
+  semester: string;
+  notes: string;
+}
+
+interface UtilityBill {
+  id: number;
+  roomId: number;
+  month: string;
+  electricity: number;
+  water: number;
+  electricityCost: number;
+  waterCost: number;
+  totalCost: number;
+  status: 'Paid' | 'Unpaid' | 'Overdue';
+  dueDate: string;
+}
+
+interface Equipment {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  location: string;
+  status: 'Available' | 'In Use' | 'Damaged' | 'Maintenance';
+  purchaseDate: string;
+  warranty: string;
+  supplier: string;
+}
+
+const KtxView = () => {
+  // State management
+  const [activeTab, setActiveTab] = useState('overview');
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [utilityBills, setUtilityBills] = useState<UtilityBill[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  
+  // Modal states
+  const [showRoomModal, setShowRoomModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showUtilityModal, setShowUtilityModal] = useState(false);
+  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  
+  // Form states
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterArea, setFilterArea] = useState<'all' | 'A' | 'B'>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  // Initialize mock data
+  useEffect(() => {
+    initializeMockData();
+  }, []);
+
+  const initializeMockData = () => {
+    // Generate 200 rooms for Area A
+    const areaARooms: Room[] = [];
+    for (let i = 1; i <= 200; i++) {
+      const floor = Math.ceil(i / 20);
+      areaARooms.push({
+        id: i,
+        roomNumber: `A${floor.toString().padStart(2, '0')}${(i % 20 || 20).toString().padStart(2, '0')}`,
+        area: 'A',
+        floor,
+        capacity: 4,
+        currentOccupancy: Math.floor(Math.random() * 5),
+        type: i <= 50 ? 'Premium' : i <= 150 ? 'Standard' : 'VIP',
+        status: Math.random() > 0.7 ? 'Occupied' : Math.random() > 0.5 ? 'Available' : 'Maintenance',
+        price: i <= 50 ? 1500000 : i <= 150 ? 1200000 : 2000000,
+        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
+        students: []
+      });
+    }
+
+    // Generate 300 rooms for Area B
+    const areaBRooms: Room[] = [];
+    for (let i = 1; i <= 300; i++) {
+      const floor = Math.ceil(i / 25);
+      areaBRooms.push({
+        id: 200 + i,
+        roomNumber: `B${floor.toString().padStart(2, '0')}${(i % 25 || 25).toString().padStart(2, '0')}`,
+        area: 'B',
+        floor,
+        capacity: 6,
+        currentOccupancy: Math.floor(Math.random() * 7),
+        type: i <= 100 ? 'Standard' : i <= 250 ? 'Premium' : 'VIP',
+        status: Math.random() > 0.6 ? 'Occupied' : Math.random() > 0.4 ? 'Available' : 'Reserved',
+        price: i <= 100 ? 1000000 : i <= 250 ? 1300000 : 1800000,
+        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
+        students: []
+      });
+    }
+
+    setRooms([...areaARooms, ...areaBRooms]);
+
+    // Mock students
+    const mockStudents: Student[] = [
+      {
+        id: 1,
+        code: 'SV001',
+        fullName: 'Nguyễn Văn An',
+        classId: 1,
+        gender: 'Nam',
+        phone: '0912345678',
+        email: 'an.nguyen@university.edu.vn',
+        address: 'Hà Nội',
+        idCard: '001234567890'
+      },
+      {
+        id: 2,
+        code: 'SV002',
+        fullName: 'Trần Thị Bình',
+        classId: 2,
+        gender: 'Nữ',
+        phone: '0923456789',
+        email: 'binh.tran@university.edu.vn',
+        address: 'TP. Hồ Chí Minh',
+        idCard: '002345678901'
+      }
+    ];
+
+    setStudents(mockStudents);
+
+    // Mock registrations
+    const mockRegistrations: Registration[] = [
+      {
+        id: 1,
+        studentId: 1,
+        roomId: 1,
+        registrationDate: '2024-01-15',
+        status: 'Approved',
+        semester: '2024-1',
+        notes: 'Đăng ký sớm'
+      }
+    ];
+
+    setRegistrations(mockRegistrations);
+
+    // Mock utility bills
+    const mockUtilityBills: UtilityBill[] = [
+      {
+        id: 1,
+        roomId: 1,
+        month: '2024-01',
+        electricity: 150,
+        water: 20,
+        electricityCost: 150 * 3000,
+        waterCost: 20 * 10000,
+        totalCost: 150 * 3000 + 20 * 10000,
+        status: 'Unpaid',
+        dueDate: '2024-02-05'
+      }
+    ];
+
+    setUtilityBills(mockUtilityBills);
+
+    // Mock equipment
+    const mockEquipment: Equipment[] = [
+      {
+        id: 1,
+        name: 'Máy lạnh',
+        category: 'Điện lạnh',
+        quantity: 500,
+        unit: 'Cái',
+        location: 'Tất cả các phòng',
+        status: 'In Use',
+        purchaseDate: '2023-01-01',
+        warranty: '2025-01-01',
+        supplier: 'LG Electronics'
+      },
+      {
+        id: 2,
+        name: 'Giường ngủ',
+        category: 'Nội thất',
+        quantity: 1000,
+        unit: 'Cái',
+        location: 'Tất cả các phòng',
+        status: 'In Use',
+        purchaseDate: '2023-06-01',
+        warranty: '2028-06-01',
+        supplier: 'Nội thất ABC'
+      }
+    ];
+
+    setEquipment(mockEquipment);
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('Importing file:', file.name);
+      // Handle file import logic here
+      alert(`Đã import file: ${file.name}`);
+      setShowImportModal(false);
+    }
+  };
+
+  const handleAutoAssign = () => {
+    console.log('Auto-assigning rooms...');
+    // Auto-assignment logic
+    alert('Đã sắp xếp tự động sinh viên vào phòng!');
+  };
+
+  const filteredRooms = rooms.filter(room => {
+    const matchesSearch = room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesArea = filterArea === 'all' || room.area === filterArea;
+    const matchesStatus = filterStatus === 'all' || room.status === filterStatus;
+    return matchesSearch && matchesArea && matchesStatus;
+  });
+
+  const getRoomStats = () => {
+    const total = rooms.length;
+    const occupied = rooms.filter(r => r.status === 'Occupied').length;
+    const available = rooms.filter(r => r.status === 'Available').length;
+    const maintenance = rooms.filter(r => r.status === 'Maintenance').length;
+    const reserved = rooms.filter(r => r.status === 'Reserved').length;
+    
+    return { total, occupied, available, maintenance, reserved };
+  };
+
+  const stats = getRoomStats();
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Quản lý Ký túc xá</h2>
+          <p className="text-gray-500">Hệ thống quản lý phòng ốc và sinh viên</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowImportModal(true)}
+          >
+            <Upload size={20}/> Import Danh sách
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={handleAutoAssign}
+          >
+            <Settings size={20} /> Tự động sắp xếp
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Tổng phòng</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+            </div>
+            <Building2 className="text-blue-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Đã ở</p>
+              <p className="text-2xl font-bold text-green-600">{stats.occupied}</p>
+            </div>
+            <Users className="text-green-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Trống</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.available}</p>
+            </div>
+            <Bed className="text-blue-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Bảo trì</p>
+              <p className="text-2xl font-bold text-orange-600">{stats.maintenance}</p>
+            </div>
+            <Settings className="text-orange-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Đặt trước</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.reserved}</p>
+            </div>
+            <Calendar className="text-purple-600" size={24} />
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex space-x-8">
+          {[
+            { id: 'overview', label: 'Tổng quan', icon: Building2 },
+            { id: 'rooms', label: 'Quản lý phòng', icon: Bed },
+            { id: 'registrations', label: 'Đăng ký phòng', icon: FileText },
+            { id: 'utilities', label: 'Điện nước', icon: Zap },
+            { id: 'equipment', label: 'Kho thiết bị', icon: Package }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800">Tổng quan Ký túc xá</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-3">Phân bố theo khu vực</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="font-medium">Khu A</span>
+                    <span className="text-blue-600 font-bold">200 phòng</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="font-medium">Khu B</span>
+                    <span className="text-green-600 font-bold">300 phòng</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-700 mb-3">Loại phòng</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span>Standard</span>
+                    <span className="font-medium">{rooms.filter(r => r.type === 'Standard').length}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                    <span>Premium</span>
+                    <span className="font-medium">{rooms.filter(r => r.type === 'Premium').length}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span>VIP</span>
+                    <span className="font-medium">{rooms.filter(r => r.type === 'VIP').length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'rooms' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Quản lý phòng</h3>
+              <Button onClick={() => setShowRoomModal(true)}>
+                <Plus size={20}/> Thêm phòng
+              </Button>
+            </div>
+            
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm phòng..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                </div>
+              </div>
+              <select
+                value={filterArea}
+                onChange={(e) => setFilterArea(e.target.value as 'all' | 'A' | 'B')}
+                className="px-4 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="all">Tất cả khu</option>
+                <option value="A">Khu A</option>
+                <option value="B">Khu B</option>
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="all">Tất cả trạng thái</option>
+                <option value="Available">Trống</option>
+                <option value="Occupied">Đã ở</option>
+                <option value="Maintenance">Bảo trì</option>
+                <option value="Reserved">Đặt trước</option>
+              </select>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4">Phòng</th>
+                    <th className="text-left py-3 px-4">Khu</th>
+                    <th className="text-left py-3 px-4">Tầng</th>
+                    <th className="text-left py-3 px-4">Loại</th>
+                    <th className="text-left py-3 px-4">Sức chứa</th>
+                    <th className="text-left py-3 px-4">Đã ở</th>
+                    <th className="text-left py-3 px-4">Giá</th>
+                    <th className="text-left py-3 px-4">Trạng thái</th>
+                    <th className="text-left py-3 px-4">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRooms.slice(0, 10).map(room => (
+                    <tr key={room.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium">{room.roomNumber}</td>
+                      <td className="py-3 px-4">{room.area}</td>
+                      <td className="py-3 px-4">{room.floor}</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          room.type === 'VIP' ? 'bg-purple-100 text-purple-800' :
+                          room.type === 'Premium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {room.type}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">{room.capacity}</td>
+                      <td className="py-3 px-4">{room.currentOccupancy}</td>
+                      <td className="py-3 px-4">{room.price.toLocaleString()}đ</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          room.status === 'Available' ? 'bg-green-100 text-green-800' :
+                          room.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
+                          room.status === 'Maintenance' ? 'bg-orange-100 text-orange-800' :
+                          'bg-purple-100 text-purple-800'
+                        }`}>
+                          {room.status === 'Available' ? 'Trống' :
+                           room.status === 'Occupied' ? 'Đã ở' :
+                           room.status === 'Maintenance' ? 'Bảo trì' : 'Đặt trước'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={16} />
+                          </button>
+                          <button className="text-green-600 hover:text-green-800">
+                            <Edit size={16} />
+                          </button>
+                          <button className="text-red-600 hover:text-red-800">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'registrations' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Đăng ký phòng</h3>
+              <Button onClick={() => setShowRegistrationModal(true)}>
+                <Plus size={20}/> Đăng ký mới
+              </Button>
+            </div>
+            
+            <div className="text-center py-8 text-gray-500">
+              <FileText size={48} className="mx-auto mb-4 text-gray-300" />
+              <p>Chưa có đăng ký nào</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'utilities' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Quản lý Điện nước</h3>
+              <Button onClick={() => setShowUtilityModal(true)}>
+                <Plus size={20} /> Thêm hóa đơn
+              </Button>
+            </div>
+            
+            <div className="text-center py-8 text-gray-500">
+              <Zap size={48} className="mx-auto mb-4 text-gray-300" />
+              <p>Chưa có hóa đơn điện nước</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'equipment' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Kho Trang thiết bị</h3>
+              <Button onClick={() => setShowEquipmentModal(true)}>
+                <Plus size={20} /> Thêm thiết bị
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {equipment.map(item => (
+                <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-medium text-gray-800">{item.name}</h4>
+                      <p className="text-sm text-gray-600">{item.category}</p>
+                      <p className="text-sm text-gray-500">Số lượng: {item.quantity} {item.unit}</p>
+                      <p className="text-sm text-gray-500">Vị trí: {item.location}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      item.status === 'Available' ? 'bg-green-100 text-green-800' :
+                      item.status === 'In Use' ? 'bg-blue-100 text-blue-800' :
+                      item.status === 'Damaged' ? 'bg-red-100 text-red-800' :
+                      'bg-orange-100 text-orange-800'
+                    }`}>
+                      {item.status === 'Available' ? 'Sẵn có' :
+                       item.status === 'In Use' ? 'Đang dùng' :
+                       item.status === 'Damaged' ? 'Hỏng' : 'Bảo trì'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <Modal isOpen={showImportModal} onClose={() => setShowImportModal(false)} title="Import Danh sách Sinh viên">
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-semibold text-blue-800 mb-2">Hướng dẫn Import</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• File phải có định dạng .xlsx hoặc .csv</li>
+                <li>• Bao gồm các cột: Mã SV, Họ tên, Lớp, Giới tính, SĐT, Email</li>
+                <li>• Dung lượng file tối đa 10MB</li>
+              </ul>
+            </div>
+            
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <Upload size={32} className="mx-auto text-gray-400 mb-2" />
+              <p className="text-sm text-gray-600 mb-2">Kéo và thả file vào đây hoặc click để chọn</p>
+              <input
+                type="file"
+                accept=".xlsx,.csv"
+                onChange={handleFileImport}
+                className="hidden"
+                id="file-import"
+              />
+              <label
+                htmlFor="file-import"
+                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition"
+              >
+                Chọn file
+              </label>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+};
+
+export default KtxView;

@@ -63,6 +63,7 @@ export const Sidebar: React.FC<{ mobile?: boolean }> = ({ mobile }) => {
     { id: 'research', label: 'Nghiên Cứu KH', icon: <FlaskConical size={20} /> }, 
     { id: 'counseling', label: 'Tư Vấn Tâm Lý', icon: <HeartHandshake size={20} /> }, 
     { id: 'dormitory', label: 'Ký Túc Xá', icon: <BedDouble size={20} /> }, 
+    { id: 'ktx', label: 'KTX Management', icon: <BedDouble size={20} /> }, 
     { id: 'health', label: 'Y Tế', icon: <HeartPulse size={20} /> }, 
     { id: 'feedback', label: 'Khảo Sát', icon: <MessageSquare size={20} /> }, 
     { id: 'alumni', label: 'Cựu HS', icon: <Users2 size={20} /> },
