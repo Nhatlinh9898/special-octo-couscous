@@ -43,6 +43,7 @@ import ServerMonitorView from './ServerMonitorView';
 import KtxView from './KtxView';
 import HotelManagementView from './HotelManagementView';
 import KtxFinanceView from './KtxFinanceView';
+import IntegratedFinanceView from './IntegratedFinanceView';
 
 const AppContent: React.FC = () => {
   const { user, activeTab, isMobileMenuOpen, toggleMobileMenu } = useContext(AppContext);
@@ -90,6 +91,7 @@ const AppContent: React.FC = () => {
       case 'ktx': return <KtxView />; // New
       case 'hotel_management': return <HotelManagementView />; // New
       case 'ktx_finance': return <KtxFinanceView />; // New
+      case 'integrated_finance': return <IntegratedFinanceView />; // New
       default: return <div>Module not found</div>;
     }
   };

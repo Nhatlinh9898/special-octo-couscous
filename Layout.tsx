@@ -37,7 +37,8 @@ import {
   Bot,
   Server,
   Building2,
-  DollarSign
+  DollarSign,
+  Activity
 } from 'lucide-react';
 import { AppContext } from './context';
 
@@ -67,6 +68,7 @@ export const Sidebar: React.FC<{ mobile?: boolean }> = ({ mobile }) => {
     { id: 'dormitory', label: 'Ký Túc Xá', icon: <BedDouble size={20} /> }, 
     { id: 'ktx', label: 'KTX Management', icon: <BedDouble size={20} /> }, 
     { id: 'ktx_finance', label: 'KTX Finance', icon: <DollarSign size={20} /> }, 
+    { id: 'integrated_finance', label: 'Integrated Finance', icon: <Activity size={20} /> }, 
     { id: 'hotel_management', label: 'Hotel Management', icon: <Building2 size={20} /> }, 
     { id: 'health', label: 'Y Tế', icon: <HeartPulse size={20} /> }, 
     { id: 'feedback', label: 'Khảo Sát', icon: <MessageSquare size={20} /> }, 
