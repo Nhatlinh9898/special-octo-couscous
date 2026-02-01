@@ -1848,6 +1848,20 @@ const KtxView = () => {
       {showUtilityModal && (
         <Modal isOpen={showUtilityModal} onClose={handleCloseUtilityModal} title="Thêm hóa đơn điện nước">
           <div className="space-y-4">
+            {/* Guidance Section */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-semibold text-blue-800 mb-2">📋 Hướng dẫn tạo hóa đơn</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p>• <strong>Bước 1:</strong> Chọn phòng và kỳ billing (tháng/năm)</p>
+                <p>• <strong>Bước 2:</strong> Nhập số điện và nước đã dùng trong kỳ</p>
+                <p>• <strong>Bước 3:</strong> Kiểm tra đơn giá và tổng tiền</p>
+                <p>• <strong>Bước 4:</strong> Chọn trạng thái và tạo hóa đơn</p>
+              </div>
+              <div className="mt-2 p-2 bg-blue-100 rounded text-xs text-blue-600">
+                💡 <strong>Lưu ý:</strong> Số điện đọc từ công-tơ (kWh), số nước đọc từ đồng hồ nước (m³)
+              </div>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phòng</label>
@@ -1873,36 +1887,47 @@ const KtxView = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tháng/Năm</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kỳ billing</label>
                 <input
                   type="month"
                   value={utilityForm.month}
                   onChange={(e) => setUtilityForm({...utilityForm, month: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  📅 Chọn tháng/năm của kỳ billing
+                </p>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Số điện (kWh)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số điện đã dùng (kWh)</label>
                 <input
                   type="number"
                   value={utilityForm.electricity}
                   onChange={(e) => setUtilityForm({...utilityForm, electricity: parseInt(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min="0"
+                  placeholder="Nhập số kWh đã tiêu thụ"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 Nhập số điện đã dùng trong kỳ này (ví dụ: 120)
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Số nước (m³)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số nước đã dùng (m³)</label>
                 <input
                   type="number"
                   value={utilityForm.water}
                   onChange={(e) => setUtilityForm({...utilityForm, water: parseInt(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min="0"
+                  placeholder="Nhập số m³ đã tiêu thụ"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  💧 Nhập số nước đã dùng trong kỳ này (ví dụ: 15)
+                </p>
               </div>
             </div>
             
@@ -1926,6 +1951,25 @@ const KtxView = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min="0"
                 />
+              </div>
+            </div>
+            
+            {/* Practical Examples */}
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+              <h4 className="font-semibold text-yellow-800 mb-2">📊 Ví dụ thực tế</h4>
+              <div className="text-sm text-yellow-700 space-y-2">
+                <div className="border-l-4 border-yellow-400 pl-3">
+                  <p><strong>Phòng A0101 - Tháng 1/2024:</strong></p>
+                  <p>• Đọc công-tơ điện: <code>125.5 kWh</code></p>
+                  <p>• Đọc đồng hồ nước: <code>12.3 m³</code></p>
+                  <p>• Thành tiền: <code>376.500đ + 307.500đ = 684.000đ</code></p>
+                </div>
+                <div className="border-l-4 border-yellow-400 pl-3">
+                  <p><strong>Phòng B0102 - Tháng 1/2024:</strong></p>
+                  <p>• Đọc công-tơ điện: <code>98.2 kWh</code></p>
+                  <p>• Đọc đồng hồ nước: <code>8.7 m³</code></p>
+                  <p>• Thành tiền: <code>294.600đ + 217.500đ = 512.100đ</code></p>
+                </div>
               </div>
             </div>
             
