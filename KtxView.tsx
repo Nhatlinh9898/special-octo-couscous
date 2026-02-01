@@ -122,6 +122,12 @@ const KtxView = () => {
     return rooms.find(r => r.roomNumber === registrationForm.roomNumber);
   };
 
+  // Registration filter state
+  const [regFilterArea, setRegFilterArea] = useState<'all' | 'A' | 'B'>('all');
+  const [regFilterType, setRegFilterType] = useState<'all' | 'Standard' | 'Premium' | 'VIP'>('all');
+  const [regFilterStatus, setRegFilterStatus] = useState<'all' | 'Available' | 'Occupied' | 'Maintenance' | 'Reserved'>('all');
+  const [regOnlyAvailable, setRegOnlyAvailable] = useState(true);
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -445,6 +451,19 @@ const KtxView = () => {
       status: 'Pending'
     });
     setShowRegistrationModal(false);
+  };
+
+  // Get filtered rooms for registration
+  const getFilteredRoomsForRegistration = () => {
+    return rooms.filter(room => {
+      const matchesArea = regFilterArea === 'all' || room.area === regFilterArea;
+      const matchesType = regFilterType === 'all' || room.type === regFilterType;
+      const matchesStatus = regFilterStatus === 'all' || room.status === regFilterStatus;
+      const hasAvailableSpots = room.capacity > room.currentOccupancy;
+      const matchesAvailability = !regOnlyAvailable || (hasAvailableSpots && room.status !== 'Maintenance');
+      
+      return matchesArea && matchesType && matchesStatus && matchesAvailability;
+    });
   };
 
   const handleCloseRegistrationModal = () => {
@@ -1298,7 +1317,7 @@ const KtxView = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="">-- Chọn phòng --</option>
-                  {rooms.map(room => {
+                  {getFilteredRoomsForRegistration().map(room => {
                     const availableSpots = room.capacity - room.currentOccupancy;
                     const statusText = room.status === 'Available' ? 'Trống' : 
                                      room.status === 'Occupied' ? 'Đã ở' : 
@@ -1320,7 +1339,7 @@ const KtxView = () => {
                   })}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Hiển thị tất cả phòng. Phòng màu xám không thể đăng ký.
+                  Hiển thị phòng theo bộ lọc. Phòng màu xám không thể đăng ký.
                 </p>
               </div>
               <div>
@@ -1366,6 +1385,67 @@ const KtxView = () => {
                 )}
               </div>
             )}
+            
+            {/* Room Filters */}
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-gray-800 mb-3">Bộ lọc phòng</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Khu vực</label>
+                  <select
+                    value={regFilterArea}
+                    onChange={(e) => setRegFilterArea(e.target.value as 'all' | 'A' | 'B')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="all">Tất cả khu</option>
+                    <option value="A">Khu A</option>
+                    <option value="B">Khu B</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Loại phòng</label>
+                  <select
+                    value={regFilterType}
+                    onChange={(e) => setRegFilterType(e.target.value as 'all' | 'Standard' | 'Premium' | 'VIP')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="all">Tất cả loại</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Premium">Premium</option>
+                    <option value="VIP">VIP</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                  <select
+                    value={regFilterStatus}
+                    onChange={(e) => setRegFilterStatus(e.target.value as 'all' | 'Available' | 'Occupied' | 'Maintenance' | 'Reserved')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="Available">Trống</option>
+                    <option value="Occupied">Đã ở</option>
+                    <option value="Maintenance">Bảo trì</option>
+                    <option value="Reserved">Đặt trước</option>
+                  </select>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="onlyAvailable"
+                    checked={regOnlyAvailable}
+                    onChange={(e) => setRegOnlyAvailable(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="onlyAvailable" className="text-sm font-medium text-gray-700">
+                    Chỉ phòng còn chỗ
+                  </label>
+                </div>
+              </div>
+              <div className="mt-2 text-sm text-gray-600">
+                Hiển thị {getFilteredRoomsForRegistration().length} phòng phù hợp
+              </div>
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
