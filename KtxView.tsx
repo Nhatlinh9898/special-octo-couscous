@@ -843,7 +843,11 @@ const KtxView = () => {
 
   // Handle detailed view of meter reading
   const handleViewReadingDetails = (roomNumber: string, reading: any, index: number) => {
+    console.log('handleViewReadingDetails called:', { roomNumber, reading, index });
+    console.log('meterHistory:', meterHistory);
+    
     setSelectedReading({ roomNumber, reading, index });
+    console.log('selectedReading set to:', { roomNumber, reading, index });
   };
 
   const handleCloseDetailModal = () => {
