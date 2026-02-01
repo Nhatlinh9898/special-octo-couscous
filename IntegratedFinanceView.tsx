@@ -14,7 +14,8 @@ import {
   Mail, 
   Bell,
   Handshake,
-  CheckCircle
+  CheckCircle,
+  Settings
 } from 'lucide-react';
 import { Button, Modal } from './components';
 
@@ -98,6 +99,12 @@ const IntegratedFinanceView = () => {
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showPartnerModal, setShowPartnerModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterBuilding, setFilterBuilding] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [isEditing, setIsEditing] = useState(false);
   
   // Form states
@@ -916,6 +923,8 @@ const IntegratedFinanceView = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'tenants' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Người thuê (KTX + Hotel)</h3>
