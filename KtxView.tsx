@@ -301,6 +301,53 @@ const KtxView = () => {
     alert('Đã thêm phòng mới thành công!');
   };
 
+  // Generate available room numbers based on area and floor
+  const getAvailableRoomNumbers = () => {
+    const existingRooms = rooms.map(r => r.roomNumber);
+    const availableRooms: string[] = [];
+    
+    // Generate room numbers for Area A (10 floors, 20 rooms per floor)
+    for (let floor = 1; floor <= 10; floor++) {
+      for (let room = 1; room <= 20; room++) {
+        const roomNumber = `A${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
+        if (!existingRooms.includes(roomNumber)) {
+          availableRooms.push(roomNumber);
+        }
+      }
+    }
+    
+    // Generate room numbers for Area B (10 floors, 25 rooms per floor)
+    for (let floor = 1; floor <= 10; floor++) {
+      for (let room = 1; room <= 25; room++) {
+        const roomNumber = `B${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
+        if (!existingRooms.includes(roomNumber)) {
+          availableRooms.push(roomNumber);
+        }
+      }
+    }
+    
+    return availableRooms.sort();
+  };
+
+  // Auto-fill room details when room number is selected
+  const handleRoomNumberChange = (roomNumber: string) => {
+    setRoomForm({...roomForm, roomNumber});
+    
+    if (roomNumber) {
+      // Extract area, floor, and room number from the selected room
+      const area = roomNumber.charAt(0) as 'A' | 'B';
+      const floor = parseInt(roomNumber.substring(1, 3));
+      
+      // Auto-fill area and floor
+      setRoomForm(prev => ({
+        ...prev,
+        roomNumber,
+        area,
+        floor
+      }));
+    }
+  };
+
   const handleEditRoom = (room: Room) => {
     setSelectedRoom(room);
     setRoomForm({
@@ -735,13 +782,37 @@ const KtxView = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Số phòng</label>
-                <input
-                  type="text"
-                  value={roomForm.roomNumber}
-                  onChange={(e) => setRoomForm({...roomForm, roomNumber: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="A0101"
-                />
+                {selectedRoom ? (
+                  <input
+                    type="text"
+                    value={roomForm.roomNumber}
+                    onChange={(e) => setRoomForm({...roomForm, roomNumber: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                    disabled
+                  />
+                ) : (
+                  <select
+                    value={roomForm.roomNumber}
+                    onChange={(e) => handleRoomNumberChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">-- Chọn số phòng --</option>
+                    {getAvailableRoomNumbers().map(roomNumber => (
+                      <option key={roomNumber} value={roomNumber}>
+                        {roomNumber}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedRoom ? "Không thể thay đổi số phòng khi chỉnh sửa" : (
+                    <>
+                      Có {getAvailableRoomNumbers().length} phòng trống | 
+                      Khu A: {getAvailableRoomNumbers().filter(r => r.startsWith('A')).length} phòng | 
+                      Khu B: {getAvailableRoomNumbers().filter(r => r.startsWith('B')).length} phòng
+                    </>
+                  )}
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Khu</label>
@@ -749,10 +820,14 @@ const KtxView = () => {
                   value={roomForm.area}
                   onChange={(e) => setRoomForm({...roomForm, area: e.target.value as 'A' | 'B'})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  disabled={!!selectedRoom}
                 >
                   <option value="A">Khu A</option>
                   <option value="B">Khu B</option>
                 </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Khu A: 200 phòng (20 phòng/tầng) | Khu B: 300 phòng (25 phòng/tầng)
+                </p>
               </div>
             </div>
             
