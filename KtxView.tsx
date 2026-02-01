@@ -102,6 +102,10 @@ const KtxView = () => {
   // State for tracking newly created rooms
   const [newlyCreatedRooms, setNewlyCreatedRooms] = useState<number[]>([]);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -496,6 +500,9 @@ const KtxView = () => {
         const newRoomIds = newRooms.map(room => room.id);
         setNewlyCreatedRooms(newRoomIds);
         
+        // Jump to first page to see new rooms
+        setCurrentPage(1);
+        
         alert(`Đã tạo thành công ${newRooms.length} phòng mới! Các phòng mới được đánh dấu màu xanh.`);
       }
     } catch (error) {
@@ -525,6 +532,10 @@ const KtxView = () => {
       setRooms([...rooms, testRoom]);
       setNewlyCreatedRooms([testRoom.id]);
       console.log('Set newly created rooms:', [testRoom.id]);
+      
+      // Jump to first page to see new room
+      setCurrentPage(1);
+      
       alert('Đã tạo phòng test thành công! Phòng mới được đánh dấu màu xanh.');
     } catch (error) {
       console.error('Test error:', error);
@@ -538,6 +549,12 @@ const KtxView = () => {
     const matchesStatus = filterStatus === 'all' || room.status === filterStatus;
     return matchesSearch && matchesArea && matchesStatus;
   });
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredRooms.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
 
   const getRoomStats = () => {
     const total = rooms.length;
@@ -793,7 +810,7 @@ const KtxView = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRooms.slice(0, 10).map(room => {
+                  {currentItems.map(room => {
                     const isNewlyCreated = newlyCreatedRooms.includes(room.id);
                     console.log(`Room ${room.roomNumber} - ID: ${room.id} - Is New: ${isNewlyCreated}`);
                     return (
@@ -866,6 +883,58 @@ const KtxView = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center mt-4">
+              <div className="text-sm text-gray-600">
+                Hiển thị {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredRooms.length)} của {filteredRooms.length} phòng
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Trước
+                </button>
+                
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-1 border rounded-lg ${
+                        currentPage === pageNum
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Sau
+                </button>
+              </div>
             </div>
           </div>
         )}
