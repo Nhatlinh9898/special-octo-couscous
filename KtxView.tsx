@@ -31,12 +31,13 @@ interface Room {
 
 interface Registration {
   id: number;
-  studentId: number;
-  roomId: number;
+  studentId: string;
+  studentName: string;
+  roomNumber: string;
   registrationDate: string;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Cancelled';
-  semester: string;
-  notes: string;
+  duration: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  requestDate: string;
 }
 
 interface UtilityBill {
@@ -138,40 +139,6 @@ const KtxView = () => {
     major: 'Công nghệ thông tin'
   });
 
-  // Registration list state
-  const [registrations, setRegistrations] = useState([
-    {
-      id: 1,
-      studentId: 'SV2024001',
-      studentName: 'Nguyễn Văn Minh',
-      roomNumber: 'A0101',
-      registrationDate: '2024-01-15',
-      duration: 6,
-      status: 'Pending' as 'Pending' | 'Approved' | 'Rejected',
-      requestDate: '2024-01-15T10:30:00'
-    },
-    {
-      id: 2,
-      studentId: 'SV2024002',
-      studentName: 'Trần Thị Anh',
-      roomNumber: 'A0102',
-      registrationDate: '2024-01-14',
-      duration: 12,
-      status: 'Approved' as 'Pending' | 'Approved' | 'Rejected',
-      requestDate: '2024-01-14T14:20:00'
-    },
-    {
-      id: 3,
-      studentId: 'SV2024003',
-      studentName: 'Lê Văn Cường',
-      roomNumber: 'B0101',
-      registrationDate: '2024-01-13',
-      duration: 6,
-      status: 'Rejected' as 'Pending' | 'Approved' | 'Rejected',
-      requestDate: '2024-01-13T09:15:00'
-    }
-  ]);
-
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -272,12 +239,33 @@ const KtxView = () => {
     const mockRegistrations: Registration[] = [
       {
         id: 1,
-        studentId: 1,
-        roomId: 1,
+        studentId: 'SV2024001',
+        studentName: 'Nguyễn Văn Minh',
+        roomNumber: 'A0101',
         registrationDate: '2024-01-15',
+        duration: 6,
+        status: 'Pending',
+        requestDate: '2024-01-15T10:30:00'
+      },
+      {
+        id: 2,
+        studentId: 'SV2024002',
+        studentName: 'Trần Thị Anh',
+        roomNumber: 'A0102',
+        registrationDate: '2024-01-14',
+        duration: 12,
         status: 'Approved',
-        semester: '2024-1',
-        notes: 'Đăng ký sớm'
+        requestDate: '2024-01-14T14:20:00'
+      },
+      {
+        id: 3,
+        studentId: 'SV2024003',
+        studentName: 'Lê Văn Cường',
+        roomNumber: 'B0101',
+        registrationDate: '2024-01-13',
+        duration: 6,
+        status: 'Rejected',
+        requestDate: '2024-01-13T09:15:00'
       }
     ];
 
