@@ -2245,6 +2245,7 @@ const KtxView = () => {
                         <th className="text-left py-2 px-2">Điện (kWh)</th>
                         <th className="text-left py-2 px-2">Nước (m³)</th>
                         <th className="text-left py-2 px-2">Ghi chú</th>
+                        <th className="text-left py-2 px-2">Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2465,7 +2466,7 @@ const KtxView = () => {
                         <span className="font-medium">{usage.avgElectricityPerDay.toFixed(2)} kWh</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="t-gray-600">Trung bình/ngày (nước):</span>
+                        <span className="text-gray-600">Trung bình/ngày (nước):</span>
                         <span className="font-medium">{usage.avgWaterPerDay.toFixed(2)} m³</span>
                       </div>
                       <div className="flex justify-between font-bold border-t pt-2">
