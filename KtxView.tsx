@@ -2277,13 +2277,32 @@ const KtxView = () => {
                 <select
                   value={utilityForm.roomId}
                   onChange={(e) => {
+                    console.log('=== ROOM SELECTION DEBUG ===');
+                    console.log('Room selection changed:', e.target.value);
+                    
                     const roomId = parseInt(e.target.value);
                     const room = rooms.find(r => r.id === roomId);
-                    setUtilityForm({
+                    
+                    console.log('Parsed roomId:', roomId);
+                    console.log('Found room:', room);
+                    console.log('Room roomNumber:', room?.roomNumber);
+                    
+                    const newUtilityForm = {
                       ...utilityForm,
                       roomId,
                       roomNumber: room?.roomNumber || ''
-                    });
+                    };
+                    
+                    console.log('New utilityForm:', newUtilityForm);
+                    
+                    setUtilityForm(newUtilityForm);
+                    
+                    // Verify after state update
+                    setTimeout(() => {
+                      console.log('UtilityForm after update:', utilityForm);
+                    }, 100);
+                    
+                    console.log('=== END ROOM SELECTION DEBUG ===');
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
@@ -2406,7 +2425,12 @@ const KtxView = () => {
                           <td className="py-2 px-2 text-xs text-gray-600">{reading.notes}</td>
                           <td className="py-2 px-2">
                             <button
-                              onClick={() => handleViewReadingDetails(utilityForm.roomNumber, reading, index)}
+                              onClick={() => {
+                                console.log('Eye icon clicked for reading:', { utilityForm, reading, index });
+                                const roomNumber = utilityForm.roomNumber || (rooms.find(r => r.id === utilityForm.roomId)?.roomNumber);
+                                console.log('Resolved roomNumber:', roomNumber);
+                                handleViewReadingDetails(roomNumber, reading, index);
+                              }}
                               className="text-purple-600 hover:text-purple-800"
                               title="Xem chi tiết"
                             >
