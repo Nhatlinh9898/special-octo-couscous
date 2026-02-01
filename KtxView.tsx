@@ -116,6 +116,12 @@ const KtxView = () => {
     status: 'Pending' as 'Pending' | 'Approved' | 'Rejected'
   });
 
+  // Get selected room details
+  const getSelectedRoomDetails = () => {
+    if (!registrationForm.roomNumber) return null;
+    return rooms.find(r => r.roomNumber === registrationForm.roomNumber);
+  };
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -1292,14 +1298,29 @@ const KtxView = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="">-- Chọn phòng --</option>
-                  {rooms.filter(r => r.status === 'Available').map(room => (
-                    <option key={room.id} value={room.roomNumber}>
-                      {room.roomNumber} - {room.type} - {room.price.toLocaleString()}đ/tháng
-                    </option>
-                  ))}
+                  {rooms.map(room => {
+                    const availableSpots = room.capacity - room.currentOccupancy;
+                    const statusText = room.status === 'Available' ? 'Trống' : 
+                                     room.status === 'Occupied' ? 'Đã ở' : 
+                                     room.status === 'Maintenance' ? 'Bảo trì' : 'Đặt trước';
+                    const canRegister = availableSpots > 0 && room.status !== 'Maintenance';
+                    
+                    return (
+                      <option 
+                        key={room.id} 
+                        value={room.roomNumber}
+                        disabled={!canRegister}
+                        className={!canRegister ? 'text-gray-400' : ''}
+                      >
+                        {room.roomNumber} - {room.type} - {room.price.toLocaleString()}đ/tháng 
+                        ({room.currentOccupancy}/{room.capacity} người) - {statusText}
+                        {!canRegister && ' - Hết chỗ'}
+                      </option>
+                    );
+                  })}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Chỉ hiển thị phòng trống
+                  Hiển thị tất cả phòng. Phòng màu xám không thể đăng ký.
                 </p>
               </div>
               <div>
@@ -1312,6 +1333,39 @@ const KtxView = () => {
                 />
               </div>
             </div>
+            
+            {/* Room Details Box */}
+            {getSelectedRoomDetails() && (
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <h4 className="font-semibold text-blue-800 mb-2">Thông tin phòng đã chọn</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm text-blue-700">
+                  <div>
+                    <p><strong>Phòng:</strong> {getSelectedRoomDetails()?.roomNumber}</p>
+                    <p><strong>Loại:</strong> {getSelectedRoomDetails()?.type}</p>
+                    <p><strong>Khu:</strong> {getSelectedRoomDetails()?.area}</p>
+                    <p><strong>Tầng:</strong> {getSelectedRoomDetails()?.floor}</p>
+                  </div>
+                  <div>
+                    <p><strong>Sức chứa:</strong> {getSelectedRoomDetails()?.capacity} người</p>
+                    <p><strong>Đã có:</strong> {getSelectedRoomDetails()?.currentOccupancy} người</p>
+                    <p><strong>Còn trống:</strong> {(getSelectedRoomDetails()?.capacity || 0) - (getSelectedRoomDetails()?.currentOccupancy || 0)} người</p>
+                    <p><strong>Giá:</strong> {getSelectedRoomDetails()?.price?.toLocaleString()}đ/tháng</p>
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <p><strong>Tiện ích:</strong> {getSelectedRoomDetails()?.facilities?.join(', ')}</p>
+                </div>
+                {((getSelectedRoomDetails()?.capacity || 0) - (getSelectedRoomDetails()?.currentOccupancy || 0)) > 0 ? (
+                  <div className="mt-2 p-2 bg-green-100 rounded text-green-800 text-sm">
+                    ✅ Phòng còn chỗ trống, có thể đăng ký
+                  </div>
+                ) : (
+                  <div className="mt-2 p-2 bg-red-100 rounded text-red-800 text-sm">
+                    ❌ Phòng đã đầy hoặc đang bảo trì, không thể đăng ký
+                  </div>
+                )}
+              </div>
+            )}
             
             <div className="grid grid-cols-2 gap-4">
               <div>
