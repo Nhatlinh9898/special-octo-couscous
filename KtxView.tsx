@@ -411,67 +411,101 @@ const KtxView = () => {
   };
 
   const handleCreateAllRooms = () => {
-    if (confirm('Bạn có chắc chắn muốn tạo tất cả phòng còn thiếu? Hành động này sẽ tạo 500 phòng (200 Khu A + 300 Khu B) với trạng thái "Trống".')) {
-      const newRooms: Room[] = [];
-      let newId = Math.max(...rooms.map(r => r.id), 0) + 1;
-      
-      // Create all Area A rooms (10 floors × 20 rooms = 200 rooms)
-      for (let floor = 1; floor <= 10; floor++) {
-        for (let room = 1; room <= 20; room++) {
-          const roomNumber = `A${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
-          
-          // Check if room already exists
-          if (!rooms.find(r => r.roomNumber === roomNumber)) {
-            const roomType = floor <= 3 ? 'Premium' : floor <= 7 ? 'Standard' : 'VIP';
-            const price = roomType === 'VIP' ? 2000000 : roomType === 'Premium' ? 1500000 : 1200000;
+    try {
+      if (confirm('Bạn có chắc chắn muốn tạo tất cả phòng còn thiếu? Hành động này sẽ tạo 500 phòng (200 Khu A + 300 Khu B) với trạng thái "Trống".')) {
+        const newRooms: Room[] = [];
+        const maxId = rooms.length > 0 ? Math.max(...rooms.map(r => r.id)) : 0;
+        let newId = maxId + 1;
+        
+        console.log('Starting room creation. Current rooms:', rooms.length);
+        
+        // Create all Area A rooms (10 floors × 20 rooms = 200 rooms)
+        for (let floor = 1; floor <= 10; floor++) {
+          for (let room = 1; room <= 20; room++) {
+            const roomNumber = `A${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
             
-            newRooms.push({
-              id: newId++,
-              roomNumber,
-              area: 'A',
-              floor,
-              capacity: 4,
-              currentOccupancy: 0,
-              type: roomType as 'Standard' | 'Premium' | 'VIP',
-              status: 'Available',
-              price,
-              facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
-              students: []
-            });
+            // Check if room already exists
+            if (!rooms.find(r => r.roomNumber === roomNumber)) {
+              const roomType = floor <= 3 ? 'Premium' : floor <= 7 ? 'Standard' : 'VIP';
+              const price = roomType === 'VIP' ? 2000000 : roomType === 'Premium' ? 1500000 : 1200000;
+              
+              newRooms.push({
+                id: newId++,
+                roomNumber,
+                area: 'A',
+                floor,
+                capacity: 4,
+                currentOccupancy: 0,
+                type: roomType as 'Standard' | 'Premium' | 'VIP',
+                status: 'Available',
+                price,
+                facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
+                students: []
+              });
+            }
           }
         }
-      }
-      
-      // Create all Area B rooms (10 floors × 25 rooms = 300 rooms)
-      for (let floor = 1; floor <= 10; floor++) {
-        for (let room = 1; room <= 25; room++) {
-          const roomNumber = `B${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
-          
-          // Check if room already exists
-          if (!rooms.find(r => r.roomNumber === roomNumber)) {
-            const roomType = floor <= 3 ? 'VIP' : floor <= 7 ? 'Premium' : 'Standard';
-            const price = roomType === 'VIP' ? 1800000 : roomType === 'Premium' ? 1300000 : 1000000;
+        
+        // Create all Area B rooms (10 floors × 25 rooms = 300 rooms)
+        for (let floor = 1; floor <= 10; floor++) {
+          for (let room = 1; room <= 25; room++) {
+            const roomNumber = `B${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
             
-            newRooms.push({
-              id: newId++,
-              roomNumber,
-              area: 'B',
-              floor,
-              capacity: 6,
-              currentOccupancy: 0,
-              type: roomType as 'Standard' | 'Premium' | 'VIP',
-              status: 'Available',
-              price,
-              facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
-              students: []
-            });
+            // Check if room already exists
+            if (!rooms.find(r => r.roomNumber === roomNumber)) {
+              const roomType = floor <= 3 ? 'VIP' : floor <= 7 ? 'Premium' : 'Standard';
+              const price = roomType === 'VIP' ? 1800000 : roomType === 'Premium' ? 1300000 : 1000000;
+              
+              newRooms.push({
+                id: newId++,
+                roomNumber,
+                area: 'B',
+                floor,
+                capacity: 6,
+                currentOccupancy: 0,
+                type: roomType as 'Standard' | 'Premium' | 'VIP',
+                status: 'Available',
+                price,
+                facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
+                students: []
+              });
+            }
           }
         }
+        
+        console.log('Created rooms:', newRooms.length);
+        
+        // Add all new rooms to existing rooms
+        setRooms([...rooms, ...newRooms]);
+        alert(`Đã tạo thành công ${newRooms.length} phòng mới!`);
       }
+    } catch (error) {
+      console.error('Error creating rooms:', error);
+      alert('Có lỗi xảy ra khi tạo phòng. Vui lòng thử lại!');
+    }
+  };
+
+  const handleTestCreateRoom = () => {
+    try {
+      const testRoom: Room = {
+        id: rooms.length > 0 ? Math.max(...rooms.map(r => r.id)) + 1 : 1,
+        roomNumber: 'TEST001',
+        area: 'A',
+        floor: 1,
+        capacity: 4,
+        currentOccupancy: 0,
+        type: 'Standard',
+        status: 'Available',
+        price: 1200000,
+        facilities: ['Điều hòa', 'Tủ lạnh'],
+        students: []
+      };
       
-      // Add all new rooms to existing rooms
-      setRooms([...rooms, ...newRooms]);
-      alert(`Đã tạo thành công ${newRooms.length} phòng mới!`);
+      setRooms([...rooms, testRoom]);
+      alert('Đã tạo phòng test thành công!');
+    } catch (error) {
+      console.error('Test error:', error);
+      alert('Lỗi test: ' + error);
     }
   };
 
@@ -658,6 +692,13 @@ const KtxView = () => {
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Quản lý phòng</h3>
               <div className="flex gap-2">
+                <Button 
+                  variant="secondary" 
+                  onClick={handleTestCreateRoom}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                >
+                  <Plus size={20}/> Test tạo 1 phòng
+                </Button>
                 <Button 
                   variant="secondary" 
                   onClick={handleCreateAllRooms}
