@@ -106,6 +106,16 @@ const KtxView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  // Registration form state
+  const [registrationForm, setRegistrationForm] = useState({
+    studentId: '',
+    studentName: '',
+    roomNumber: '',
+    registrationDate: new Date().toISOString().split('T')[0],
+    duration: 6, // months
+    status: 'Pending' as 'Pending' | 'Approved' | 'Rejected'
+  });
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -413,6 +423,35 @@ const KtxView = () => {
       facilities: ['Điều hòa', 'Tủ lạnh']
     });
     setShowRoomModal(false);
+  };
+
+  const handleAddRegistration = () => {
+    console.log('Adding registration:', registrationForm);
+    alert(`Đã tạo đăng ký cho sinh viên ${registrationForm.studentName} vào phòng ${registrationForm.roomNumber}!`);
+    
+    // Reset form and close modal
+    setRegistrationForm({
+      studentId: '',
+      studentName: '',
+      roomNumber: '',
+      registrationDate: new Date().toISOString().split('T')[0],
+      duration: 6,
+      status: 'Pending'
+    });
+    setShowRegistrationModal(false);
+  };
+
+  const handleCloseRegistrationModal = () => {
+    // Reset form when closing modal
+    setRegistrationForm({
+      studentId: '',
+      studentName: '',
+      roomNumber: '',
+      registrationDate: new Date().toISOString().split('T')[0],
+      duration: 6,
+      status: 'Pending'
+    });
+    setShowRegistrationModal(false);
   };
 
   const handleDeleteRoom = (roomId: number) => {
@@ -1211,6 +1250,111 @@ const KtxView = () => {
               </Button>
               <Button onClick={handleAddRoom}>
                 {selectedRoom ? 'Cập nhật' : 'Thêm'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Registration Modal */}
+      {showRegistrationModal && (
+        <Modal isOpen={showRegistrationModal} onClose={handleCloseRegistrationModal} title="Đăng ký phòng mới">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mã sinh viên</label>
+                <input
+                  type="text"
+                  value={registrationForm.studentId}
+                  onChange={(e) => setRegistrationForm({...registrationForm, studentId: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  placeholder="SV001"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Họ tên sinh viên</label>
+                <input
+                  type="text"
+                  value={registrationForm.studentName}
+                  onChange={(e) => setRegistrationForm({...registrationForm, studentName: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  placeholder="Nguyễn Văn A"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phòng đăng ký</label>
+                <select
+                  value={registrationForm.roomNumber}
+                  onChange={(e) => setRegistrationForm({...registrationForm, roomNumber: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">-- Chọn phòng --</option>
+                  {rooms.filter(r => r.status === 'Available').map(room => (
+                    <option key={room.id} value={room.roomNumber}>
+                      {room.roomNumber} - {room.type} - {room.price.toLocaleString()}đ/tháng
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Chỉ hiển thị phòng trống
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian đăng ký</label>
+                <input
+                  type="date"
+                  value={registrationForm.registrationDate}
+                  onChange={(e) => setRegistrationForm({...registrationForm, registrationDate: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian thuê (tháng)</label>
+                <input
+                  type="number"
+                  value={registrationForm.duration}
+                  onChange={(e) => setRegistrationForm({...registrationForm, duration: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="1"
+                  max="12"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                <select
+                  value={registrationForm.status}
+                  onChange={(e) => setRegistrationForm({...registrationForm, status: e.target.value as 'Pending' | 'Approved' | 'Rejected'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="Pending">Chờ duyệt</option>
+                  <option value="Approved">Đã duyệt</option>
+                  <option value="Rejected">Từ chối</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="font-semibold text-blue-800 mb-2">Thông tin đăng ký</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p>• Sinh viên: {registrationForm.studentName || 'Chưa nhập'}</p>
+                <p>• Phòng: {registrationForm.roomNumber || 'Chưa chọn'}</p>
+                <p>• Thời gian: {registrationForm.duration} tháng</p>
+                <p>• Trạng thái: {registrationForm.status === 'Pending' ? 'Chờ duyệt' : registrationForm.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="secondary" onClick={handleCloseRegistrationModal}>
+                Hủy
+              </Button>
+              <Button onClick={handleAddRegistration}>
+                Tạo đăng ký
               </Button>
             </div>
           </div>
