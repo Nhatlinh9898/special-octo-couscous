@@ -102,20 +102,21 @@ const KtxView = () => {
   // State for tracking newly created rooms
   const [newlyCreatedRooms, setNewlyCreatedRooms] = useState<number[]>([]);
 
+  // Initialize mock data
+  useEffect(() => {
+    initializeMockData();
+  }, []);
+
   // Auto-clear highlights after 5 seconds
   useEffect(() => {
     if (newlyCreatedRooms.length > 0) {
       const timer = setTimeout(() => {
         setNewlyCreatedRooms([]);
+        console.log('Auto-cleared highlights');
       }, 5000);
       return () => clearTimeout(timer);
     }
   }, [newlyCreatedRooms]);
-
-  // Initialize mock data
-  useEffect(() => {
-    initializeMockData();
-  }, []);
 
   const initializeMockData = () => {
     // Generate 200 rooms for Area A
@@ -505,6 +506,7 @@ const KtxView = () => {
 
   const handleTestCreateRoom = () => {
     try {
+      console.log('Creating test room...');
       const testRoom: Room = {
         id: rooms.length > 0 ? Math.max(...rooms.map(r => r.id)) + 1 : 1,
         roomNumber: 'TEST001',
@@ -519,8 +521,10 @@ const KtxView = () => {
         students: []
       };
       
+      console.log('Test room created:', testRoom);
       setRooms([...rooms, testRoom]);
       setNewlyCreatedRooms([testRoom.id]);
+      console.log('Set newly created rooms:', [testRoom.id]);
       alert('Đã tạo phòng test thành công! Phòng mới được đánh dấu màu xanh.');
     } catch (error) {
       console.error('Test error:', error);
@@ -789,18 +793,21 @@ const KtxView = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRooms.slice(0, 10).map(room => (
+                  {filteredRooms.slice(0, 10).map(room => {
+                    const isNewlyCreated = newlyCreatedRooms.includes(room.id);
+                    console.log(`Room ${room.roomNumber} - ID: ${room.id} - Is New: ${isNewlyCreated}`);
+                    return (
                     <tr 
                       key={room.id} 
                       className={`border-b border-gray-100 hover:bg-gray-50 ${
-                        newlyCreatedRooms.includes(room.id) 
+                        isNewlyCreated
                           ? 'bg-green-50 border-green-300 animate-pulse' 
                           : ''
                       }`}
                     >
                       <td className="py-3 px-4 font-medium">
                         {room.roomNumber}
-                        {newlyCreatedRooms.includes(room.id) && (
+                        {isNewlyCreated && (
                           <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full animate-bounce">
                             Mới
                           </span>
@@ -855,7 +862,8 @@ const KtxView = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
