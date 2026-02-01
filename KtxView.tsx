@@ -95,6 +95,7 @@ const KtxView = () => {
     capacity: 4,
     type: 'Standard' as 'Standard' | 'Premium' | 'VIP',
     price: 1200000,
+    status: 'Available' as 'Available' | 'Occupied' | 'Maintenance' | 'Reserved',
     facilities: ['Điều hòa', 'Tủ lạnh']
   });
 
@@ -275,9 +276,9 @@ const KtxView = () => {
       area: roomForm.area,
       floor: roomForm.floor,
       capacity: roomForm.capacity,
-      currentOccupancy: 0,
+      currentOccupancy: roomForm.status === 'Occupied' ? 1 : 0,
       type: roomForm.type,
-      status: 'Available',
+      status: roomForm.status,
       price: roomForm.price,
       facilities: roomForm.facilities,
       students: []
@@ -294,6 +295,7 @@ const KtxView = () => {
       capacity: 4,
       type: 'Standard',
       price: 1200000,
+      status: 'Available',
       facilities: ['Điều hòa', 'Tủ lạnh']
     });
     setShowRoomModal(false);
@@ -357,6 +359,7 @@ const KtxView = () => {
       capacity: room.capacity,
       type: room.type,
       price: room.price,
+      status: room.status,
       facilities: room.facilities
     });
     setShowRoomModal(true);
@@ -372,6 +375,7 @@ const KtxView = () => {
       capacity: 4,
       type: 'Standard',
       price: 1200000,
+      status: 'Available',
       facilities: ['Điều hòa', 'Tủ lạnh']
     });
     setShowRoomModal(true);
@@ -387,6 +391,7 @@ const KtxView = () => {
       capacity: 4,
       type: 'Standard',
       price: 1200000,
+      status: 'Available',
       facilities: ['Điều hòa', 'Tủ lạnh']
     });
     setShowRoomModal(false);
@@ -874,20 +879,6 @@ const KtxView = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sức chứa</label>
-                <input
-                  type="number"
-                  value={roomForm.capacity}
-                  onChange={(e) => setRoomForm({...roomForm, capacity: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  min="1"
-                  max="8"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Loại phòng</label>
                 <select
                   value={roomForm.type}
@@ -899,6 +890,9 @@ const KtxView = () => {
                   <option value="VIP">VIP</option>
                 </select>
               </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Giá phòng (VNĐ)</label>
                 <input
@@ -907,6 +901,36 @@ const KtxView = () => {
                   onChange={(e) => setRoomForm({...roomForm, price: parseInt(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min="0"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                <select
+                  value={roomForm.status}
+                  onChange={(e) => setRoomForm({...roomForm, status: e.target.value as 'Available' | 'Occupied' | 'Maintenance' | 'Reserved'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="Available">Trống</option>
+                  <option value="Occupied">Đã ở</option>
+                  <option value="Maintenance">Bảo trì</option>
+                  <option value="Reserved">Đặt trước</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {roomForm.status === 'Occupied' ? 'Sẽ tự động đặt 1 người đang ở' : 'Số người đang ở: 0'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sức chứa</label>
+                <input
+                  type="number"
+                  value={roomForm.capacity}
+                  onChange={(e) => setRoomForm({...roomForm, capacity: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="1"
+                  max="8"
                 />
               </div>
             </div>
