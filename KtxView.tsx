@@ -694,8 +694,14 @@ const KtxView = () => {
 
   // Handle image capture and meter reading
   const handleImageCapture = (meterType: 'electricity' | 'water') => {
+    console.log('handleImageCapture called with meterType:', meterType);
+    console.log('Current utilityForm:', utilityForm);
+    
     const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+    console.log('Selected room:', selectedRoom);
+    
     if (!selectedRoom) {
+      console.log('No selected room found');
       alert('❌ Vui lòng chọn phòng trước khi chụp công-tơ!');
       return;
     }
@@ -704,10 +710,17 @@ const KtxView = () => {
     const roomHistory = meterHistory[roomNumber] || [];
     const currentDate = new Date().toISOString().split('T')[0];
     
+    console.log('Room number:', roomNumber);
+    console.log('Room history:', roomHistory);
+    console.log('Current date:', currentDate);
+    
     // Get last reading from history
     const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
     const previousElectricity = lastReading ? lastReading.electricityReading : 0;
     const previousWater = lastReading ? lastReading.waterReading : 0;
+    
+    console.log('Last reading:', lastReading);
+    console.log('Previous readings:', { previousElectricity, previousWater });
     
     // Update display state immediately
     setMeterReadings(prev => ({
@@ -716,12 +729,17 @@ const KtxView = () => {
       previousWater
     }));
     
+    console.log('Updated meter readings state');
+    
     // Simulate current reading (in real app, this would come from image OCR)
     let currentElectricity, currentWater;
     
     if (meterType === 'electricity') {
+      console.log('Processing electricity meter capture');
       currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
       currentWater = previousWater || 0;
+      
+      console.log('Generated current electricity reading:', currentElectricity);
       
       // Update current reading state
       setMeterReadings(prev => ({
@@ -729,6 +747,8 @@ const KtxView = () => {
         currentElectricity,
         electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`
       }));
+      
+      console.log('Updated current electricity reading');
       
       // Update history
       const newReading = {
@@ -739,23 +759,34 @@ const KtxView = () => {
         notes: `Chụp ngày ${currentDate}`
       };
       
+      console.log('New electricity reading to add:', newReading);
+      
       setMeterHistory(prev => ({
         ...prev,
         [roomNumber]: [...(prev[roomNumber] || []), newReading]
       }));
       
+      console.log('Updated meter history for room:', roomNumber);
+      
       // Update utility form with calculated usage
       const usage = currentElectricity - previousElectricity;
+      console.log('Calculated electricity usage:', usage);
+      
       setUtilityForm(prev => ({
         ...prev,
         electricity: Math.max(0, usage)
       }));
       
+      console.log('Updated utility form with electricity usage');
+      
       alert(`📸 Đã chụp công-tơ điện phòng ${roomNumber}!\n\nChỉ số trước: ${previousElectricity} kWh\nChỉ số hiện tại: ${currentElectricity} kWh\nTiêu thụ kỳ này: ${usage} kWh\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
       
     } else {
+      console.log('Processing water meter capture');
       currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
       currentElectricity = previousElectricity || 0;
+      
+      console.log('Generated current water reading:', currentWater);
       
       // Update current reading state
       setMeterReadings(prev => ({
@@ -763,6 +794,8 @@ const KtxView = () => {
         currentWater,
         waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`
       }));
+      
+      console.log('Updated current water reading');
       
       // Update history
       const newReading = {
@@ -773,20 +806,30 @@ const KtxView = () => {
         notes: `Chụp ngày ${currentDate}`
       };
       
+      console.log('New water reading to add:', newReading);
+      
       setMeterHistory(prev => ({
         ...prev,
         [roomNumber]: [...(prev[roomNumber] || []), newReading]
       }));
       
+      console.log('Updated meter history for room:', roomNumber);
+      
       // Update utility form with calculated usage
       const usage = currentWater - previousWater;
+      console.log('Calculated water usage:', usage);
+      
       setUtilityForm(prev => ({
         ...prev,
         water: Math.max(0, usage)
       }));
       
+      console.log('Updated utility form with water usage');
+      
       alert(`📸 Đã chụp đồng hồ nước phòng ${roomNumber}!\n\nChỉ số trước: ${previousWater} m³\nChỉ số hiện tại: ${currentWater} m³\nTiêu thụ kỳ này: ${usage} m³\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
     }
+    
+    console.log('handleImageCapture completed successfully');
   };
 
   // Get last reading for selected room - FIXED
