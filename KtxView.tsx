@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock } from 'lucide-react';
+import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock, Camera } from 'lucide-react';
 import { Button, Modal } from './components';
 
 // Interfaces
@@ -141,6 +141,16 @@ const KtxView = () => {
     waterCost: 25000,
     totalAmount: 0,
     status: 'Unpaid' as 'Paid' | 'Unpaid' | 'Overdue'
+  });
+
+  // Meter reading state
+  const [meterReadings, setMeterReadings] = useState({
+    previousElectricity: 0,
+    currentElectricity: 0,
+    previousWater: 0,
+    currentWater: 0,
+    electricityImage: '',
+    waterImage: ''
   });
 
   // Mock current user state (in real app, this would come from authentication)
@@ -619,6 +629,70 @@ const KtxView = () => {
     });
     setShowUtilityModal(false);
   };
+
+  // Handle image capture and meter reading
+  const handleImageCapture = (meterType: 'electricity' | 'water') => {
+    // In a real app, this would open camera or file picker
+    // For demo, we'll simulate with random numbers
+    if (meterType === 'electricity') {
+      const previousReading = meterReadings.previousElectricity || Math.floor(Math.random() * 1000);
+      const currentReading = previousReading + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
+      
+      setMeterReadings(prev => ({
+        ...prev,
+        previousElectricity: previousReading,
+        currentElectricity: currentReading,
+        electricityImage: `electricity_meter_${Date.now()}.jpg`
+      }));
+      
+      // Update utility form with calculated usage
+      const usage = currentReading - previousReading;
+      setUtilityForm(prev => ({
+        ...prev,
+        electricity: usage
+      }));
+      
+      alert(`📸 Đã chụp công-tơ điện!\n\nChỉ số trước: ${previousReading} kWh\nChỉ số hiện tại: ${currentReading} kWh\nTiêu thụ: ${usage} kWh\n\nSố liệu đã được tự động cập nhật!`);
+    } else {
+      const previousReading = meterReadings.previousWater || Math.floor(Math.random() * 100);
+      const currentReading = previousReading + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
+      
+      setMeterReadings(prev => ({
+        ...prev,
+        previousWater: previousReading,
+        currentWater: currentReading,
+        waterImage: `water_meter_${Date.now()}.jpg`
+      }));
+      
+      // Update utility form with calculated usage
+      const usage = currentReading - previousReading;
+      setUtilityForm(prev => ({
+        ...prev,
+        water: usage
+      }));
+      
+      alert(`📸 Đã chụp đồng hồ nước!\n\nChỉ số trước: ${previousReading} m³\nChỉ số hiện tại: ${currentReading} m³\nTiêu thụ: ${usage} m³\n\nSố liệu đã được tự động cập nhật!`);
+    }
+  };
+
+  // Calculate usage from meter readings
+  const calculateUsage = () => {
+    const electricityUsage = meterReadings.currentElectricity - meterReadings.previousElectricity;
+    const waterUsage = meterReadings.currentWater - meterReadings.previousWater;
+    
+    setUtilityForm(prev => ({
+      ...prev,
+      electricity: Math.max(0, electricityUsage),
+      water: Math.max(0, waterUsage)
+    }));
+  };
+
+  // Auto-calculate when meter readings change
+  useEffect(() => {
+    if (meterReadings.currentElectricity > 0 && meterReadings.previousElectricity > 0) {
+      calculateUsage();
+    }
+  }, [meterReadings.currentElectricity, meterReadings.previousElectricity, meterReadings.currentWater, meterReadings.previousWater]);
 
   const handleDeleteRoom = (roomId: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
@@ -1970,6 +2044,71 @@ const KtxView = () => {
                   <p>• Đọc đồng hồ nước: <code>8.7 m³</code></p>
                   <p>• Thành tiền: <code>294.600đ + 217.500đ = 512.100đ</code></p>
                 </div>
+              </div>
+            </div>
+            
+            {/* Smart Meter Reading Section */}
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h4 className="font-semibold text-green-800 mb-3">📸 Chụp hình công-tơ (Tự động tính toán)</h4>
+              
+              {/* Electricity Meter */}
+              <div className="mb-4 p-3 bg-white rounded-lg border border-green-200">
+                <div className="flex justify-between items-center mb-2">
+                  <h5 className="font-medium text-green-700">⚡ Công-tơ điện</h5>
+                  <button
+                    onClick={() => handleImageCapture('electricity')}
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                  >
+                    <Camera size={14} /> Chụp công-tơ
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-600">Chỉ số trước:</span>
+                    <span className="ml-2 font-medium">{meterReadings.previousElectricity || 0} kWh</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Chỉ số hiện tại:</span>
+                    <span className="ml-2 font-medium">{meterReadings.currentElectricity || 0} kWh</span>
+                  </div>
+                </div>
+                {meterReadings.electricityImage && (
+                  <div className="mt-2 text-xs text-green-600">
+                    📸 Đã chụp: {meterReadings.electricityImage}
+                  </div>
+                )}
+              </div>
+              
+              {/* Water Meter */}
+              <div className="p-3 bg-white rounded-lg border border-green-200">
+                <div className="flex justify-between items-center mb-2">
+                  <h5 className="font-medium text-green-700">💧 Đồng hồ nước</h5>
+                  <button
+                    onClick={() => handleImageCapture('water')}
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                  >
+                    <Camera size={14} /> Chụp đồng hồ
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-600">Chỉ số trước:</span>
+                    <span className="ml-2 font-medium">{meterReadings.previousWater || 0} m³</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Chỉ số hiện tại:</span>
+                    <span className="ml-2 font-medium">{meterReadings.currentWater || 0} m³</span>
+                  </div>
+                </div>
+                {meterReadings.waterImage && (
+                  <div className="mt-2 text-xs text-green-600">
+                    📸 Đã chụp: {meterReadings.waterImage}
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-3 p-2 bg-green-100 rounded text-xs text-green-700">
+                💡 <strong>Thông minh:</strong> Chụp hình công-tơ sẽ tự động tính toán lượng tiêu thụ và điền vào form!
               </div>
             </div>
             
