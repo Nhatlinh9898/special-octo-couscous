@@ -759,13 +759,22 @@ const KtxView = () => {
     }
   };
 
-  // Get last reading for selected room
+  // Get last reading for selected room - FIXED
   const getLastReading = () => {
     const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
-    if (!selectedRoom) return null;
+    if (!selectedRoom) {
+      console.log('No selected room found');
+      return null;
+    }
     
-    const roomHistory = meterHistory[selectedRoom.roomNumber] || [];
-    return roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+    const roomNumber = selectedRoom.roomNumber;
+    const roomHistory = meterHistory[roomNumber] || [];
+    console.log('Room history for', roomNumber, ':', roomHistory);
+    
+    const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+    console.log('Last reading:', lastReading);
+    
+    return lastReading;
   };
 
   // Calculate usage based on billing period
@@ -822,15 +831,28 @@ const KtxView = () => {
     }
   }, [utilityForm.roomId, utilityForm.month]);
 
-  // Update display when room changes
+  // Update display when room changes - FIXED
   useEffect(() => {
-    const lastReading = getLastReading();
-    if (lastReading) {
-      setMeterReadings(prev => ({
-        ...prev,
-        previousElectricity: lastReading.electricityReading,
-        previousWater: lastReading.waterReading
-      }));
+    if (utilityForm.roomId) {
+      const lastReading = getLastReading();
+      if (lastReading) {
+        setMeterReadings(prev => ({
+          ...prev,
+          previousElectricity: lastReading.electricityReading,
+          previousWater: lastReading.waterReading
+        }));
+        console.log('Updated meter readings from history:', {
+          previousElectricity: lastReading.electricityReading,
+          previousWater: lastReading.waterReading
+        });
+      } else {
+        // Reset to 0 if no history
+        setMeterReadings(prev => ({
+          ...prev,
+          previousElectricity: 0,
+          previousWater: 0
+        }));
+      }
     }
   }, [utilityForm.roomId]);
 
@@ -2342,6 +2364,29 @@ const KtxView = () => {
               <div className="mt-3 p-2 bg-green-100 rounded text-xs text-green-700">
                 💡 <strong>Thông minh:</strong> Chụp hình công-tơ sẽ tự động tính toán lượng tiêu thụ và điền vào form!
               </div>
+            </div>
+            
+            {/* Test Button */}
+            <div className="mt-2 p-2 bg-red-50 rounded border border-red-200">
+              <button
+                onClick={() => {
+                  console.log('Test button clicked');
+                  console.log('Current utilityForm.roomId:', utilityForm.roomId);
+                  console.log('Current meterHistory:', meterHistory);
+                  
+                  if (utilityForm.roomNumber && meterHistory[utilityForm.roomNumber]) {
+                    const firstReading = meterHistory[utilityForm.roomNumber][0];
+                    console.log('Testing with first reading:', firstReading);
+                    handleViewReadingDetails(utilityForm.roomNumber, firstReading, 0);
+                  } else {
+                    console.log('No room selected or no history');
+                    alert('Vui lòng chọn phòng có lịch sử để test!');
+                  }
+                }}
+                className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+              >
+                🧪 Test Detail View
+              </button>
             </div>
             
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
