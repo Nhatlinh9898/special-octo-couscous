@@ -722,22 +722,40 @@ const KtxView = () => {
     console.log('Last reading:', lastReading);
     console.log('Previous readings:', { previousElectricity, previousWater });
     
-    // Update display state immediately
-    setMeterReadings(prev => ({
-      ...prev,
-      previousElectricity,
-      previousWater
-    }));
+    // Check if we already captured this meter type today
+    const todayReadings = roomHistory.filter(r => r.date === currentDate);
+    const alreadyCapturedElectricity = todayReadings.some(r => r.electricityImage);
+    const alreadyCapturedWater = todayReadings.some(r => r.waterImage);
     
-    console.log('Updated meter readings state');
+    console.log('Today readings:', todayReadings);
+    console.log('Already captured electricity:', alreadyCapturedElectricity);
+    console.log('Already captured water:', alreadyCapturedWater);
+    
+    // Prevent duplicate capture for same meter type on same day
+    if (meterType === 'electricity' && alreadyCapturedElectricity) {
+      alert('⚠️ Đã chụp công-tơ điện cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentElectricity + ' kWh\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
+      return;
+    }
+    
+    if (meterType === 'water' && alreadyCapturedWater) {
+      alert('⚠️ Đã chụp đồng hồ nước cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentWater + ' m³\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
+      return;
+    }
+    
+    // Preserve the other meter's current reading when switching
+    let currentElectricity = meterReadings.currentElectricity;
+    let currentWater = meterReadings.currentWater;
+    let electricityImage = meterReadings.electricityImage;
+    let waterImage = meterReadings.waterImage;
+    
+    console.log('Preserving current readings:', { currentElectricity, currentWater });
     
     // Simulate current reading (in real app, this would come from image OCR)
-    let currentElectricity, currentWater;
-    
     if (meterType === 'electricity') {
       console.log('Processing electricity meter capture');
       currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
-      currentWater = previousWater || 0;
+      // Keep water reading unchanged
+      electricityImage = `electricity_meter_${roomNumber}_${Date.now()}.jpg`;
       
       console.log('Generated current electricity reading:', currentElectricity);
       
@@ -745,7 +763,7 @@ const KtxView = () => {
       setMeterReadings(prev => ({
         ...prev,
         currentElectricity,
-        electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`
+        electricityImage
       }));
       
       console.log('Updated current electricity reading');
@@ -754,8 +772,8 @@ const KtxView = () => {
       const newReading = {
         date: currentDate,
         electricityReading: currentElectricity,
-        waterReading: previousWater,
-        electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`,
+        waterReading: currentWater, // Keep existing water reading
+        electricityImage,
         notes: `Chụp ngày ${currentDate}`
       };
       
@@ -784,7 +802,8 @@ const KtxView = () => {
     } else {
       console.log('Processing water meter capture');
       currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
-      currentElectricity = previousElectricity || 0;
+      // Keep electricity reading unchanged
+      waterImage = `water_meter_${roomNumber}_${Date.now()}.jpg`;
       
       console.log('Generated current water reading:', currentWater);
       
@@ -792,7 +811,7 @@ const KtxView = () => {
       setMeterReadings(prev => ({
         ...prev,
         currentWater,
-        waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`
+        waterImage
       }));
       
       console.log('Updated current water reading');
@@ -800,9 +819,9 @@ const KtxView = () => {
       // Update history
       const newReading = {
         date: currentDate,
-        electricityReading: previousElectricity,
+        electricityReading: currentElectricity, // Keep existing electricity reading
         waterReading: currentWater,
-        waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`,
+        waterImage,
         notes: `Chụp ngày ${currentDate}`
       };
       
