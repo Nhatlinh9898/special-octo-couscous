@@ -92,12 +92,14 @@ const CounselingView = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showArticlesModal, setShowArticlesModal] = useState(false);
   const [showArticleDetailModal, setShowArticleDetailModal] = useState(false);
+  const [showCreateArticleModal, setShowCreateArticleModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   
   // AI
   const [isScreening, setIsScreening] = useState(false);
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
   const [showAIModal, setShowAIModal] = useState(false);
+  const [isGeneratingArticle, setIsGeneratingArticle] = useState(false);
   
   // Auto-scheduling state
   const [availableCounselors, setAvailableCounselors] = useState<Counselor[]>([]);
@@ -117,6 +119,96 @@ const CounselingView = () => {
     preferredDate: '',
     preferredTime: ''
   });
+
+  // Article creation state
+  const [articleForm, setArticleForm] = useState({
+    title: '',
+    category: 'Tâm lý học đường',
+    topic: '',
+    targetAudience: 'Học sinh',
+    tone: 'Thân thiện',
+    length: 'Trung bình',
+    keywords: ''
+  });
+
+  // Articles state
+  const [articles, setArticles] = useState([
+    {
+      id: 1,
+      title: "Quản lý stress trong mùa thi cử",
+      summary: "Học cách nhận diện các dấu hiệu stress và áp dụng các kỹ thuật thư giãn hiệu quả để giữ tinh thần thoải mái trong giai đoạn quan trọng này.",
+      content: `# Quản lý stress trong mùa thi cử
+
+## Nhận diện dấu hiệu stress
+
+Stress trong mùa thi cử là một hiện tượng tâm lý bình thường, nhưng nếu không được quản lý tốt có thể ảnh hưởng tiêu cực đến kết quả học tập và sức khỏe.
+
+### Dấu hiệu nhận biết:
+- **Về thể chất:** Đau đầu, mệt mỏi, mất ngủ, tim đập nhanh
+- **Về cảm xúc:** Lo lắng, cáu kỉnh, buồn bã, dễ khóc
+- **Về hành vi:** Trốn tránh học tập, trì hoãn, ăn uống thất thường
+- **Về nhận thức:** Khó tập trung, trí nhớ suy giảm, tư duy tiêu cực
+
+## Kỹ thuật thư giãn hiệu quả
+
+### 1. Kỹ thuật hít thở sâu (4-7-8)
+1. Hít vào bằng mũi đếm 4 giây
+2. Giữ hơi thở đếm 7 giây  
+3. Thở ra từ từ bằng miệng đếm 8 giây
+4. Lặp lại 5-10 lần
+
+### 2. Thư giãn cơ bản tiến
+- Nằm ngửa, nhắm mắt
+- Từng nhóm cơ căng trong 5 giây rồi thả lỏng
+- Bắt đầu từ chân, đi lên dần đến đầu
+
+### 3. Tư duy tích cực
+- Thay đổi suy nghĩ tiêu cực thành tích cực
+- Tập trung vào giải pháp thay vì vấn đề
+- Nhắc nhở bản thân về những thành công đã đạt được
+
+## Lịch trình học tập hiệu quả
+
+### Nguyên tắc Pomodoro:
+- Học tập tập trung 25 phút
+- Nghỉ ngơi 5 phút
+- Sau 4 Pomodoro, nghỉ dài 15-30 phút
+
+### Môi trường học tập:
+- Không gian yên tĩnh, đủ ánh sáng
+- Để điện thoại ở phòng khác
+- Có nước lọc và đồ ăn nhẹ lành mạnh
+
+## Chăm sóc sức khỏe
+
+### Dinh dưỡng:
+- Ăn đủ 3 bữa, không bỏ bữa
+- Tăng cường rau xanh, trái cây
+- Hạn chế cà phê, nước ngọt có ga
+
+### Vận động:
+- Tập thể dục nhẹ nhàng 30 phút mỗi ngày
+- Đi bộ, yoga, hoặc các môn thể thao yêu thích
+- Vận động giúp giải tỏa stress hiệu quả
+
+## Khi nào cần tìm kiếm sự giúp đỡ?
+
+Hãy tìm đến chuyên gia tâm lý khi:
+- Stress kéo dài hơn 2 tuần
+- Ảnh hưởng nghiêm trọng đến cuộc sống hàng ngày
+- Có dấu hiệu trầm cảm (mất hứng thú, thay đổi cân nặng)
+- Có suy nghĩ tiêu cực về bản thân
+
+## Lời khuyên cuối cùng
+
+Hãy nhớ rằng stress không hoàn toàn xấu - nó có thể là động lực để bạn cố gắng hơn. Điều quan trọng là học cách quản lý stress một cách hiệu quả.
+
+Chúc các bạn vượt qua mùa thi thành công!`,
+      author: "Ts. Nguyễn Thị An",
+      date: "15/10/2024",
+      category: "Tâm lý học đường"
+    }
+  ]);
 
   useEffect(() => {
     api.getSessions().then(setSessions);
@@ -261,6 +353,111 @@ const CounselingView = () => {
     setShowArticleDetailModal(true);
   };
 
+  const handleCreateArticle = () => {
+    console.log('Create article button clicked');
+    setArticleForm({
+      title: '',
+      category: 'Tâm lý học đường',
+      topic: '',
+      targetAudience: 'Học sinh',
+      tone: 'Thân thiện',
+      length: 'Trung bình',
+      keywords: ''
+    });
+    setShowCreateArticleModal(true);
+  };
+
+  const handleAIGenerateArticle = async () => {
+    if (!articleForm.topic) {
+      alert('Vui lòng nhập chủ đề bài viết!');
+      return;
+    }
+
+    setIsGeneratingArticle(true);
+    
+    try {
+      // Simulate AI generation
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const generatedContent = `# ${articleForm.title || articleForm.topic}
+
+## Giới thiệu
+
+${articleForm.topic} là một vấn đề quan trọng cần được quan tâm trong đời sống học đường và phát triển cá nhân. Bài viết này sẽ cung cấp những thông tin hữu ích và thực tế cho ${articleForm.targetAudience.toLowerCase()}.
+
+## Nội dung chính
+
+### Phần 1: Hiểu đúng về vấn đề
+
+${articleForm.topic} ảnh hưởng trực tiếp đến sức khỏe tinh thần và hiệu quả học tập của học sinh. Việc nhận diện sớm và có biện pháp can thiệp kịp thời sẽ giúp các em vượt qua khó khăn này một cách hiệu quả.
+
+### Phần 2: Dấu hiệu nhận biết
+
+Các dấu hiệu cần lưu ý:
+- Thay đổi trong hành vi hàng ngày
+- Suy giảm kết quả học tập
+- Mất hứng thú với các hoạt động trước đây
+- Thay đổi trong giao tiếp xã hội
+
+### Phần 3: Giải pháp và biện pháp
+
+#### 3.1. Tự chăm sóc
+- Duy trì lối sống lành mạnh
+- Tập thể dục đều đặn
+- Ngủ đủ giấc
+- Dinh dưỡng cân bằng
+
+#### 3.2. Tìm kiếm sự hỗ trợ
+- Chia sẻ với gia đình, bạn bè
+- Tìm đến chuyên gia tư vấn
+- Tham gia các nhóm hỗ trợ
+
+#### 3.3. Kỹ năng đối phó
+- Kỹ thuật thư giãn
+- Quản lý thời gian hiệu quả
+- Tư duy tích cực
+
+### Phần 4: Lời khuyên thực tế
+
+Dưới đây là một số lời khuyên thực tế dành cho ${articleForm.targetAudience.toLowerCase()}:
+
+1. **Đừng ngần ngại tìm kiếm giúp đỡ:** Mọi người đều cần sự hỗ trợ đôi khi.
+2. **Chăm sóc bản thân:** Sức khỏe tinh thần quan trọng như sức khỏe thể chất.
+3. **Xây dựng mạng lưới hỗ trợ:** Xung quanh có những người quan tâm sẽ giúp bạn cảm thấy không cô đơn.
+4. **Kiên nhẫn với bản thân:** Quá trình cải thiện cần thời gian và sự kiên trì.
+
+## Kết luận
+
+${articleForm.topic} là một hành trình, không phải là đích đến. Quan trọng nhất là nhận thức được vấn đề và chủ động tìm kiếm giải pháp. Hãy nhớ rằng bạn không đơn độc và luôn có sự hỗ trợ xung quanh.
+
+---
+
+*Bài viết được tạo bởi AI với sự tư vấn từ các chuyên gia tâm lý có kinh nghiệm. Để được tư vấn chi tiết hơn, vui lòng liên hệ với trung tâm tư vấn của trường.*
+
+**Từ khóa:** ${articleForm.keywords || articleForm.topic}`;
+
+      const newArticle = {
+        id: Date.now(),
+        title: articleForm.title || articleForm.topic,
+        summary: `Bài viết về ${articleForm.topic} dành cho ${articleForm.targetAudience.toLowerCase()} với giọng văn ${articleForm.tone.toLowerCase()}.`,
+        content: generatedContent,
+        author: "AI Assistant",
+        date: new Date().toISOString().split('T')[0],
+        category: articleForm.category
+      };
+
+      setArticles(prev => [newArticle, ...prev]);
+      setShowCreateArticleModal(false);
+      alert('Đã tạo bài viết thành công bằng AI!');
+
+    } catch (error) {
+      console.error('Error generating article:', error);
+      alert('Có lỗi xảy ra khi tạo bài viết. Vui lòng thử lại!');
+    } finally {
+      setIsGeneratingArticle(false);
+    }
+  };
+
   const getStudentName = (id: number) => MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
 
   return (
@@ -288,6 +485,12 @@ const CounselingView = () => {
              onClick={handleArticles}
            >
              <BookOpen size={20}/> Bài viết
+           </Button>
+           <Button 
+             variant="secondary" 
+             onClick={handleCreateArticle}
+           >
+             <Plus size={20}/> Tạo bài viết
            </Button>
         </div>
       </div>
@@ -677,179 +880,48 @@ const CounselingView = () => {
 
                 {/* Articles */}
                 <div className="space-y-4">
-                  <h4 className="font-bold text-gray-800 text-lg">Bài viết hữu ích</h4>
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-bold text-gray-800 text-lg">Bài viết hữu ích</h4>
+                    <Button 
+                      size="sm" 
+                      variant="secondary"
+                      onClick={() => {
+                        setShowArticlesModal(false);
+                        handleCreateArticle();
+                      }}
+                    >
+                      <Plus size={14} className="mr-1" /> Tạo bài viết mới
+                    </Button>
+                  </div>
                   
-                  <div 
-                    className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition cursor-pointer"
-                    onClick={() => handleArticleClick({
-                      id: 1,
-                      title: "Quản lý stress trong mùa thi cử",
-                      content: `# Quản lý stress trong mùa thi cử
-
-## Nhận diện dấu hiệu stress
-
-Stress trong mùa thi cử là một hiện tượng tâm lý bình thường, nhưng nếu không được quản lý tốt có thể ảnh hưởng tiêu cực đến kết quả học tập và sức khỏe.
-
-### Dấu hiệu nhận biết:
-- **Về thể chất:** Đau đầu, mệt mỏi, mất ngủ, tim đập nhanh
-- **Về cảm xúc:** Lo lắng, cáu kỉnh, buồn bã, dễ khóc
-- **Về hành vi:** Trốn tránh học tập, trì hoãn, ăn uống thất thường
-- **Về nhận thức:** Khó tập trung, trí nhớ suy giảm, tư duy tiêu cực
-
-## Kỹ thuật thư giãn hiệu quả
-
-### 1. Kỹ thuật hít thở sâu (4-7-8)
-1. Hít vào bằng mũi đếm 4 giây
-2. Giữ hơi thở đếm 7 giây  
-3. Thở ra từ từ bằng miệng đếm 8 giây
-4. Lặp lại 5-10 lần
-
-### 2. Thư giãn cơ bản tiến
-- Nằm ngửa, nhắm mắt
-- Từng nhóm cơ căng trong 5 giây rồi thả lỏng
-- Bắt đầu từ chân, đi lên dần đến đầu
-
-### 3. Tư duy tích cực
-- Thay đổi suy nghĩ tiêu cực thành tích cực
-- Tập trung vào giải pháp thay vì vấn đề
-- Nhắc nhở bản thân về những thành công đã đạt được
-
-## Lịch trình học tập hiệu quả
-
-### Nguyên tắc Pomodoro:
-- Học tập tập trung 25 phút
-- Nghỉ ngơi 5 phút
-- Sau 4 Pomodoro, nghỉ dài 15-30 phút
-
-### Môi trường học tập:
-- Không gian yên tĩnh, đủ ánh sáng
-- Để điện thoại ở phòng khác
-- Có nước lọc và đồ ăn nhẹ lành mạnh
-
-## Chăm sóc sức khỏe
-
-### Dinh dưỡng:
-- Ăn đủ 3 bữa, không bỏ bữa
-- Tăng cường rau xanh, trái cây
-- Hạn chế cà phê, nước ngọt có ga
-
-### Vận động:
-- Tập thể dục nhẹ nhàng 30 phút mỗi ngày
-- Đi bộ, yoga, hoặc các môn thể thao yêu thích
-- Vận động giúp giải tỏa stress hiệu quả
-
-## Khi nào cần tìm kiếm sự giúp đỡ?
-
-Hãy tìm đến chuyên gia tâm lý khi:
-- Stress kéo dài hơn 2 tuần
-- Ảnh hưởng nghiêm trọng đến cuộc sống hàng ngày
-- Có dấu hiệu trầm cảm (mất hứng thú, thay đổi cân nặng)
-- Có suy nghĩ tiêu cực về bản thân
-
-## Lời khuyên cuối cùng
-
-Hãy nhớ rằng stress không hoàn toàn xấu - nó có thể là động lực để bạn cố gắng hơn. Điều quan trọng là học cách quản lý stress một cách hiệu quả.
-
-Chúc các bạn vượt qua mùa thi thành công!`,
-                      author: "Ts. Nguyễn Thị An",
-                      date: "15/10/2024",
-                      category: "Tâm lý học đường"
-                    })}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
-                        <Brain size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="font-bold text-gray-800 mb-2">Quản lý stress trong mùa thi cử</h5>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Học cách nhận diện các dấu hiệu stress và áp dụng các kỹ thuật thư giãn hiệu quả để giữ tinh thần thoải mái 
-                          trong giai đoạn quan trọng này.
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <User size={12} /> Ts. Nguyễn Thị An
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar size={12} /> 15/10/2024
-                          </span>
-                          <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded">Tâm lý học đường</span>
+                  {articles.map((article) => (
+                    <div 
+                      key={article.id}
+                      className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition cursor-pointer"
+                      onClick={() => handleArticleClick(article)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                          <BookOpen size={20} />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-bold text-gray-800 mb-2">{article.title}</h5>
+                          <p className="text-gray-600 text-sm mb-3">
+                            {article.summary}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <User size={12} /> {article.author}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar size={12} /> {article.date}
+                            </span>
+                            <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded">{article.category}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
-                        <BookOpen size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="font-bold text-gray-800 mb-2">Cẩm nang chọn ngành nghề 2024</h5>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Hướng dẫn chi tiết cách khám phá sở thích, năng lực và thị trường lao động để chọn được ngành nghề 
-                          phù hợp nhất với bản thân.
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <User size={12} /> Ths. Trần Văn Bình
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar size={12} /> 20/09/2024
-                          </span>
-                          <span className="px-2 py-1 bg-green-50 text-green-600 rounded">Hướng nghiệp</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
-                        <HeartHandshake size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="font-bold text-gray-800 mb-2">Xây dựng mối quan hệ bạn bè lành mạnh</h5>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Kỹ năng giao tiếp và giải quyết xung đột giúp bạn xây dựng những mối quan hệ bạn bè tích cực, 
-                          hỗ trợ cho sự phát triển cá nhân.
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <User size={12} /> Chuyên gia tâm lý Lê Thị Cúc
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar size={12} /> 05/10/2024
-                          </span>
-                          <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded">Kỹ năng sống</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
-                        <FileText size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="font-bold text-gray-800 mb-2">Trắc nghiệm tính cách MBTI và ứng dụng</h5>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Khám phá loại hình tính cách của bạn qua trắc nghiệm MBTI và tìm hiểu cách áp dụng vào học tập 
-                          và lựa chọn nghề nghiệp.
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <User size={12} /> Ts. Phạm Văn Dũng
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar size={12} /> 10/09/2024
-                          </span>
-                          <span className="px-2 py-1 bg-purple-50 text-purple-600 rounded">Tự khám phá</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Resources */}
@@ -958,6 +1030,180 @@ Chúc các bạn vượt qua mùa thi thành công!`,
                       <FileText size={14} className="mr-1" /> Lưu
                     </Button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Article Modal */}
+      {showCreateArticleModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '700px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Tạo Bài viết Mới với AI</h3>
+              <button 
+                onClick={() => setShowCreateArticleModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-100">
+                  <h4 className="font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                    <Brain size={16} />
+                    AI Content Generator
+                  </h4>
+                  <p className="text-purple-700 text-sm">
+                    AI sẽ giúp bạn tạo bài viết chuyên nghiệp dựa trên các thông tin bạn cung cấp.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề bài viết</label>
+                    <input
+                      type="text"
+                      value={articleForm.title}
+                      onChange={(e) => setArticleForm({...articleForm, title: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Nhập tiêu đề (tùy chọn)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Chuyên mục</label>
+                    <select
+                      value={articleForm.category}
+                      onChange={(e) => setArticleForm({...articleForm, category: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Tâm lý học đường">Tâm lý học đường</option>
+                      <option value="Hướng nghiệp">Hướng nghiệp</option>
+                      <option value="Kỹ năng sống">Kỹ năng sống</option>
+                      <option value="Tự khám phá">Tự khám phá</option>
+                      <option value="Sức khỏe tinh thần">Sức khỏe tinh thần</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Chủ đề chính *</label>
+                  <textarea
+                    value={articleForm.topic}
+                    onChange={(e) => setArticleForm({...articleForm, topic: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                    placeholder="Mô tả chủ đề bạn muốn viết về..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Đối tượng mục tiêu</label>
+                    <select
+                      value={articleForm.targetAudience}
+                      onChange={(e) => setArticleForm({...articleForm, targetAudience: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Học sinh">Học sinh</option>
+                      <option value="Phụ huynh">Phụ huynh</option>
+                      <option value="Giáo viên">Giáo viên</option>
+                      <option value="Tất cả mọi người">Tất cả mọi người</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Giọng văn</label>
+                    <select
+                      value={articleForm.tone}
+                      onChange={(e) => setArticleForm({...articleForm, tone: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Thân thiện">Thân thiện</option>
+                      <option value="Chuyên nghiệp">Chuyên nghiệp</option>
+                      <option value="Trang trọng">Trang trọng</option>
+                      <option value="Vui vẻ">Vui vẻ</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Độ dài bài viết</label>
+                    <select
+                      value={articleForm.length}
+                      onChange={(e) => setArticleForm({...articleForm, length: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Ngắn">Ngắn (300-500 từ)</option>
+                      <option value="Trung bình">Trung bình (500-1000 từ)</option>
+                      <option value="Dài">Dài (1000-2000 từ)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Từ khóa</label>
+                    <input
+                      type="text"
+                      value={articleForm.keywords}
+                      onChange={(e) => setArticleForm({...articleForm, keywords: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="từ khóa 1, từ khóa 2, ..."
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="font-semibold text-blue-800 mb-2">AI sẽ tạo:</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• Tiêu đề hấp dẫn (nếu không cung cấp)</li>
+                    <li>• Nội dung có cấu trúc rõ ràng</li>
+                    <li>• Các heading và subheading</li>
+                    <li>• Bullet points và danh sách</li>
+                    <li>• Lời khuyên thực tế</li>
+                    <li>• Kết luận và lời khuyến nghị</li>
+                  </ul>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowCreateArticleModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button 
+                    onClick={handleAIGenerateArticle} 
+                    disabled={isGeneratingArticle || !articleForm.topic}
+                  >
+                    {isGeneratingArticle ? (
+                      <>
+                        <Loader2 size={16} className="mr-1 animate-spin" /> 
+                        AI đang tạo...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={16} className="mr-1" /> 
+                        Tạo với AI
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
