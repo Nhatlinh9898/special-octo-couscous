@@ -672,6 +672,13 @@ const KtxView = () => {
     const previousElectricity = lastReading ? lastReading.electricityReading : 0;
     const previousWater = lastReading ? lastReading.waterReading : 0;
     
+    // Update display state immediately
+    setMeterReadings(prev => ({
+      ...prev,
+      previousElectricity,
+      previousWater
+    }));
+    
     // Simulate current reading (in real app, this would come from image OCR)
     let currentElectricity, currentWater;
     
@@ -679,10 +686,9 @@ const KtxView = () => {
       currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
       currentWater = previousWater || 0;
       
-      // Update meter readings state
+      // Update current reading state
       setMeterReadings(prev => ({
         ...prev,
-        previousElectricity,
         currentElectricity,
         electricityImage: `electricity_meter_${roomNumber}_${Date.now()}.jpg`
       }));
@@ -714,10 +720,9 @@ const KtxView = () => {
       currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
       currentElectricity = previousElectricity || 0;
       
-      // Update meter readings state
+      // Update current reading state
       setMeterReadings(prev => ({
         ...prev,
-        previousWater,
         currentWater,
         waterImage: `water_meter_${roomNumber}_${Date.now()}.jpg`
       }));
@@ -809,6 +814,18 @@ const KtxView = () => {
       calculateUsageForPeriod();
     }
   }, [utilityForm.roomId, utilityForm.month]);
+
+  // Update display when room changes
+  useEffect(() => {
+    const lastReading = getLastReading();
+    if (lastReading) {
+      setMeterReadings(prev => ({
+        ...prev,
+        previousElectricity: lastReading.electricityReading,
+        previousWater: lastReading.waterReading
+      }));
+    }
+  }, [utilityForm.roomId]);
 
   const handleDeleteRoom = (roomId: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
@@ -2213,7 +2230,7 @@ const KtxView = () => {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-gray-600">Chỉ số trước:</span>
-                    <span className="ml-2 font-medium">{meterReadings.previousElectricity || 0} kWh</span>
+                    <span className="ml-2 font-medium">{getLastReading()?.electricityReading || 0} kWh</span>
                   </div>
                   <div>
                     <span className="text-gray-600">Chỉ số hiện tại:</span>
@@ -2241,7 +2258,7 @@ const KtxView = () => {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-gray-600">Chỉ số trước:</span>
-                    <span className="ml-2 font-medium">{meterReadings.previousWater || 0} m³</span>
+                    <span className="ml-2 font-medium">{getLastReading()?.waterReading || 0} m³</span>
                   </div>
                   <div>
                     <span className="text-gray-600">Chỉ số hiện tại:</span>
