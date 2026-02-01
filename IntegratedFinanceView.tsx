@@ -19,13 +19,16 @@ import { Button, Modal } from './components';
 interface Tenant {
   id: number;
   name: string;
-  type: 'Student' | 'Hotel Guest';
+  type: 'Student' | 'Teacher' | 'Visitor';
   roomNumber: string;
   building: 'KTX-A' | 'KTX-B' | 'Hotel';
   email: string;
   phone: string;
   balance: number;
   status: 'Active' | 'CheckedOut';
+  checkInDate: string;
+  checkOutDate?: string;
+  purpose?: string; // Study, Teaching, Visiting
 }
 
 interface Transaction {
@@ -79,18 +82,50 @@ const IntegratedFinanceView = () => {
         email: 'an.nguyen@university.edu.vn',
         phone: '0912345678',
         balance: 1500000,
-        status: 'Active'
+        status: 'Active',
+        checkInDate: '2024-01-01',
+        purpose: 'Study'
       },
       {
         id: 2,
-        name: 'John Smith',
-        type: 'Hotel Guest',
-        roomNumber: 'H0201',
+        name: 'Trần Thị Bình',
+        type: 'Student',
+        roomNumber: 'B0205',
+        building: 'KTX-B',
+        email: 'binh.tran@university.edu.vn',
+        phone: '0923456789',
+        balance: -500000,
+        status: 'Active',
+        checkInDate: '2024-01-01',
+        purpose: 'Study'
+      },
+      {
+        id: 3,
+        name: 'Ts. Nguyễn Văn Cường',
+        type: 'Teacher',
+        roomNumber: 'H0101',
         building: 'Hotel',
-        email: 'john.smith@email.com',
-        phone: '+1-234-567-8900',
+        email: 'cuong.nguyen@university.edu.vn',
+        phone: '0934567890',
         balance: 0,
-        status: 'Active'
+        status: 'Active',
+        checkInDate: '2024-01-15',
+        checkOutDate: '2024-01-20',
+        purpose: 'Teaching'
+      },
+      {
+        id: 4,
+        name: 'Dr. Sarah Johnson',
+        type: 'Visitor',
+        roomNumber: 'H0203',
+        building: 'Hotel',
+        email: 'sarah.johnson@university.edu',
+        phone: '+1-555-0123',
+        balance: 0,
+        status: 'Active',
+        checkInDate: '2024-01-18',
+        checkOutDate: '2024-01-22',
+        purpose: 'Visiting'
       }
     ]);
 
@@ -107,12 +142,32 @@ const IntegratedFinanceView = () => {
       },
       {
         id: 2,
-        tenantName: 'John Smith',
-        roomNumber: 'H0201',
+        tenantName: 'Trần Thị Bình',
+        roomNumber: 'B0205',
+        building: 'KTX-B',
+        type: 'Electricity',
+        amount: 175000,
+        date: '2024-01-10',
+        status: 'Unpaid'
+      },
+      {
+        id: 3,
+        tenantName: 'Ts. Nguyễn Văn Cường',
+        roomNumber: 'H0101',
+        building: 'Hotel',
+        type: 'Service',
+        amount: 2500000,
+        date: '2024-01-15',
+        status: 'Paid'
+      },
+      {
+        id: 4,
+        tenantName: 'Dr. Sarah Johnson',
+        roomNumber: 'H0203',
         building: 'Hotel',
         type: 'Service',
         amount: 3500000,
-        date: '2024-01-15',
+        date: '2024-01-18',
         status: 'Paid'
       }
     ]);
@@ -161,11 +216,18 @@ const IntegratedFinanceView = () => {
       .filter(t => t.building === 'Hotel')
       .reduce((sum, t) => sum + t.amount, 0);
 
+    const students = tenants.filter(t => t.type === 'Student');
+    const teachers = tenants.filter(t => t.type === 'Teacher');
+    const visitors = tenants.filter(t => t.type === 'Visitor');
+
     return {
       totalRevenue: ktxRevenue + hotelRevenue,
       ktxRevenue,
       hotelRevenue,
       totalTenants: tenants.length,
+      students: students.length,
+      teachers: teachers.length,
+      visitors: visitors.length,
       activePartners: partners.filter(p => p.status === 'Active').length,
       pendingInvoices: invoices.filter(i => i.status === 'Unpaid' || i.status === 'Overdue').length
     };
@@ -242,9 +304,9 @@ const IntegratedFinanceView = () => {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Người thuê</p>
+              <p className="text-sm text-gray-600">Học sinh KTX</p>
               <p className="text-2xl font-bold text-orange-600">
-                {stats.totalTenants}
+                {stats.students}
               </p>
             </div>
             <Users className="text-orange-600" size={24} />
@@ -254,9 +316,9 @@ const IntegratedFinanceView = () => {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Đối tác</p>
+              <p className="text-sm text-gray-600">Giáo viên & Khách</p>
               <p className="text-2xl font-bold text-teal-600">
-                {stats.activePartners}
+                {stats.teachers + stats.visitors}
               </p>
             </div>
             <Handshake className="text-teal-600" size={24} />
@@ -328,19 +390,19 @@ const IntegratedFinanceView = () => {
               </div>
               
               <div>
-                <h4 className="font-medium text-gray-700 mb-3">Người thuê</h4>
+                <h4 className="font-medium text-gray-700 mb-3">Phân bổ Người thuê</h4>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span className="font-medium">Sinh viên KTX</span>
-                    <span className="text-green-600 font-bold">
-                      {tenants.filter(t => t.type === 'Student').length}
-                    </span>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="font-medium">Học sinh KTX</span>
+                    <span className="text-blue-600 font-bold">{stats.students}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                    <span className="font-medium">Khách Hotel</span>
-                    <span className="text-orange-600 font-bold">
-                      {tenants.filter(t => t.type === 'Hotel Guest').length}
-                    </span>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="font-medium">Giáo viên</span>
+                    <span className="text-green-600 font-bold">{stats.teachers}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span className="font-medium">Khách tham quan</span>
+                    <span className="text-purple-600 font-bold">{stats.visitors}</span>
                   </div>
                 </div>
               </div>
@@ -377,6 +439,7 @@ const IntegratedFinanceView = () => {
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4">Tên</th>
                     <th className="text-left py-3 px-4">Loại</th>
+                    <th className="text-left py-3 px-4">Mục đích</th>
                     <th className="text-left py-3 px-4">Phòng</th>
                     <th className="text-left py-3 px-4">Tòa nhà</th>
                     <th className="text-left py-3 px-4">Liên hệ</th>
@@ -390,9 +453,17 @@ const IntegratedFinanceView = () => {
                       <td className="py-3 px-4 font-medium">{tenant.name}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded text-xs ${
-                          tenant.type === 'Student' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          tenant.type === 'Student' ? 'bg-blue-100 text-blue-800' :
+                          tenant.type === 'Teacher' ? 'bg-green-100 text-green-800' :
+                          'bg-purple-100 text-purple-800'
                         }`}>
-                          {tenant.type === 'Student' ? 'Sinh viên' : 'Khách sạn'}
+                          {tenant.type === 'Student' ? 'Học sinh' :
+                           tenant.type === 'Teacher' ? 'Giáo viên' : 'Khách tham quan'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                          {tenant.purpose}
                         </span>
                       </td>
                       <td className="py-3 px-4">{tenant.roomNumber}</td>
