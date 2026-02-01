@@ -41,6 +41,7 @@ import SmartCampusView from './SmartCampusView';
 import AIAssistantView from './AIAssistantView';
 import ServerMonitorView from './ServerMonitorView';
 import KtxView from './KtxView';
+import HotelManagementView from './HotelManagementView';
 
 const AppContent: React.FC = () => {
   const { user, activeTab, isMobileMenuOpen, toggleMobileMenu } = useContext(AppContext);
@@ -86,6 +87,7 @@ const AppContent: React.FC = () => {
       case 'ai_assistant': return <AIAssistantView />;
       case 'server_monitor': return <ServerMonitorView />; // New
       case 'ktx': return <KtxView />; // New
+      case 'hotel_management': return <HotelManagementView />; // New
       default: return <div>Module not found</div>;
     }
   };

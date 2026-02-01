@@ -35,7 +35,8 @@ import {
   TrendingUp,
   Cpu,
   Bot,
-  Server
+  Server,
+  Building2
 } from 'lucide-react';
 import { AppContext } from './context';
 
@@ -64,6 +65,7 @@ export const Sidebar: React.FC<{ mobile?: boolean }> = ({ mobile }) => {
     { id: 'counseling', label: 'Tư Vấn Tâm Lý', icon: <HeartHandshake size={20} /> }, 
     { id: 'dormitory', label: 'Ký Túc Xá', icon: <BedDouble size={20} /> }, 
     { id: 'ktx', label: 'KTX Management', icon: <BedDouble size={20} /> }, 
+    { id: 'hotel_management', label: 'Hotel Management', icon: <Building2 size={20} /> }, 
     { id: 'health', label: 'Y Tế', icon: <HeartPulse size={20} /> }, 
     { id: 'feedback', label: 'Khảo Sát', icon: <MessageSquare size={20} /> }, 
     { id: 'alumni', label: 'Cựu HS', icon: <Users2 size={20} /> },
