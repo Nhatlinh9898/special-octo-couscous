@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2, CheckCircle, AlertCircle, Download } from 'lucide-react';
+import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2, CheckCircle, AlertCircle, Download, Upload } from 'lucide-react';
 import { api, MOCK_STUDENTS } from './data';
 import { CounselingSession, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
@@ -93,6 +93,7 @@ const CounselingView = () => {
   const [showArticlesModal, setShowArticlesModal] = useState(false);
   const [showArticleDetailModal, setShowArticleDetailModal] = useState(false);
   const [showCreateArticleModal, setShowCreateArticleModal] = useState(false);
+  const [showUploadArticleModal, setShowUploadArticleModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   
   // AI
@@ -129,6 +130,17 @@ const CounselingView = () => {
     tone: 'Thân thiện',
     length: 'Trung bình',
     keywords: ''
+  });
+
+  // Article upload state
+  const [uploadForm, setUploadForm] = useState({
+    title: '',
+    content: '',
+    category: 'Tâm lý học đường',
+    author: '',
+    summary: '',
+    keywords: '',
+    file: null as File | null
   });
 
   // Articles state
@@ -367,6 +379,52 @@ Chúc các bạn vượt qua mùa thi thành công!`,
     setShowCreateArticleModal(true);
   };
 
+  const handleUploadArticle = () => {
+    console.log('Upload article button clicked');
+    setUploadForm({
+      title: '',
+      content: '',
+      category: 'Tâm lý học đường',
+      author: '',
+      summary: '',
+      keywords: '',
+      file: null
+    });
+    setShowUploadArticleModal(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log('File selected:', file.name);
+      setUploadForm(prev => ({
+        ...prev,
+        file: file
+      }));
+    }
+  };
+
+  const handleSaveUpload = () => {
+    if (!uploadForm.title || !uploadForm.content || !uploadForm.author) {
+      alert('Vui lòng điền các thông tin bắt buộc!');
+      return;
+    }
+
+    const newArticle = {
+      id: Date.now(),
+      title: uploadForm.title,
+      summary: uploadForm.summary || `Bài viết chuyên gia từ ${uploadForm.author}`,
+      content: uploadForm.content,
+      author: uploadForm.author,
+      date: new Date().toISOString().split('T')[0],
+      category: uploadForm.category
+    };
+
+    setArticles(prev => [newArticle, ...prev]);
+    setShowUploadArticleModal(false);
+    alert(`Đã tải lên bài viết "${uploadForm.title}" thành công!`);
+  };
+
   const handleAIGenerateArticle = async () => {
     if (!articleForm.topic) {
       alert('Vui lòng nhập chủ đề bài viết!');
@@ -540,6 +598,12 @@ Hotline: 1900 1234`;
              onClick={handleCreateArticle}
            >
              <Plus size={20}/> Tạo bài viết
+           </Button>
+           <Button 
+             variant="secondary" 
+             onClick={handleUploadArticle}
+           >
+             <Upload size={20}/> Tải lên bài viết
            </Button>
         </div>
       </div>
@@ -1341,6 +1405,178 @@ Hotline: 1900 1234`;
                         Tạo với AI
                       </>
                     )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Article Modal */}
+      {showUploadArticleModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '700px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Tải lên Bài viết Chuyên gia</h3>
+              <button 
+                onClick={() => setShowUploadArticleModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-100">
+                  <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                    <Upload size={16} />
+                    Chuyên gia Upload
+                  </h4>
+                  <p className="text-green-700 text-sm">
+                    Chia sẻ kiến thức và kinh nghiệm của bạn với cộng đồng học sinh.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề bài viết *</label>
+                    <input
+                      type="text"
+                      value={uploadForm.title}
+                      onChange={(e) => setUploadForm({...uploadForm, title: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Nhập tiêu đề bài viết"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên chuyên gia *</label>
+                    <input
+                      type="text"
+                      value={uploadForm.author}
+                      onChange={(e) => setUploadForm({...uploadForm, author: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Ts. Nguyễn Văn A"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Chuyên mục</label>
+                    <select
+                      value={uploadForm.category}
+                      onChange={(e) => setUploadForm({...uploadForm, category: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Tâm lý học đường">Tâm lý học đường</option>
+                      <option value="Hướng nghiệp">Hướng nghiệp</option>
+                      <option value="Kỹ năng sống">Kỹ năng sống</option>
+                      <option value="Tự khám phá">Tự khám phá</option>
+                      <option value="Sức khỏe tinh thần">Sức khỏe tinh thần</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Từ khóa</label>
+                    <input
+                      type="text"
+                      value={uploadForm.keywords}
+                      onChange={(e) => setUploadForm({...uploadForm, keywords: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="từ khóa 1, từ khóa 2, ..."
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tóm tắt bài viết</label>
+                  <textarea
+                    value={uploadForm.summary}
+                    onChange={(e) => setUploadForm({...uploadForm, summary: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-16"
+                    placeholder="Tóm tắt nội dung chính của bài viết..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung bài viết *</label>
+                  <textarea
+                    value={uploadForm.content}
+                    onChange={(e) => setUploadForm({...uploadForm, content: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-48"
+                    placeholder="Nhập nội dung chi tiết của bài viết. Hỗ trợ Markdown format..."
+
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hoặc tải lên file (Optional)</label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition">
+                    <Upload size={32} className="mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600 mb-2">
+                      Kéo và thả file vào đây hoặc click để chọn
+                    </p>
+                    <input
+                      type="file"
+                      accept=".txt,.doc,.docx,.pdf"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="inline-block px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      Chọn file
+                    </label>
+                    {uploadForm.file && (
+                      <p className="text-xs text-green-600 mt-2">
+                        Đã chọn: {uploadForm.file.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="font-semibold text-blue-800 mb-2">Hướng dẫn Upload:</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• Điền đầy đủ thông tin bắt buộc (Tiêu đề, Nội dung, Tác giả)</li>
+                    <li>• Sử dụng Markdown format cho nội dung (## cho heading, - cho list)</li>
+                    <li>• Có thể tải lên file .txt, .doc, .docx, .pdf</li>
+                    <li>• Bài viết sẽ được hiển thị ngay sau khi upload</li>
+                    <li>• Nội dung nên chuyên nghiệp và phù hợp với học sinh</li>
+                  </ul>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowUploadArticleModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button 
+                    onClick={handleSaveUpload}
+                    disabled={!uploadForm.title || !uploadForm.content || !uploadForm.author}
+                  >
+                    <Upload size={16} className="mr-1" /> 
+                    Tải lên bài viết
                   </Button>
                 </div>
               </div>
