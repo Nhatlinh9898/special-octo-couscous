@@ -9,6 +9,8 @@ import {
   BarChart3, 
   Plus, 
   Eye, 
+  Edit, 
+  Trash2,
   Mail, 
   Bell,
   Handshake,
@@ -69,6 +71,47 @@ const IntegratedFinanceView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  
+  // Modal states
+  const [showTenantModal, setShowTenantModal] = useState(false);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showPartnerModal, setShowPartnerModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Form states
+  const [tenantForm, setTenantForm] = useState({
+    name: '',
+    type: 'Student' as 'Student' | 'Teacher' | 'Visitor',
+    roomNumber: '',
+    building: 'KTX-A' as 'KTX-A' | 'KTX-B' | 'Hotel',
+    email: '',
+    phone: '',
+    balance: 0,
+    purpose: 'Study'
+  });
+  
+  const [transactionForm, setTransactionForm] = useState({
+    tenantName: '',
+    roomNumber: '',
+    building: '',
+    type: 'Rent' as 'Rent' | 'Electricity' | 'Water' | 'Service',
+    amount: 0,
+    date: '',
+    description: ''
+  });
+  
+  const [partnerForm, setPartnerForm] = useState({
+    name: '',
+    type: 'Supplier' as 'Supplier' | 'Service Provider' | 'Utility',
+    category: '',
+    contact: '',
+    phone: '',
+    email: '',
+    address: '',
+    taxCode: ''
+  });
 
   useEffect(() => {
     // Mock data
@@ -239,6 +282,144 @@ const IntegratedFinanceView = () => {
 
   const generateBulkInvoices = () => {
     alert('Đã tạo hóa đơn hàng loạt!');
+  };
+
+  // CRUD Handler Functions
+  const handleAddTenant = () => {
+    setIsEditing(false);
+    setTenantForm({
+      name: '',
+      type: 'Student',
+      roomNumber: '',
+      building: 'KTX-A',
+      email: '',
+      phone: '',
+      balance: 0,
+      purpose: 'Study'
+    });
+    setShowTenantModal(true);
+  };
+
+  const handleEditTenant = (tenant: Tenant) => {
+    setIsEditing(true);
+    setSelectedItem(tenant);
+    setTenantForm({
+      name: tenant.name,
+      type: tenant.type,
+      roomNumber: tenant.roomNumber,
+      building: tenant.building,
+      email: tenant.email,
+      phone: tenant.phone,
+      balance: tenant.balance,
+      purpose: tenant.purpose || 'Study'
+    });
+    setShowTenantModal(true);
+  };
+
+  const handleSaveTenant = () => {
+    if (!tenantForm.name || !tenantForm.roomNumber) {
+      alert('Vui lòng điền thông tin bắt buộc!');
+      return;
+    }
+
+    if (isEditing && selectedItem) {
+      // Update existing tenant
+      setTenants(prev => prev.map(t => 
+        t.id === selectedItem.id 
+          ? { ...t, ...tenantForm, id: t.id, status: 'Active' as const, checkInDate: t.checkInDate }
+          : t
+      ));
+      alert('Đã cập nhật thông tin người thuê!');
+    } else {
+      // Add new tenant
+      const newTenant: Tenant = {
+        id: Date.now(),
+        ...tenantForm,
+        status: 'Active',
+        checkInDate: new Date().toISOString().split('T')[0]
+      };
+      setTenants(prev => [...prev, newTenant]);
+      alert('Đã thêm người thuê mới!');
+    }
+    setShowTenantModal(false);
+  };
+
+  const handleDeleteTenant = (tenantId: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa người thuê này?')) {
+      setTenants(prev => prev.filter(t => t.id !== tenantId));
+      alert('Đã xóa người thuê!');
+    }
+  };
+
+  const handleAddTransaction = () => {
+    setIsEditing(false);
+    setTransactionForm({
+      tenantName: '',
+      roomNumber: '',
+      building: '',
+      type: 'Rent',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      description: ''
+    });
+    setShowTransactionModal(true);
+  };
+
+  const handleSaveTransaction = () => {
+    if (!transactionForm.tenantName || !transactionForm.amount) {
+      alert('Vui lòng điền thông tin bắt buộc!');
+      return;
+    }
+
+    const newTransaction: Transaction = {
+      id: Date.now(),
+      ...transactionForm,
+      status: 'Unpaid'
+    };
+    setTransactions(prev => [...prev, newTransaction]);
+    setShowTransactionModal(false);
+    alert('Đã thêm giao dịch mới!');
+  };
+
+  const handleAddPartner = () => {
+    setIsEditing(false);
+    setPartnerForm({
+      name: '',
+      type: 'Supplier',
+      category: '',
+      contact: '',
+      phone: '',
+      email: '',
+      address: '',
+      taxCode: ''
+    });
+    setShowPartnerModal(true);
+  };
+
+  const handleSavePartner = () => {
+    if (!partnerForm.name || !partnerForm.contact) {
+      alert('Vui lòng điền thông tin bắt buộc!');
+      return;
+    }
+
+    const newPartner: Partner = {
+      id: Date.now(),
+      ...partnerForm,
+      totalContracts: 0,
+      totalValue: 0,
+      status: 'Active',
+      contracts: []
+    };
+    setPartners(prev => [...prev, newPartner]);
+    setShowPartnerModal(false);
+    alert('Đã thêm đối tác mới!');
+  };
+
+  const handleDeletePartner = (partnerId: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa đối tác này?')) {
+      setPartners(prev => prev.filter(p => p.id !== partnerId));
+      alert('Đã xóa đối tác!');
+    }
   };
 
   const stats = getStats();
@@ -428,7 +609,7 @@ const IntegratedFinanceView = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Người thuê (KTX + Hotel)</h3>
-              <Button>
+              <Button onClick={handleAddTenant}>
                 <Plus size={20}/> Thêm Người thuê
               </Button>
             </div>
@@ -481,11 +662,23 @@ const IntegratedFinanceView = () => {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
-                          <button className="text-blue-600 hover:text-blue-800">
+                          <button 
+                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => handleEditTenant(tenant)}
+                          >
                             <Eye size={16} />
                           </button>
-                          <button className="text-green-600 hover:text-green-800">
-                            <Mail size={16} />
+                          <button 
+                            className="text-green-600 hover:text-green-800"
+                            onClick={() => handleEditTenant(tenant)}
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button 
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => handleDeleteTenant(tenant.id)}
+                          >
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -501,7 +694,7 @@ const IntegratedFinanceView = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Giao dịch Tích hợp</h3>
-              <Button>
+              <Button onClick={handleAddTransaction}>
                 <Plus size={20}/> Thêm Giao dịch
               </Button>
             </div>
@@ -538,6 +731,19 @@ const IntegratedFinanceView = () => {
                         }`}>
                           {transaction.status === 'Paid' ? 'Đã TT' : 'Chưa TT'}
                         </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={16} />
+                          </button>
+                          <button className="text-green-600 hover:text-green-800">
+                            <Edit size={16} />
+                          </button>
+                          <button className="text-red-600 hover:text-red-800">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -601,7 +807,7 @@ const IntegratedFinanceView = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Quản lý Đối tác</h3>
-              <Button>
+              <Button onClick={handleAddPartner}>
                 <Plus size={20}/> Thêm Đối tác
               </Button>
             </div>
@@ -625,12 +831,403 @@ const IntegratedFinanceView = () => {
                     <p><strong>Hợp đồng:</strong> {partner.totalContracts}</p>
                     <p><strong>Giá trị:</strong> {(partner.totalValue / 1000000).toFixed(1)}M VNĐ</p>
                   </div>
+                  <div className="flex justify-end gap-2 mt-3">
+                    <button className="text-blue-600 hover:text-blue-800">
+                      <Eye size={16} />
+                    </button>
+                    <button className="text-green-600 hover:text-green-800">
+                      <Edit size={16} />
+                    </button>
+                    <button className="text-red-600 hover:text-red-800" onClick={() => handleDeletePartner(partner.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* Tenant Modal */}
+      {showTenantModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">
+                {isEditing ? 'Cập nhật Người thuê' : 'Thêm Người thuê Mới'}
+              </h3>
+              <button 
+                onClick={() => setShowTenantModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên *</label>
+                    <input
+                      type="text"
+                      value={tenantForm.name}
+                      onChange={(e) => setTenantForm({...tenantForm, name: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Nhập họ và tên"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại *</label>
+                    <select
+                      value={tenantForm.type}
+                      onChange={(e) => setTenantForm({...tenantForm, type: e.target.value as any})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Student">Học sinh</option>
+                      <option value="Teacher">Giáo viên</option>
+                      <option value="Visitor">Khách tham quan</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phòng *</label>
+                    <input
+                      type="text"
+                      value={tenantForm.roomNumber}
+                      onChange={(e) => setTenantForm({...tenantForm, roomNumber: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="A0101"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tòa nhà *</label>
+                    <select
+                      value={tenantForm.building}
+                      onChange={(e) => setTenantForm({...tenantForm, building: e.target.value as any})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="KTX-A">KTX-A</option>
+                      <option value="KTX-B">KTX-B</option>
+                      <option value="Hotel">Hotel</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={tenantForm.email}
+                      onChange={(e) => setTenantForm({...tenantForm, email: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
+                    <input
+                      type="tel"
+                      value={tenantForm.phone}
+                      onChange={(e) => setTenantForm({...tenantForm, phone: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="09xxxxxxxx"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Số dư</label>
+                  <input
+                    type="number"
+                    value={tenantForm.balance}
+                    onChange={(e) => setTenantForm({...tenantForm, balance: parseInt(e.target.value) || 0})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowTenantModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleSaveTenant}>
+                    {isEditing ? 'Cập nhật' : 'Thêm'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Modal */}
+      {showTransactionModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Thêm Giao dịch Mới</h3>
+              <button 
+                onClick={() => setShowTransactionModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Người thuê *</label>
+                  <input
+                    type="text"
+                    value={transactionForm.tenantName}
+                    onChange={(e) => setTransactionForm({...transactionForm, tenantName: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="Nhập tên người thuê"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phòng</label>
+                    <input
+                      type="text"
+                      value={transactionForm.roomNumber}
+                      onChange={(e) => setTransactionForm({...transactionForm, roomNumber: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="A0101"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tòa nhà</label>
+                    <input
+                      type="text"
+                      value={transactionForm.building}
+                      onChange={(e) => setTransactionForm({...transactionForm, building: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="KTX-A"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại giao dịch</label>
+                    <select
+                      value={transactionForm.type}
+                      onChange={(e) => setTransactionForm({...transactionForm, type: e.target.value as any})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Rent">Tiền phòng</option>
+                      <option value="Electricity">Tiền điện</option>
+                      <option value="Water">Tiền nước</option>
+                      <option value="Service">Dịch vụ</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền *</label>
+                    <input
+                      type="number"
+                      value={transactionForm.amount}
+                      onChange={(e) => setTransactionForm({...transactionForm, amount: parseInt(e.target.value) || 0})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày</label>
+                  <input
+                    type="date"
+                    value={transactionForm.date}
+                    onChange={(e) => setTransactionForm({...transactionForm, date: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                  <textarea
+                    value={transactionForm.description}
+                    onChange={(e) => setTransactionForm({...transactionForm, description: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
+                    placeholder="Mô tả giao dịch..."
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowTransactionModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleSaveTransaction}>
+                    Thêm
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Partner Modal */}
+      {showPartnerModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Thêm Đối tác Mới</h3>
+              <button 
+                onClick={() => setShowPartnerModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên đối tác *</label>
+                    <input
+                      type="text"
+                      value={partnerForm.name}
+                      onChange={(e) => setPartnerForm({...partnerForm, name: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Nhập tên đối tác"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại</label>
+                    <select
+                      value={partnerForm.type}
+                      onChange={(e) => setPartnerForm({...partnerForm, type: e.target.value as any})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                      <option value="Supplier">Nhà cung cấp</option>
+                      <option value="Service Provider">Dịch vụ</option>
+                      <option value="Utility">Tiện ích</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Người liên hệ *</label>
+                  <input
+                    type="text"
+                    value={partnerForm.contact}
+                    onChange={(e) => setPartnerForm({...partnerForm, contact: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="Tên người liên hệ"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
+                    <input
+                      type="tel"
+                      value={partnerForm.phone}
+                      onChange={(e) => setPartnerForm({...partnerForm, phone: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="09xxxxxxxx"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={partnerForm.email}
+                      onChange={(e) => setPartnerForm({...partnerForm, email: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                  <input
+                    type="text"
+                    value={partnerForm.address}
+                    onChange={(e) => setPartnerForm({...partnerForm, address: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="Địa chỉ"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="secondary" onClick={() => setShowPartnerModal(false)}>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleSavePartner}>
+                    Thêm
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
