@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock } from 'lucide-react';
 import { Button, Modal } from './components';
 
 // Interfaces
@@ -137,6 +137,40 @@ const KtxView = () => {
     class: 'CNTT4',
     major: 'Công nghệ thông tin'
   });
+
+  // Registration list state
+  const [registrations, setRegistrations] = useState([
+    {
+      id: 1,
+      studentId: 'SV2024001',
+      studentName: 'Nguyễn Văn Minh',
+      roomNumber: 'A0101',
+      registrationDate: '2024-01-15',
+      duration: 6,
+      status: 'Pending' as 'Pending' | 'Approved' | 'Rejected',
+      requestDate: '2024-01-15T10:30:00'
+    },
+    {
+      id: 2,
+      studentId: 'SV2024002',
+      studentName: 'Trần Thị Anh',
+      roomNumber: 'A0102',
+      registrationDate: '2024-01-14',
+      duration: 12,
+      status: 'Approved' as 'Pending' | 'Approved' | 'Rejected',
+      requestDate: '2024-01-14T14:20:00'
+    },
+    {
+      id: 3,
+      studentId: 'SV2024003',
+      studentName: 'Lê Văn Cường',
+      roomNumber: 'B0101',
+      registrationDate: '2024-01-13',
+      duration: 6,
+      status: 'Rejected' as 'Pending' | 'Approved' | 'Rejected',
+      requestDate: '2024-01-13T09:15:00'
+    }
+  ]);
 
   // Initialize mock data
   useEffect(() => {
@@ -460,6 +494,22 @@ const KtxView = () => {
 
   const handleAddRegistration = () => {
     console.log('Adding registration:', registrationForm);
+    
+    // Create new registration
+    const newRegistration = {
+      id: registrations.length + 1,
+      studentId: currentUser.id,
+      studentName: currentUser.name,
+      roomNumber: registrationForm.roomNumber,
+      registrationDate: registrationForm.registrationDate,
+      duration: registrationForm.duration,
+      status: 'Pending' as 'Pending' | 'Approved' | 'Rejected',
+      requestDate: new Date().toISOString()
+    };
+    
+    // Add to registrations list
+    setRegistrations([...registrations, newRegistration]);
+    
     alert(`Đã tạo đăng ký thành công!\n\nSinh viên: ${currentUser.name} (${currentUser.id})\nPhòng: ${registrationForm.roomNumber}\nThời gian: ${registrationForm.duration} tháng\nTrạng thái: Chờ duyệt\n\nVui lòng chờ admin duyệt đăng ký của bạn.`);
     
     // Reset form and close modal
@@ -1033,9 +1083,99 @@ const KtxView = () => {
               </Button>
             </div>
             
-            <div className="text-center py-8 text-gray-500">
-              <FileText size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>Chưa có đăng ký nào</p>
+            {/* Registration Statistics */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Tổng đăng ký</p>
+                    <p className="text-2xl font-bold text-gray-800">{registrations.length}</p>
+                  </div>
+                  <FileText size={24} className="text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Chờ duyệt</p>
+                    <p className="text-2xl font-bold text-yellow-600">{registrations.filter(r => r.status === 'Pending').length}</p>
+                  </div>
+                  <Clock size={24} className="text-yellow-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Đã duyệt</p>
+                    <p className="text-2xl font-bold text-green-600">{registrations.filter(r => r.status === 'Approved').length}</p>
+                  </div>
+                  <CheckCircle size={24} className="text-green-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Từ chối</p>
+                    <p className="text-2xl font-bold text-red-600">{registrations.filter(r => r.status === 'Rejected').length}</p>
+                  </div>
+                  <XCircle size={24} className="text-red-500" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Registration Table */}
+            <div className="bg-white rounded-lg border border-gray-200">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left py-3 px-4">Mã SV</th>
+                    <th className="text-left py-3 px-4">Họ tên</th>
+                    <th className="text-left py-3 px-4">Phòng</th>
+                    <th className="text-left py-3 px-4">Ngày đăng ký</th>
+                    <th className="text-left py-3 px-4">Thời gian</th>
+                    <th className="text-left py-3 px-4">Trạng thái</th>
+                    <th className="text-left py-3 px-4">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {registrations.map(registration => (
+                    <tr key={registration.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium">{registration.studentId}</td>
+                      <td className="py-3 px-4">{registration.studentName}</td>
+                      <td className="py-3 px-4">{registration.roomNumber}</td>
+                      <td className="py-3 px-4">{registration.registrationDate}</td>
+                      <td className="py-3 px-4">{registration.duration} tháng</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          registration.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                          registration.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {registration.status === 'Pending' ? 'Chờ duyệt' :
+                           registration.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={16} />
+                          </button>
+                          {registration.status === 'Pending' && (
+                            <>
+                              <button className="text-green-600 hover:text-green-800">
+                                <CheckCircle size={16} />
+                              </button>
+                              <button className="text-red-600 hover:text-red-800">
+                                <XCircle size={16} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
