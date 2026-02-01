@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { HeartHandshake, Calendar, User, FileText, Clock, Plus, BookOpen, Brain, Loader2, CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { api, MOCK_STUDENTS } from './data';
 import { CounselingSession, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
@@ -455,6 +455,55 @@ ${articleForm.topic} là một hành trình, không phải là đích đến. Qu
       alert('Có lỗi xảy ra khi tạo bài viết. Vui lòng thử lại!');
     } finally {
       setIsGeneratingArticle(false);
+    }
+  };
+
+  const handleDownloadArticle = (article: any) => {
+    console.log('Download article clicked:', article.title);
+    
+    // Create content for download
+    const content = `${article.title}
+
+Tác giả: ${article.author}
+Ngày: ${article.date}
+Chuyên mục: ${article.category}
+
+${article.content}
+
+---
+Bài viết được tạo bởi Trung tâm Tư vấn Tâm lý & Hướng nghiệp
+Website: https://school-counseling.edu.vn
+Email: tuvan@school.edu.vn
+Hotline: 1900 1234`;
+
+    // Create blob and download
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${article.title.replace(/[^a-z0-9]/gi, '_')}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert(`Đã tải xuống bài viết: ${article.title}`);
+  };
+
+  const handleExternalLink = (type: string) => {
+    console.log('External link clicked:', type);
+    
+    const links = {
+      'mbti': 'https://www.16personalities.com/vi',
+      'depression': 'https://www.psychologytoday.com/us/therapy-types/depression',
+      'anxiety': 'https://www.anxiety.org/',
+      'career': 'https://www.mynextmove.org/explore',
+      'stress': 'https://www.mindtools.com/pages/main/newMN_TCS_01.htm',
+      'relationship': 'https://www.psychologytoday.com/us/therapy-types/relationship-counseling'
+    };
+    
+    if (links[type]) {
+      window.open(links[type], '_blank');
     }
   };
 
@@ -1017,7 +1066,7 @@ ${articleForm.topic} là một hành trình, không phải là đích đến. Qu
               </div>
               
               <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-4">
                   <div className="text-sm text-gray-500">
                     <p>Bài viết này hữu ích cho bạn?</p>
                     <p className="mt-1">Chia sẻ để bạn bè cùng đọc nhé!</p>
@@ -1029,6 +1078,95 @@ ${articleForm.topic} là một hành trình, không phải là đích đến. Qu
                     <Button variant="secondary" size="sm">
                       <FileText size={14} className="mr-1" /> Lưu
                     </Button>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={() => handleDownloadArticle(selectedArticle)}
+                    >
+                      <Download size={14} className="mr-1" /> Tải xuống
+                    </Button>
+                  </div>
+                </div>
+
+                {/* External Resources Section */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                    <BookOpen size={16} />
+                    Tài nguyên & Trắc nghiệm Chuyên sâu
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button
+                      onClick={() => handleExternalLink('mbti')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <Brain size={16} className="text-blue-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Trắc nghiệm MBTI</div>
+                        <div className="text-xs text-gray-600">Khám phá tính cách 16Personalities</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExternalLink('stress')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <AlertCircle size={16} className="text-green-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Quản lý Stress</div>
+                        <div className="text-xs text-gray-600">Công cụ MindTools</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExternalLink('anxiety')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <HeartHandshake size={16} className="text-purple-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Lo âu & Sợ hãi</div>
+                        <div className="text-xs text-gray-600">Tài liệu Anxiety.org</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExternalLink('career')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <Calendar size={16} className="text-orange-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Hướng nghiệp</div>
+                        <div className="text-xs text-gray-600">My Next Move</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExternalLink('depression')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <User size={16} className="text-red-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Trầm cảm</div>
+                        <div className="text-xs text-gray-600">Psychology Today</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExternalLink('relationship')}
+                      className="flex items-center gap-2 p-3 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 transition text-left"
+                    >
+                      <HeartHandshake size={16} className="text-rose-600" />
+                      <div>
+                        <div className="font-medium text-gray-800 text-sm">Mối quan hệ</div>
+                        <div className="text-xs text-gray-600">Tư vấn tâm lý</div>
+                      </div>
+                    </button>
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-blue-100 rounded-lg">
+                    <p className="text-xs text-blue-700">
+                      <strong>Lưu ý:</strong> Các liên kết ngoài dẫn đến các trang web chuyên nghiệp về sức khỏe tâm lý. 
+                      Hãy tham khảo và thảo luận với chuyên gia tư vấn khi cần.
+                    </p>
                   </div>
                 </div>
               </div>
