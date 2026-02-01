@@ -128,10 +128,31 @@ const KtxView = () => {
   const [regFilterStatus, setRegFilterStatus] = useState<'all' | 'Available' | 'Occupied' | 'Maintenance' | 'Reserved'>('all');
   const [regOnlyAvailable, setRegOnlyAvailable] = useState(true);
 
+  // Mock current user state (in real app, this would come from authentication)
+  const [currentUser] = useState({
+    id: 'SV2024001',
+    name: 'Nguyễn Văn Minh',
+    email: 'minh.nv@university.edu.vn',
+    phone: '0912345678',
+    class: 'CNTT4',
+    major: 'Công nghệ thông tin'
+  });
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
   }, []);
+
+  // Auto-fill user information when registration modal opens
+  useEffect(() => {
+    if (showRegistrationModal) {
+      setRegistrationForm(prev => ({
+        ...prev,
+        studentId: currentUser.id,
+        studentName: currentUser.name
+      }));
+    }
+  }, [showRegistrationModal, currentUser]);
 
   // Auto-clear highlights after 5 seconds
   useEffect(() => {
@@ -439,7 +460,7 @@ const KtxView = () => {
 
   const handleAddRegistration = () => {
     console.log('Adding registration:', registrationForm);
-    alert(`Đã tạo đăng ký cho sinh viên ${registrationForm.studentName} vào phòng ${registrationForm.roomNumber}!`);
+    alert(`Đã tạo đăng ký thành công!\n\nSinh viên: ${currentUser.name} (${currentUser.id})\nPhòng: ${registrationForm.roomNumber}\nThời gian: ${registrationForm.duration} tháng\nTrạng thái: Chờ duyệt\n\nVui lòng chờ admin duyệt đăng ký của bạn.`);
     
     // Reset form and close modal
     setRegistrationForm({
@@ -1285,6 +1306,26 @@ const KtxView = () => {
       {showRegistrationModal && (
         <Modal isOpen={showRegistrationModal} onClose={handleCloseRegistrationModal} title="Đăng ký phòng mới">
           <div className="space-y-4">
+            {/* User Information Section */}
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h4 className="font-semibold text-green-800 mb-2">Thông tin sinh viên</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm text-green-700">
+                <div>
+                  <p><strong>Mã SV:</strong> {currentUser.id}</p>
+                  <p><strong>Họ tên:</strong> {currentUser.name}</p>
+                  <p><strong>Email:</strong> {currentUser.email}</p>
+                </div>
+                <div>
+                  <p><strong>SĐT:</strong> {currentUser.phone}</p>
+                  <p><strong>Lớp:</strong> {currentUser.class}</p>
+                  <p><strong>Ngành:</strong> {currentUser.major}</p>
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-green-600">
+                ✅ Thông tin được tự động điền từ tài khoản đăng nhập
+              </div>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Mã sinh viên</label>
@@ -1292,9 +1333,11 @@ const KtxView = () => {
                   type="text"
                   value={registrationForm.studentId}
                   onChange={(e) => setRegistrationForm({...registrationForm, studentId: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
                   placeholder="SV001"
+                  readOnly
                 />
+                <p className="text-xs text-gray-500 mt-1">Tự động điền từ tài khoản</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Họ tên sinh viên</label>
@@ -1302,9 +1345,11 @@ const KtxView = () => {
                   type="text"
                   value={registrationForm.studentName}
                   onChange={(e) => setRegistrationForm({...registrationForm, studentName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
                   placeholder="Nguyễn Văn A"
+                  readOnly
                 />
+                <p className="text-xs text-gray-500 mt-1">Tự động điền từ tài khoản</p>
               </div>
             </div>
             
@@ -1476,10 +1521,12 @@ const KtxView = () => {
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
               <h4 className="font-semibold text-blue-800 mb-2">Thông tin đăng ký</h4>
               <div className="text-sm text-blue-700 space-y-1">
-                <p>• Sinh viên: {registrationForm.studentName || 'Chưa nhập'}</p>
-                <p>• Phòng: {registrationForm.roomNumber || 'Chưa chọn'}</p>
-                <p>• Thời gian: {registrationForm.duration} tháng</p>
-                <p>• Trạng thái: {registrationForm.status === 'Pending' ? 'Chờ duyệt' : registrationForm.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}</p>
+                <p>• <strong>Sinh viên:</strong> {registrationForm.studentName || currentUser.name}</p>
+                <p>• <strong>Mã SV:</strong> {registrationForm.studentId || currentUser.id}</p>
+                <p>• <strong>Phòng:</strong> {registrationForm.roomNumber || 'Chưa chọn'}</p>
+                <p>• <strong>Thời gian:</strong> {registrationForm.duration} tháng</p>
+                <p>• <strong>Ngày đăng ký:</strong> {registrationForm.registrationDate}</p>
+                <p>• <strong>Trạng thái:</strong> {registrationForm.status === 'Pending' ? 'Chờ duyệt' : registrationForm.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}</p>
               </div>
             </div>
             
