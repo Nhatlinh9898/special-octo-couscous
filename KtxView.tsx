@@ -410,6 +410,71 @@ const KtxView = () => {
     alert('Đã sắp xếp tự động sinh viên vào phòng!');
   };
 
+  const handleCreateAllRooms = () => {
+    if (confirm('Bạn có chắc chắn muốn tạo tất cả phòng còn thiếu? Hành động này sẽ tạo 500 phòng (200 Khu A + 300 Khu B) với trạng thái "Trống".')) {
+      const newRooms: Room[] = [];
+      let newId = Math.max(...rooms.map(r => r.id), 0) + 1;
+      
+      // Create all Area A rooms (10 floors × 20 rooms = 200 rooms)
+      for (let floor = 1; floor <= 10; floor++) {
+        for (let room = 1; room <= 20; room++) {
+          const roomNumber = `A${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
+          
+          // Check if room already exists
+          if (!rooms.find(r => r.roomNumber === roomNumber)) {
+            const roomType = floor <= 3 ? 'Premium' : floor <= 7 ? 'Standard' : 'VIP';
+            const price = roomType === 'VIP' ? 2000000 : roomType === 'Premium' ? 1500000 : 1200000;
+            
+            newRooms.push({
+              id: newId++,
+              roomNumber,
+              area: 'A',
+              floor,
+              capacity: 4,
+              currentOccupancy: 0,
+              type: roomType as 'Standard' | 'Premium' | 'VIP',
+              status: 'Available',
+              price,
+              facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
+              students: []
+            });
+          }
+        }
+      }
+      
+      // Create all Area B rooms (10 floors × 25 rooms = 300 rooms)
+      for (let floor = 1; floor <= 10; floor++) {
+        for (let room = 1; room <= 25; room++) {
+          const roomNumber = `B${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`;
+          
+          // Check if room already exists
+          if (!rooms.find(r => r.roomNumber === roomNumber)) {
+            const roomType = floor <= 3 ? 'VIP' : floor <= 7 ? 'Premium' : 'Standard';
+            const price = roomType === 'VIP' ? 1800000 : roomType === 'Premium' ? 1300000 : 1000000;
+            
+            newRooms.push({
+              id: newId++,
+              roomNumber,
+              area: 'B',
+              floor,
+              capacity: 6,
+              currentOccupancy: 0,
+              type: roomType as 'Standard' | 'Premium' | 'VIP',
+              status: 'Available',
+              price,
+              facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
+              students: []
+            });
+          }
+        }
+      }
+      
+      // Add all new rooms to existing rooms
+      setRooms([...rooms, ...newRooms]);
+      alert(`Đã tạo thành công ${newRooms.length} phòng mới!`);
+    }
+  };
+
   const filteredRooms = rooms.filter(room => {
     const matchesSearch = room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesArea = filterArea === 'all' || room.area === filterArea;
@@ -424,7 +489,12 @@ const KtxView = () => {
     const maintenance = rooms.filter(r => r.status === 'Maintenance').length;
     const reserved = rooms.filter(r => r.status === 'Reserved').length;
     
-    return { total, occupied, available, maintenance, reserved };
+    // Calculate missing rooms
+    const existingRoomNumbers = rooms.map(r => r.roomNumber);
+    const totalExpectedRooms = 500; // 200 Area A + 300 Area B
+    const missingRooms = totalExpectedRooms - total;
+    
+    return { total, occupied, available, maintenance, reserved, missingRooms };
   };
 
   const stats = getRoomStats();
@@ -453,7 +523,7 @@ const KtxView = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -501,6 +571,16 @@ const KtxView = () => {
               <p className="text-2xl font-bold text-purple-600">{stats.reserved}</p>
             </div>
             <Calendar className="text-purple-600" size={24} />
+          </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Cần tạo</p>
+              <p className="text-2xl font-bold text-red-600">{stats.missingRooms}</p>
+            </div>
+            <Plus className="text-red-600" size={24} />
           </div>
         </div>
       </div>
@@ -577,9 +657,18 @@ const KtxView = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Quản lý phòng</h3>
-              <Button onClick={handleAddRoomClick}>
-                <Plus size={20}/> Thêm phòng
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="secondary" 
+                  onClick={handleCreateAllRooms}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Plus size={20}/> Tạo tất cả phòng
+                </Button>
+                <Button onClick={handleAddRoomClick}>
+                  <Plus size={20}/> Thêm phòng
+                </Button>
+              </div>
             </div>
             
             <div className="flex gap-4 mb-4">
