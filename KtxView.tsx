@@ -235,6 +235,24 @@ const KtxView = () => {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    // Create CSV template content
+    const csvContent = "Mã SV,Họ tên,Lớp,Giới tính,SĐT,Email,Địa chỉ,CCCD\n" +
+                      "SV001,Nguyễn Văn An,CNTT1,Nam,0912345678,an.nguyen@university.edu.vn,Hà Nội,001234567890\n" +
+                      "SV002,Trần Thị Bình,CNTT2,Nữ,0923456789,binh.tran@university.edu.vn,TP.HCM,002345678901\n";
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'template_danh_sach_sinh_vien.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleAutoAssign = () => {
     console.log('Auto-assigning rooms...');
     // Auto-assignment logic
@@ -591,9 +609,24 @@ const KtxView = () => {
               <h4 className="font-semibold text-blue-800 mb-2">Hướng dẫn Import</h4>
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>• File phải có định dạng .xlsx hoặc .csv</li>
-                <li>• Bao gồm các cột: Mã SV, Họ tên, Lớp, Giới tính, SĐT, Email</li>
+                <li>• Bao gồm các cột: Mã SV, Họ tên, Lớp, Giới tính, SĐT, Email, Địa chỉ, CCCD</li>
                 <li>• Dung lượng file tối đa 10MB</li>
               </ul>
+            </div>
+            
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h4 className="font-semibold text-green-800 mb-2">File Mẫu</h4>
+              <p className="text-sm text-green-700 mb-3">
+                Tải file mẫu để biết đúng định dạng dữ liệu cần import
+              </p>
+              <Button 
+                onClick={handleDownloadTemplate}
+                className="w-full"
+                variant="secondary"
+              >
+                <Download size={16} className="mr-2" />
+                Tải File Mẫu (.csv)
+              </Button>
             </div>
             
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
