@@ -99,6 +99,19 @@ const KtxView = () => {
     facilities: ['Điều hòa', 'Tủ lạnh']
   });
 
+  // State for tracking newly created rooms
+  const [newlyCreatedRooms, setNewlyCreatedRooms] = useState<number[]>([]);
+
+  // Auto-clear highlights after 5 seconds
+  useEffect(() => {
+    if (newlyCreatedRooms.length > 0) {
+      const timer = setTimeout(() => {
+        setNewlyCreatedRooms([]);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [newlyCreatedRooms]);
+
   // Initialize mock data
   useEffect(() => {
     initializeMockData();
@@ -477,7 +490,12 @@ const KtxView = () => {
         
         // Add all new rooms to existing rooms
         setRooms([...rooms, ...newRooms]);
-        alert(`Đã tạo thành công ${newRooms.length} phòng mới!`);
+        
+        // Track newly created room IDs
+        const newRoomIds = newRooms.map(room => room.id);
+        setNewlyCreatedRooms(newRoomIds);
+        
+        alert(`Đã tạo thành công ${newRooms.length} phòng mới! Các phòng mới được đánh dấu màu xanh.`);
       }
     } catch (error) {
       console.error('Error creating rooms:', error);
@@ -502,7 +520,8 @@ const KtxView = () => {
       };
       
       setRooms([...rooms, testRoom]);
-      alert('Đã tạo phòng test thành công!');
+      setNewlyCreatedRooms([testRoom.id]);
+      alert('Đã tạo phòng test thành công! Phòng mới được đánh dấu màu xanh.');
     } catch (error) {
       console.error('Test error:', error);
       alert('Lỗi test: ' + error);
@@ -694,6 +713,13 @@ const KtxView = () => {
               <div className="flex gap-2">
                 <Button 
                   variant="secondary" 
+                  onClick={() => setNewlyCreatedRooms([])}
+                  className="bg-gray-500 hover:bg-gray-600 text-white"
+                >
+                  <CheckCircle size={20}/> Xóa đánh dấu
+                </Button>
+                <Button 
+                  variant="secondary" 
                   onClick={handleTestCreateRoom}
                   className="bg-yellow-500 hover:bg-yellow-600 text-white"
                 >
@@ -764,8 +790,22 @@ const KtxView = () => {
                 </thead>
                 <tbody>
                   {filteredRooms.slice(0, 10).map(room => (
-                    <tr key={room.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 font-medium">{room.roomNumber}</td>
+                    <tr 
+                      key={room.id} 
+                      className={`border-b border-gray-100 hover:bg-gray-50 ${
+                        newlyCreatedRooms.includes(room.id) 
+                          ? 'bg-green-50 border-green-300 animate-pulse' 
+                          : ''
+                      }`}
+                    >
+                      <td className="py-3 px-4 font-medium">
+                        {room.roomNumber}
+                        {newlyCreatedRooms.includes(room.id) && (
+                          <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full animate-bounce">
+                            Mới
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3 px-4">{room.area}</td>
                       <td className="py-3 px-4">{room.floor}</td>
                       <td className="py-3 px-4">
