@@ -709,10 +709,12 @@ const KtxView = () => {
     const roomNumber = selectedRoom.roomNumber;
     const roomHistory = meterHistory[roomNumber] || [];
     const currentDate = new Date().toISOString().split('T')[0];
+    const timestamp = Date.now();
     
     console.log('Room number:', roomNumber);
     console.log('Room history:', roomHistory);
     console.log('Current date:', currentDate);
+    console.log('Timestamp:', timestamp);
     
     // Get last reading from history
     const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
@@ -755,7 +757,7 @@ const KtxView = () => {
       console.log('Processing electricity meter capture');
       currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
       // Keep water reading unchanged
-      electricityImage = `electricity_meter_${roomNumber}_${Date.now()}.jpg`;
+      electricityImage = `electricity_meter_${roomNumber}_${timestamp}.jpg`;
       
       console.log('Generated current electricity reading:', currentElectricity);
       
@@ -803,7 +805,7 @@ const KtxView = () => {
       console.log('Processing water meter capture');
       currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
       // Keep electricity reading unchanged
-      waterImage = `water_meter_${roomNumber}_${Date.now()}.jpg`;
+      waterImage = `water_meter_${roomNumber}_${timestamp}.jpg`;
       
       console.log('Generated current water reading:', currentWater);
       
