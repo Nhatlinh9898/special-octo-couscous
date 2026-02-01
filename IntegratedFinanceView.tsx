@@ -18,6 +18,25 @@ import {
 } from 'lucide-react';
 import { Button, Modal } from './components';
 
+interface Room {
+  id: number;
+  number: string;
+  type: 'KTX Standard' | 'KTX Premium' | 'Hotel Standard' | 'Hotel Deluxe' | 'Hotel Suite';
+  building: 'KTX-A' | 'KTX-B' | 'Hotel';
+  floor: number;
+  capacity: number;
+  monthlyRent: number;
+  electricityRate: number;
+  waterRate: number;
+  currentOccupancy: number;
+  maxOccupancy: number;
+  status: 'Available' | 'Occupied' | 'Maintenance' | 'Cleaning' | 'Reserved';
+  currentTenants: string[]; // Array of tenant names
+  pendingMoveOuts: string[]; // Tenants planning to move out
+  pendingMoveIns: string[]; // Tenants waiting to move in
+  lastUpdated: string;
+}
+
 interface Tenant {
   id: number;
   name: string;
@@ -71,6 +90,7 @@ const IntegratedFinanceView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   
   // Modal states
   const [showTenantModal, setShowTenantModal] = useState(false);
@@ -114,7 +134,154 @@ const IntegratedFinanceView = () => {
   });
 
   useEffect(() => {
-    // Mock data
+    // Mock rooms data
+    const mockRooms: Room[] = [
+      {
+        id: 1,
+        number: 'A0101',
+        type: 'KTX Standard',
+        building: 'KTX-A',
+        floor: 1,
+        capacity: 4,
+        monthlyRent: 1200000,
+        electricityRate: 3500,
+        waterRate: 12000,
+        currentOccupancy: 4,
+        maxOccupancy: 4,
+        status: 'Occupied',
+        currentTenants: ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Văn Cường', 'Phạm Thị Dung'],
+        pendingMoveOuts: [],
+        pendingMoveIns: [],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 2,
+        number: 'A0102',
+        type: 'KTX Standard',
+        building: 'KTX-A',
+        floor: 1,
+        capacity: 4,
+        monthlyRent: 1200000,
+        electricityRate: 3500,
+        waterRate: 12000,
+        currentOccupancy: 3,
+        maxOccupancy: 4,
+        status: 'Available',
+        currentTenants: ['Hoàng Văn Em'],
+        pendingMoveOuts: [],
+        pendingMoveIns: ['Nguyễn Thị Phương'],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 3,
+        number: 'A0103',
+        type: 'KTX Premium',
+        building: 'KTX-A',
+        floor: 1,
+        capacity: 2,
+        monthlyRent: 1500000,
+        electricityRate: 3500,
+        waterRate: 12000,
+        currentOccupancy: 2,
+        maxOccupancy: 2,
+        status: 'Occupied',
+        currentTenants: ['Ts. Nguyễn Văn Hùng'],
+        pendingMoveOuts: ['Ts. Nguyễn Văn Hùng'],
+        pendingMoveIns: [],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 4,
+        number: 'B0201',
+        type: 'KTX Standard',
+        building: 'KTX-B',
+        floor: 2,
+        capacity: 4,
+        monthlyRent: 1000000,
+        electricityRate: 3500,
+        waterRate: 12000,
+        currentOccupancy: 4,
+        maxOccupancy: 4,
+        status: 'Occupied',
+        currentTenants: ['Trần Thị Bình', 'Lê Thị Hoa', 'Ngô Đức Anh', 'Vũ Văn Long'],
+        pendingMoveOuts: ['Trần Thị Bình'],
+        pendingMoveIns: [],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 5,
+        number: 'B0202',
+        type: 'KTX Standard',
+        building: 'KTX-B',
+        floor: 2,
+        capacity: 4,
+        monthlyRent: 1000000,
+        electricityRate: 3500,
+        waterRate: 12000,
+        currentOccupancy: 2,
+        maxOccupancy: 4,
+        status: 'Available',
+        currentTenants: ['Vũ Thị Kim'],
+        pendingMoveOuts: [],
+        pendingMoveIns: ['Phạm Văn Quân', 'Lê Văn Sơn'],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 6,
+        number: 'H0101',
+        type: 'Hotel Standard',
+        building: 'Hotel',
+        floor: 1,
+        capacity: 2,
+        monthlyRent: 0,
+        electricityRate: 4000,
+        waterRate: 15000,
+        currentOccupancy: 1,
+        maxOccupancy: 2,
+        status: 'Occupied',
+        currentTenants: ['Ts. Nguyễn Văn Cường'],
+        pendingMoveOuts: [],
+        pendingMoveIns: [],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 7,
+        number: 'H0102',
+        type: 'Hotel Deluxe',
+        building: 'Hotel',
+        floor: 1,
+        capacity: 2,
+        monthlyRent: 0,
+        electricityRate: 4000,
+        waterRate: 15000,
+        currentOccupancy: 1,
+        maxOccupancy: 2,
+        status: 'Available',
+        currentTenants: [],
+        pendingMoveOuts: [],
+        pendingMoveIns: ['Dr. Sarah Johnson'],
+        lastUpdated: new Date().toISOString()
+      },
+      {
+        id: 8,
+        number: 'H0203',
+        type: 'Hotel Suite',
+        building: 'Hotel',
+        floor: 2,
+        capacity: 4,
+        monthlyRent: 0,
+        electricityRate: 5000,
+        waterRate: 20000,
+        currentOccupancy: 1,
+        maxOccupancy: 4,
+        status: 'Occupied',
+        currentTenants: ['Dr. Michael Brown'],
+        pendingMoveOuts: [],
+        pendingMoveIns: [],
+        lastUpdated: new Date().toISOString()
+      }
+    ];
+    setRooms(mockRooms);
     setTenants([
       {
         id: 1,
@@ -524,6 +691,7 @@ const IntegratedFinanceView = () => {
         <nav className="flex space-x-8">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+            { id: 'rooms', label: 'Quản lý Phòng', icon: Building2 },
             { id: 'tenants', label: 'Người thuê', icon: Users },
             { id: 'transactions', label: 'Giao dịch', icon: Receipt },
             { id: 'invoices', label: 'Hóa đơn', icon: FileText },
@@ -605,7 +773,149 @@ const IntegratedFinanceView = () => {
           </div>
         )}
 
-        {activeTab === 'tenants' && (
+        {activeTab === 'rooms' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Quản lý Phòng Chi tiết</h3>
+              <div className="flex gap-2">
+                <select
+                  value={filterBuilding}
+                  onChange={(e) => setFilterBuilding(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="all">Tất cả</option>
+                  <option value="KTX-A">KTX-A</option>
+                  <option value="KTX-B">KTX-B</option>
+                  <option value="Hotel">Hotel</option>
+                </select>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="Available">Trống</option>
+                  <option value="Occupied">Đã ở</option>
+                  <option value="Maintenance">Bảo trì</option>
+                  <option value="Cleaning">Dọn dọn</option>
+                  <option value="Reserved">Đặt trước</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rooms.filter(room => 
+                (filterBuilding === 'all' || room.building === filterBuilding) &&
+                (filterStatus === 'all' || room.status === filterStatus)
+              ).map(room => (
+                <div key={room.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 className="font-medium text-gray-800">{room.number}</h4>
+                      <p className="text-sm text-gray-600">{room.type}</p>
+                      <p className="text-xs text-gray-500">Tầng {room.floor}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      room.status === 'Available' ? 'bg-green-100 text-green-800' :
+                      room.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
+                      room.status === 'Maintenance' ? 'bg-orange-100 text-orange-800' :
+                      room.status === 'Cleaning' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-purple-100 text-purple-800'
+                    }`}>
+                      {room.status === 'Available' ? 'Trống' :
+                       room.status === 'Occupied' ? 'Đã ở' :
+                       room.status === 'Maintenance' ? 'Bảo trì' :
+                       room.status === 'Cleaning' ? 'Dọn dọn' : 'Đặt trước'}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Sức chứa:</span>
+                      <span className="font-medium">{room.currentOccupancy}/{room.maxOccupancy}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Giá phòng:</span>
+                      <span className="font-medium">
+                        {room.monthlyRent > 0 ? `${room.monthlyRent.toLocaleString()}đ/tháng` : 'Theo ngày'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Điện:</span>
+                      <span className="font-medium">{room.electricityRate.toLocaleString()}đ/kWh</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Nước:</span>
+                      <span className="font-medium">{room.waterRate.toLocaleString()}đ/m³</span>
+                    </div>
+                  </div>
+
+                  {/* Current Tenants */}
+                  <div className="border-t border-gray-100 pt-3">
+                    <h5 className="font-medium text-gray-700 mb-2">Người đang ở ({room.currentTenants.length}/{room.maxOccupancy})</h5>
+                    <div className="space-y-1">
+                      {room.currentTenants.map((tenant, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                          <span className="text-gray-700">• {tenant}</span>
+                          <span className="text-xs text-gray-500">
+                            {tenants.find(t => t.name === tenant)?.balance < 0 && (
+                              <span className="text-red-600 font-medium"> (Nợ)</span>
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pending Move Outs */}
+                  {room.pendingMoveOuts.length > 0 && (
+                    <div className="border-t border-orange-100 pt-3">
+                      <h5 className="font-medium text-orange-700 mb-2">Sắp chuyển đi ({room.pendingMoveOuts.length})</h5>
+                      <div className="space-y-1">
+                        {room.pendingMoveOuts.map((tenant, index) => (
+                          <div key={index} className="flex justify-between items-center text-sm">
+                            <span className="text-orange-700">• {tenant}</span>
+                            <span className="text-xs text-orange-500">Sắp chuyển</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pending Move Ins */}
+                  {room.pendingMoveIns.length > 0 && (
+                    <div className="border-t border-blue-100 pt-3">
+                      <h5 className="font-medium text-blue-700 mb-2">Chờ vào ({room.pendingMoveIns.length})</h5>
+                      <div className="space-y-1">
+                        {room.pendingMoveIns.map((tenant, index) => (
+                          <div key={index} className="flex justify-between items-center text-sm">
+                            <span className="text-blue-700">• {tenant}</span>
+                            <span className="text-xs text-blue-500">Chờ vào</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-2 mt-3">
+                    <button className="text-blue-600 hover:text-blue-800 text-sm">
+                      <Eye size={14} className="mr-1" /> Chi tiết
+                    </button>
+                    <button className="text-green-600 hover:text-green-800 text-sm">
+                      <Edit size={14} className="mr-1" /> Sửa
+                    </button>
+                    <button className="text-purple-600 hover:text-purple-800 text-sm">
+                      <Settings size={14} /> Quản lý
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">Người thuê (KTX + Hotel)</h3>
