@@ -91,6 +91,8 @@ const CounselingView = () => {
   const [sessions, setSessions] = useState<CounselingSession[]>([]);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showArticlesModal, setShowArticlesModal] = useState(false);
+  const [showArticleDetailModal, setShowArticleDetailModal] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<any>(null);
   
   // AI
   const [isScreening, setIsScreening] = useState(false);
@@ -251,6 +253,12 @@ const CounselingView = () => {
   const handleArticles = () => {
     console.log('Articles button clicked');
     setShowArticlesModal(true);
+  };
+
+  const handleArticleClick = (article: any) => {
+    console.log('Article clicked:', article.title);
+    setSelectedArticle(article);
+    setShowArticleDetailModal(true);
   };
 
   const getStudentName = (id: number) => MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
@@ -671,7 +679,83 @@ const CounselingView = () => {
                 <div className="space-y-4">
                   <h4 className="font-bold text-gray-800 text-lg">Bài viết hữu ích</h4>
                   
-                  <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
+                  <div 
+                    className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition cursor-pointer"
+                    onClick={() => handleArticleClick({
+                      id: 1,
+                      title: "Quản lý stress trong mùa thi cử",
+                      content: `# Quản lý stress trong mùa thi cử
+
+## Nhận diện dấu hiệu stress
+
+Stress trong mùa thi cử là một hiện tượng tâm lý bình thường, nhưng nếu không được quản lý tốt có thể ảnh hưởng tiêu cực đến kết quả học tập và sức khỏe.
+
+### Dấu hiệu nhận biết:
+- **Về thể chất:** Đau đầu, mệt mỏi, mất ngủ, tim đập nhanh
+- **Về cảm xúc:** Lo lắng, cáu kỉnh, buồn bã, dễ khóc
+- **Về hành vi:** Trốn tránh học tập, trì hoãn, ăn uống thất thường
+- **Về nhận thức:** Khó tập trung, trí nhớ suy giảm, tư duy tiêu cực
+
+## Kỹ thuật thư giãn hiệu quả
+
+### 1. Kỹ thuật hít thở sâu (4-7-8)
+1. Hít vào bằng mũi đếm 4 giây
+2. Giữ hơi thở đếm 7 giây  
+3. Thở ra từ từ bằng miệng đếm 8 giây
+4. Lặp lại 5-10 lần
+
+### 2. Thư giãn cơ bản tiến
+- Nằm ngửa, nhắm mắt
+- Từng nhóm cơ căng trong 5 giây rồi thả lỏng
+- Bắt đầu từ chân, đi lên dần đến đầu
+
+### 3. Tư duy tích cực
+- Thay đổi suy nghĩ tiêu cực thành tích cực
+- Tập trung vào giải pháp thay vì vấn đề
+- Nhắc nhở bản thân về những thành công đã đạt được
+
+## Lịch trình học tập hiệu quả
+
+### Nguyên tắc Pomodoro:
+- Học tập tập trung 25 phút
+- Nghỉ ngơi 5 phút
+- Sau 4 Pomodoro, nghỉ dài 15-30 phút
+
+### Môi trường học tập:
+- Không gian yên tĩnh, đủ ánh sáng
+- Để điện thoại ở phòng khác
+- Có nước lọc và đồ ăn nhẹ lành mạnh
+
+## Chăm sóc sức khỏe
+
+### Dinh dưỡng:
+- Ăn đủ 3 bữa, không bỏ bữa
+- Tăng cường rau xanh, trái cây
+- Hạn chế cà phê, nước ngọt có ga
+
+### Vận động:
+- Tập thể dục nhẹ nhàng 30 phút mỗi ngày
+- Đi bộ, yoga, hoặc các môn thể thao yêu thích
+- Vận động giúp giải tỏa stress hiệu quả
+
+## Khi nào cần tìm kiếm sự giúp đỡ?
+
+Hãy tìm đến chuyên gia tâm lý khi:
+- Stress kéo dài hơn 2 tuần
+- Ảnh hưởng nghiêm trọng đến cuộc sống hàng ngày
+- Có dấu hiệu trầm cảm (mất hứng thú, thay đổi cân nặng)
+- Có suy nghĩ tiêu cực về bản thân
+
+## Lời khuyên cuối cùng
+
+Hãy nhớ rằng stress không hoàn toàn xấu - nó có thể là động lực để bạn cố gắng hơn. Điều quan trọng là học cách quản lý stress một cách hiệu quả.
+
+Chúc các bạn vượt qua mùa thi thành công!`,
+                      author: "Ts. Nguyễn Thị An",
+                      date: "15/10/2024",
+                      category: "Tâm lý học đường"
+                    })}
+                  >
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
                         <Brain size={20} />
@@ -789,6 +873,91 @@ const CounselingView = () => {
                   <Button onClick={() => setShowArticlesModal(false)}>
                     Đóng
                   </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Article Detail Modal */}
+      {showArticleDetailModal && selectedArticle && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '900px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">{selectedArticle.title}</h3>
+                <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
+                  <span className="flex items-center gap-1">
+                    <User size={12} /> {selectedArticle.author}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar size={12} /> {selectedArticle.date}
+                  </span>
+                  <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded">{selectedArticle.category}</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowArticleDetailModal(false)} 
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
+              >
+                <Plus size={20} className="rotate-45"/>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
+              <div className="prose prose-sm max-w-none">
+                {selectedArticle.content.split('\n').map((paragraph: string, index: number) => {
+                  if (paragraph.startsWith('# ')) {
+                    return <h1 key={index} className="text-2xl font-bold text-gray-800 mb-4 mt-6">{paragraph.substring(2)}</h1>;
+                  } else if (paragraph.startsWith('## ')) {
+                    return <h2 key={index} className="text-xl font-bold text-gray-800 mb-3 mt-5">{paragraph.substring(3)}</h2>;
+                  } else if (paragraph.startsWith('### ')) {
+                    return <h3 key={index} className="text-lg font-semibold text-gray-800 mb-2 mt-4">{paragraph.substring(4)}</h3>;
+                  } else if (paragraph.startsWith('- ')) {
+                    return <li key={index} className="text-gray-700 mb-1 ml-4">{paragraph.substring(2)}</li>;
+                  } else if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                    return <p key={index} className="font-semibold text-gray-800 mb-2">{paragraph}</p>;
+                  } else if (paragraph.trim() === '') {
+                    return <br key={index} />;
+                  } else {
+                    return <p key={index} className="text-gray-700 mb-3 leading-relaxed">{paragraph}</p>;
+                  }
+                })}
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-500">
+                    <p>Bài viết này hữu ích cho bạn?</p>
+                    <p className="mt-1">Chia sẻ để bạn bè cùng đọc nhé!</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="sm">
+                      <HeartHandshake size={14} className="mr-1" /> Thích
+                    </Button>
+                    <Button variant="secondary" size="sm">
+                      <FileText size={14} className="mr-1" /> Lưu
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
