@@ -48,7 +48,7 @@ interface UtilityBill {
   water: number;
   electricityCost: number;
   waterCost: number;
-  totalCost: number;
+  totalAmount: number;
   status: 'Paid' | 'Unpaid' | 'Overdue';
   dueDate: string;
 }
@@ -128,6 +128,20 @@ const KtxView = () => {
   const [regFilterType, setRegFilterType] = useState<'all' | 'Standard' | 'Premium' | 'VIP'>('all');
   const [regFilterStatus, setRegFilterStatus] = useState<'all' | 'Available' | 'Occupied' | 'Maintenance' | 'Reserved'>('all');
   const [regOnlyAvailable, setRegOnlyAvailable] = useState(true);
+
+  // Utility bill form state
+  const [utilityForm, setUtilityForm] = useState({
+    roomId: 0,
+    roomNumber: '',
+    month: '',
+    year: new Date().getFullYear(),
+    electricity: 0,
+    water: 0,
+    electricityCost: 3000,
+    waterCost: 25000,
+    totalAmount: 0,
+    status: 'Unpaid' as 'Paid' | 'Unpaid' | 'Overdue'
+  });
 
   // Mock current user state (in real app, this would come from authentication)
   const [currentUser] = useState({
@@ -277,12 +291,24 @@ const KtxView = () => {
         id: 1,
         roomId: 1,
         month: '2024-01',
-        electricity: 150,
-        water: 20,
-        electricityCost: 150 * 3000,
-        waterCost: 20 * 10000,
-        totalCost: 150 * 3000 + 20 * 10000,
+        electricity: 120,
+        water: 15,
+        electricityCost: 3000,
+        waterCost: 25000,
+        totalAmount: (120 * 3000) + (15 * 25000),
         status: 'Unpaid',
+        dueDate: '2024-02-05'
+      },
+      {
+        id: 2,
+        roomId: 2,
+        month: '2024-01',
+        electricity: 95,
+        water: 12,
+        electricityCost: 3000,
+        waterCost: 25000,
+        totalAmount: (95 * 3000) + (12 * 25000),
+        status: 'Paid',
         dueDate: '2024-02-05'
       }
     ];
@@ -536,6 +562,62 @@ const KtxView = () => {
       status: 'Pending'
     });
     setShowRegistrationModal(false);
+  };
+
+  const handleAddUtilityBill = () => {
+    console.log('Adding utility bill:', utilityForm);
+    
+    // Calculate total amount
+    const totalAmount = (utilityForm.electricity * utilityForm.electricityCost) + 
+                       (utilityForm.water * utilityForm.waterCost);
+    
+    const newBill: UtilityBill = {
+      id: utilityBills.length + 1,
+      roomId: utilityForm.roomId,
+      month: utilityForm.month,
+      electricity: utilityForm.electricity,
+      water: utilityForm.water,
+      electricityCost: utilityForm.electricityCost,
+      waterCost: utilityForm.waterCost,
+      totalAmount,
+      status: utilityForm.status,
+      dueDate: new Date(utilityForm.year, new Date(utilityForm.month).getMonth() + 1, 5).toISOString().split('T')[0]
+    };
+    
+    setUtilityBills([...utilityBills, newBill]);
+    alert(`Đã tạo hóa đơn thành công!\n\nPhòng: ${utilityForm.roomNumber}\nTháng: ${utilityForm.month}/${utilityForm.year}\nTiền điện: ${utilityForm.electricity} kWh × ${utilityForm.electricityCost.toLocaleString()}đ = ${(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ\nTiền nước: ${utilityForm.water} m³ × ${utilityForm.waterCost.toLocaleString()}đ = ${(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ\nTổng cộng: ${totalAmount.toLocaleString()}đ`);
+    
+    // Reset form and close modal
+    setUtilityForm({
+      roomId: 0,
+      roomNumber: '',
+      month: '',
+      year: new Date().getFullYear(),
+      electricity: 0,
+      water: 0,
+      electricityCost: 3000,
+      waterCost: 25000,
+      totalAmount: 0,
+      status: 'Unpaid'
+    });
+    setShowUtilityModal(false);
+  };
+
+  const handleCloseUtilityModal = () => {
+    // Reset form when closing modal
+    setUtilityForm({
+      roomId: 0,
+      roomNumber: '',
+      month: '',
+      year: new Date().getFullYear(),
+      electricity: 0,
+      water: 0,
+      electricityCost: 3000,
+      waterCost: 25000,
+      totalAmount: 0,
+      status: 'Unpaid'
+    });
+    setShowUtilityModal(false);
   };
 
   const handleDeleteRoom = (roomId: number) => {
@@ -1177,9 +1259,101 @@ const KtxView = () => {
               </Button>
             </div>
             
-            <div className="text-center py-8 text-gray-500">
-              <Zap size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>Chưa có hóa đơn điện nước</p>
+            {/* Utility Bill Statistics */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Tổng hóa đơn</p>
+                    <p className="text-2xl font-bold text-gray-800">{utilityBills.length}</p>
+                  </div>
+                  <Zap size={24} className="text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Chưa thanh toán</p>
+                    <p className="text-2xl font-bold text-yellow-600">{utilityBills.filter(b => b.status === 'Unpaid').length}</p>
+                  </div>
+                  <Clock size={24} className="text-yellow-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Đã thanh toán</p>
+                    <p className="text-2xl font-bold text-green-600">{utilityBills.filter(b => b.status === 'Paid').length}</p>
+                  </div>
+                  <CheckCircle size={24} className="text-green-500" />
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Quá hạn</p>
+                    <p className="text-2xl font-bold text-red-600">{utilityBills.filter(b => b.status === 'Overdue').length}</p>
+                  </div>
+                  <XCircle size={24} className="text-red-500" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Utility Bill Table */}
+            <div className="bg-white rounded-lg border border-gray-200">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left py-3 px-4">Phòng</th>
+                    <th className="text-left py-3 px-4">Tháng</th>
+                    <th className="text-left py-3 px-4">Điện (kWh)</th>
+                    <th className="text-left py-3 px-4">Nước (m³)</th>
+                    <th className="text-left py-3 px-4">Tiền điện</th>
+                    <th className="text-left py-3 px-4">Tiền nước</th>
+                    <th className="text-left py-3 px-4">Tổng cộng</th>
+                    <th className="text-left py-3 px-4">Trạng thái</th>
+                    <th className="text-left py-3 px-4">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {utilityBills.map(bill => {
+                    const room = rooms.find(r => r.id === bill.roomId);
+                    return (
+                    <tr key={bill.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium">{room?.roomNumber || 'N/A'}</td>
+                      <td className="py-3 px-4">{bill.month}</td>
+                      <td className="py-3 px-4">{bill.electricity}</td>
+                      <td className="py-3 px-4">{bill.water}</td>
+                      <td className="py-3 px-4">{(bill.electricity * bill.electricityCost).toLocaleString()}đ</td>
+                      <td className="py-3 px-4">{(bill.water * bill.waterCost).toLocaleString()}đ</td>
+                      <td className="py-3 px-4 font-semibold">{bill.totalAmount.toLocaleString()}đ</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          bill.status === 'Unpaid' ? 'bg-yellow-100 text-yellow-800' :
+                          bill.status === 'Paid' ? 'bg-green-100 text-green-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {bill.status === 'Unpaid' ? 'Chưa thanh toán' :
+                           bill.status === 'Paid' ? 'Đã thanh toán' : 'Quá hạn'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={16} />
+                          </button>
+                          {bill.status === 'Unpaid' && (
+                            <button className="text-green-600 hover:text-green-800">
+                              <CheckCircle size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -1664,6 +1838,136 @@ const KtxView = () => {
               </Button>
               <Button onClick={handleAddRegistration}>
                 Tạo đăng ký
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Utility Bill Modal */}
+      {showUtilityModal && (
+        <Modal isOpen={showUtilityModal} onClose={handleCloseUtilityModal} title="Thêm hóa đơn điện nước">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phòng</label>
+                <select
+                  value={utilityForm.roomId}
+                  onChange={(e) => {
+                    const roomId = parseInt(e.target.value);
+                    const room = rooms.find(r => r.id === roomId);
+                    setUtilityForm({
+                      ...utilityForm,
+                      roomId,
+                      roomNumber: room?.roomNumber || ''
+                    });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">-- Chọn phòng --</option>
+                  {rooms.map(room => (
+                    <option key={room.id} value={room.id}>
+                      {room.roomNumber} - {room.type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tháng/Năm</label>
+                <input
+                  type="month"
+                  value={utilityForm.month}
+                  onChange={(e) => setUtilityForm({...utilityForm, month: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số điện (kWh)</label>
+                <input
+                  type="number"
+                  value={utilityForm.electricity}
+                  onChange={(e) => setUtilityForm({...utilityForm, electricity: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số nước (m³)</label>
+                <input
+                  type="number"
+                  value={utilityForm.water}
+                  onChange={(e) => setUtilityForm({...utilityForm, water: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="0"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Đơn giá điện (đ/kWh)</label>
+                <input
+                  type="number"
+                  value={utilityForm.electricityCost}
+                  onChange={(e) => setUtilityForm({...utilityForm, electricityCost: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Đơn giá nước (đ/m³)</label>
+                <input
+                  type="number"
+                  value={utilityForm.waterCost}
+                  onChange={(e) => setUtilityForm({...utilityForm, waterCost: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  min="0"
+                />
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-gray-800 mb-2">Chi tiết hóa đơn</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Tiền điện:</span>
+                  <span>{utilityForm.electricity} kWh × {utilityForm.electricityCost.toLocaleString()}đ = {(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tiền nước:</span>
+                  <span>{utilityForm.water} m³ × {utilityForm.waterCost.toLocaleString()}đ = {(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ</span>
+                </div>
+                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                  <span>Tổng cộng:</span>
+                  <span>{((utilityForm.electricity * utilityForm.electricityCost) + (utilityForm.water * utilityForm.waterCost)).toLocaleString()}đ</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                <select
+                  value={utilityForm.status}
+                  onChange={(e) => setUtilityForm({...utilityForm, status: e.target.value as 'Paid' | 'Unpaid' | 'Overdue'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="Unpaid">Chưa thanh toán</option>
+                  <option value="Paid">Đã thanh toán</option>
+                  <option value="Overdue">Quá hạn</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="secondary" onClick={handleCloseUtilityModal}>
+                Hủy
+              </Button>
+              <Button onClick={handleAddUtilityBill}>
+                Tạo hóa đơn
               </Button>
             </div>
           </div>
