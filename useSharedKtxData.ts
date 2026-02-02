@@ -1,5 +1,6 @@
 // Simple Shared Data Hook for KTX System
 import { useState, useEffect } from 'react';
+import { completeRoomData, completeMeterHistory, completeStudentData, completeUtilityBills } from './completeRoomData';
 
 // Shared interfaces
 export interface Student {
@@ -79,138 +80,26 @@ let globalUtilityBills: UtilityBill[] = [];
 let globalMeterHistory: {[key: string]: MeterReading[]} = {};
 let globalRegistrations: Registration[] = [];
 
-// Initial data
+// Initialize data
 const initializeData = () => {
   if (globalStudents.length === 0) {
-    globalStudents = [
-      {
-        id: 1,
-        code: 'SV2024001',
-        fullName: 'Nguyễn Văn Minh',
-        classId: 1,
-        gender: 'Nam',
-        phone: '0912345678',
-        email: 'minh.nv@university.edu.vn',
-        address: 'Hà Nội',
-        idCard: '001234567890',
-        roomNumber: 'A0101',
-        checkInDate: '2024-01-01',
-        status: 'Active'
-      },
-      {
-        id: 2,
-        code: 'SV2024002',
-        fullName: 'Trần Thị Lan',
-        classId: 2,
-        gender: 'Nữ',
-        phone: '0923456789',
-        email: 'lan.tt@university.edu.vn',
-        address: 'Hà Nội',
-        idCard: '002345678901',
-        roomNumber: 'A0102',
-        checkInDate: '2024-01-01',
-        status: 'Active'
-      },
-      {
-        id: 3,
-        code: 'SV2024003',
-        fullName: 'Lê Văn Hùng',
-        classId: 1,
-        gender: 'Nam',
-        phone: '0934567890',
-        email: 'hung.lv@university.edu.vn',
-        address: 'Hà Nội',
-        idCard: '003456789012',
-        roomNumber: 'B0101',
-        checkInDate: '2024-01-01',
-        status: 'Active'
-      }
-    ];
-  }
-
-  if (globalRooms.length === 0) {
-    globalRooms = [
-      {
-        id: 1,
-        roomNumber: 'A0101',
-        area: 'A',
-        floor: 1,
-        capacity: 4,
-        currentOccupancy: 1,
-        type: 'Standard',
-        status: 'Occupied',
-        price: 1500000,
-        facilities: ['WiFi', 'Điều hòa', 'Tủ lạnh', 'Nóng lạnh'],
-        students: [],
-        electricityRate: 3000,
-        waterRate: 25000
-      },
-      {
-        id: 2,
-        roomNumber: 'A0102',
-        area: 'A',
-        floor: 1,
-        capacity: 4,
-        currentOccupancy: 1,
-        type: 'Standard',
-        status: 'Occupied',
-        price: 1500000,
-        facilities: ['WiFi', 'Điều hòa', 'Tủ lạnh', 'Nóng lạnh'],
-        students: [],
-        electricityRate: 3000,
-        waterRate: 25000
-      },
-      {
-        id: 3,
-        roomNumber: 'B0101',
-        area: 'B',
-        floor: 1,
-        capacity: 3,
-        currentOccupancy: 1,
-        type: 'Premium',
-        status: 'Occupied',
-        price: 2000000,
-        facilities: ['WiFi', 'Điều hòa', 'Tủ lạnh', 'Nóng lạnh', 'Máy giặt'],
-        students: [],
-        electricityRate: 3000,
-        waterRate: 25000
-      },
-      {
-        id: 4,
-        roomNumber: 'H001',
-        area: 'Hotel',
-        floor: 1,
-        capacity: 2,
-        currentOccupancy: 0,
-        type: 'Deluxe',
-        status: 'Available',
-        price: 500000,
-        facilities: ['WiFi', 'Điều hòa', 'Mini bar', 'Room service'],
-        students: [],
-        electricityRate: 4000,
-        waterRate: 30000
-      }
-    ];
-  }
-
-  if (Object.keys(globalMeterHistory).length === 0) {
-    globalMeterHistory = {
-      'A0101': [
-        { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
-        { date: '2024-01-15', electricityReading: 1125, waterReading: 212, notes: 'Giữa kỳ' },
-        { date: '2024-02-01', electricityReading: 1250, waterReading: 225, notes: 'Cuối kỳ' }
-      ],
-      'A0102': [
-        { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
-        { date: '2024-01-15', electricityReading: 1048, waterReading: 188, notes: 'Giữa kỳ' },
-        { date: '2024-02-01', electricityReading: 1148, waterReading: 198, notes: 'Cuối kỳ' }
-      ],
-      'B0101': [
-        { date: '2024-01-01', electricityReading: 1200, waterReading: 240, notes: 'Đầu kỳ' },
-        { date: '2024-01-15', electricityReading: 1355, waterReading: 258, notes: 'Giữa kỳ' },
-        { date: '2024-02-01', electricityReading: 1510, waterReading: 276, notes: 'Cuối kỳ' }
-      ]
-    };
+    console.log('🏠 Initializing complete KTX and Hotel data...');
+    
+    // Use complete data from completeRoomData.ts
+    globalStudents = completeStudentData;
+    globalRooms = completeRoomData.map(room => ({
+      ...room,
+      students: [] // Will be populated separately
+    }));
+    globalMeterHistory = completeMeterHistory;
+    globalUtilityBills = completeUtilityBills;
+    
+    console.log('✅ Data initialized:', {
+      rooms: globalRooms.length,
+      students: globalStudents.length,
+      bills: globalUtilityBills.length,
+      meterHistory: Object.keys(globalMeterHistory).length
+    });
   }
 };
 

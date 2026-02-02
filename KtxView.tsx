@@ -14,6 +14,9 @@ interface Student {
   email: string;
   address: string;
   idCard: string;
+  roomNumber?: string;
+  checkInDate?: string;
+  status: 'Active' | 'Inactive' | 'Pending';
 }
 
 interface Room {
@@ -44,14 +47,19 @@ interface Registration {
 interface UtilityBill {
   id: number;
   roomId: number;
+  roomNumber: string;
   month: string;
+  year: number;
   electricity: number;
   water: number;
   electricityCost: number;
   waterCost: number;
   totalAmount: number;
-  status: 'Paid' | 'Unpaid' | 'Overdue';
+  status: 'Paid' | 'Unpaid' | 'Partial';
   dueDate: string;
+  paidDate?: string;
+  paymentMethod?: string;
+  notes?: string;
 }
 
 interface Equipment {
@@ -162,134 +170,20 @@ const KtxView = () => {
     status: 'Unpaid' as 'Paid' | 'Unpaid' | 'Overdue'
   });
 
-  // Meter reading state
+  // Current meter readings state
   const [meterReadings, setMeterReadings] = useState({
-    previousElectricity: 0,
     currentElectricity: 0,
-    previousWater: 0,
     currentWater: 0,
     electricityImage: '',
     waterImage: ''
   });
 
-  // Selected reading for detailed view
+  // Selected reading for detail view
   const [selectedReading, setSelectedReading] = useState<{
     roomNumber: string;
     reading: any;
     index: number;
   } | null>(null);
-
-  // Meter reading history for each room
-  const [meterHistory, setMeterHistory] = useState<{[key: string]: Array<{
-    date: string;
-    electricityReading: number;
-    waterReading: number;
-    electricityImage?: string;
-    waterImage?: string;
-    notes?: string;
-  }>}>({
-    // Comprehensive history for all rooms
-    'A0101': [
-      { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1125, waterReading: 212, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1250, waterReading: 225, notes: 'Cuối kỳ' }
-    ],
-    'A0102': [
-      { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1048, waterReading: 188, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1148, waterReading: 198, notes: 'Cuối kỳ' }
-    ],
-    'A0103': [
-      { date: '2024-01-01', electricityReading: 1100, waterReading: 220, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1235, waterReading: 235, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1370, waterReading: 250, notes: 'Cuối kỳ' }
-    ],
-    'A0104': [
-      { date: '2024-01-01', electricityReading: 900, waterReading: 170, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 998, waterReading: 178, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1098, waterReading: 188, notes: 'Cuối kỳ' }
-    ],
-    'A0105': [
-      { date: '2024-01-01', electricityReading: 1050, waterReading: 210, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1185, waterReading: 225, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1320, waterReading: 240, notes: 'Cuối kỳ' }
-    ],
-    'A0201': [
-      { date: '2024-01-01', electricityReading: 1200, waterReading: 240, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1335, waterReading: 255, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1470, waterReading: 270, notes: 'Cuối kỳ' }
-    ],
-    'A0202': [
-      { date: '2024-01-01', electricityReading: 850, waterReading: 160, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 938, waterReading: 168, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1028, waterReading: 178, notes: 'Cuối kỳ' }
-    ],
-    'A0203': [
-      { date: '2024-01-01', electricityReading: 1150, waterReading: 230, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1285, waterReading: 245, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1420, waterReading: 260, notes: 'Cuối kỳ' }
-    ],
-    'A0204': [
-      { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1115, waterReading: 212, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1230, waterReading: 225, notes: 'Cuối kỳ' }
-    ],
-    'A0205': [
-      { date: '2024-01-01', electricityReading: 950, waterReading: 190, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1058, waterReading: 202, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1168, waterReading: 215, notes: 'Cuối kỳ' }
-    ],
-    'B0101': [
-      { date: '2024-01-01', electricityReading: 1300, waterReading: 260, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1455, waterReading: 278, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1610, waterReading: 296, notes: 'Cuối kỳ' }
-    ],
-    'B0102': [
-      { date: '2024-01-01', electricityReading: 800, waterReading: 150, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 888, waterReading: 158, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 978, waterReading: 168, notes: 'Cuối kỳ' }
-    ],
-    'B0103': [
-      { date: '2024-01-01', electricityReading: 1250, waterReading: 250, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1405, waterReading: 268, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1560, waterReading: 286, notes: 'Cuối kỳ' }
-    ],
-    'B0104': [
-      { date: '2024-01-01', electricityReading: 900, waterReading: 170, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 998, waterReading: 178, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1098, waterReading: 188, notes: 'Cuối kỳ' }
-    ],
-    'B0105': [
-      { date: '2024-01-01', electricityReading: 1100, waterReading: 220, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1235, waterReading: 235, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1370, waterReading: 250, notes: 'Cuối kỳ' }
-    ],
-    'B0201': [
-      { date: '2024-01-01', electricityReading: 1400, waterReading: 280, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1575, waterReading: 298, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1750, waterReading: 316, notes: 'Cuối kỳ' }
-    ],
-    'B0202': [
-      { date: '2024-01-01', electricityReading: 750, waterReading: 140, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 838, waterReading: 148, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 928, waterReading: 158, notes: 'Cuối kỳ' }
-    ],
-    'B0203': [
-      { date: '2024-01-01', electricityReading: 1350, waterReading: 270, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1525, waterReading: 288, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1700, waterReading: 306, notes: 'Cuối kỳ' }
-    ],
-    'B0204': [
-      { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1058, waterReading: 192, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1168, waterReading: 205, notes: 'Cuối kỳ' }
-    ],
-    'B0205': [
-      { date: '2024-01-01', electricityReading: 1050, waterReading: 210, notes: 'Đầu kỳ' },
-      { date: '2024-01-15', electricityReading: 1185, waterReading: 225, notes: 'Giữa kỳ' },
-      { date: '2024-02-01', electricityReading: 1320, waterReading: 240, notes: 'Cuối kỳ' }
-    ]
-  });
 
   // Mock current user state (in real app, this would come from authentication)
   const [currentUser] = useState({
@@ -367,35 +261,49 @@ const KtxView = () => {
       });
     }
 
-    setRooms([...areaARooms, ...areaBRooms]);
+    syncRooms([...areaARooms, ...areaBRooms]);
 
     // Mock students
     const mockStudents: Student[] = [
       {
         id: 1,
-        code: 'SV001',
-        fullName: 'Nguyễn Văn An',
+        code: 'SV2024001',
+        fullName: 'Nguyễn Văn Minh',
         classId: 1,
         gender: 'Nam',
         phone: '0912345678',
-        email: 'an.nguyen@university.edu.vn',
+        email: 'minh.nv@university.edu.vn',
         address: 'Hà Nội',
-        idCard: '001234567890'
+        idCard: '001234567890',
+        status: 'Active'
       },
       {
         id: 2,
-        code: 'SV002',
-        fullName: 'Trần Thị Bình',
+        code: 'SV2024002',
+        fullName: 'Trần Thị Lan',
         classId: 2,
         gender: 'Nữ',
         phone: '0923456789',
-        email: 'binh.tran@university.edu.vn',
-        address: 'TP. Hồ Chí Minh',
-        idCard: '002345678901'
+        email: 'lan.tt@university.edu.vn',
+        address: 'Hà Nội',
+        idCard: '002345678901',
+        status: 'Active'
+      },
+      {
+        id: 3,
+        code: 'SV2024003',
+        fullName: 'Lê Văn Hùng',
+        classId: 1,
+        gender: 'Nam',
+        phone: '0934567890',
+        email: 'hung.lv@university.edu.vn',
+        address: 'Hà Nội',
+        idCard: '003456789012',
+        status: 'Active'
       }
     ];
 
-    setStudents(mockStudents);
+    syncStudents(mockStudents);
 
     // Mock registrations
     const mockRegistrations: Registration[] = [
@@ -431,37 +339,41 @@ const KtxView = () => {
       }
     ];
 
-    setRegistrations(mockRegistrations);
+    syncRegistrations(mockRegistrations);
 
     // Mock utility bills
     const mockUtilityBills: UtilityBill[] = [
       {
         id: 1,
         roomId: 1,
-        month: '2024-01',
+        roomNumber: 'A0101',
+        month: '01',
+        year: 2024,
         electricity: 120,
         water: 15,
         electricityCost: 3000,
         waterCost: 25000,
-        totalAmount: (120 * 3000) + (15 * 25000),
-        status: 'Unpaid',
-        dueDate: '2024-02-05'
+        totalAmount: 361000,
+        status: 'Paid',
+        dueDate: '2024-01-31'
       },
       {
         id: 2,
         roomId: 2,
-        month: '2024-01',
-        electricity: 95,
+        roomNumber: 'A0102',
+        month: '01',
+        year: 2024,
+        electricity: 98,
         water: 12,
         electricityCost: 3000,
         waterCost: 25000,
-        totalAmount: (95 * 3000) + (12 * 25000),
-        status: 'Paid',
-        dueDate: '2024-02-05'
+        totalAmount: 294000,
+        status: 'Unpaid',
+        dueDate: '2024-01-31'
       }
     ];
 
-    setUtilityBills(mockUtilityBills);
+    syncUtilityBills(mockUtilityBills);
 
     // Mock equipment
     const mockEquipment: Equipment[] = [
@@ -542,7 +454,7 @@ const KtxView = () => {
     };
     
     // Add to rooms array
-    setRooms([...rooms, newRoom]);
+    syncRooms([...rooms, newRoom]);
     
     // Reset form and close modal
     setRoomForm({
@@ -670,7 +582,7 @@ const KtxView = () => {
     };
     
     // Add to registrations list
-    setRegistrations([...registrations, newRegistration]);
+    syncRegistrations([...registrations, newRegistration]);
     
     alert(`Đã tạo đăng ký thành công!\n\nSinh viên: ${currentUser.name} (${currentUser.id})\nPhòng: ${registrationForm.roomNumber}\nThời gian: ${registrationForm.duration} tháng\nTrạng thái: Chờ duyệt\n\nVui lòng chờ admin duyệt đăng ký của bạn.`);
     
@@ -747,7 +659,9 @@ const KtxView = () => {
     const newBill: UtilityBill = {
       id: utilityBills.length + 1,
       roomId: utilityForm.roomId,
+      roomNumber: utilityForm.roomNumber,
       month: utilityForm.month,
+      year: utilityForm.year,
       electricity: utilityForm.electricity,
       water: utilityForm.water,
       electricityCost: utilityForm.electricityCost,
@@ -759,7 +673,7 @@ const KtxView = () => {
     
     console.log('New bill created:', newBill);
     
-    setUtilityBills([...utilityBills, newBill]);
+    syncUtilityBills([...utilityBills, newBill]);
     console.log('Updated utility bills:', [...utilityBills, newBill]);
     
     alert(`Đã tạo hóa đơn thành công!\n\nPhòng: ${utilityForm.roomNumber}\nTháng: ${utilityForm.month}/${utilityForm.year}\nTiền điện: ${utilityForm.electricity} kWh × ${utilityForm.electricityCost.toLocaleString()}đ = ${(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ\nTiền nước: ${utilityForm.water} m³ × ${utilityForm.waterCost.toLocaleString()}đ = ${(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ\nTổng cộng: ${totalAmount.toLocaleString()}đ`);
@@ -887,10 +801,12 @@ const KtxView = () => {
       
       console.log('New electricity reading to add:', newReading);
       
-      setMeterHistory(prev => ({
-        ...prev,
-        [roomNumber]: [...(prev[roomNumber] || []), newReading]
-      }));
+      const updatedHistory = {
+        ...meterHistory,
+        [roomNumber]: [...(meterHistory[roomNumber] || []), newReading]
+      };
+      
+      syncMeterHistory(updatedHistory);
       
       console.log('Updated meter history for room:', roomNumber);
       
@@ -935,10 +851,12 @@ const KtxView = () => {
       
       console.log('New water reading to add:', newReading);
       
-      setMeterHistory(prev => ({
-        ...prev,
-        [roomNumber]: [...(prev[roomNumber] || []), newReading]
-      }));
+      const updatedHistory = {
+        ...meterHistory,
+        [roomNumber]: [...(meterHistory[roomNumber] || []), newReading]
+      };
+      
+      syncMeterHistory(updatedHistory);
       
       console.log('Updated meter history for room:', roomNumber);
       
@@ -1058,7 +976,7 @@ const KtxView = () => {
 
   const handleDeleteRoom = (roomId: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
-      setRooms(rooms.filter(r => r.id !== roomId));
+      syncRooms(rooms.filter(r => r.id !== roomId));
       alert('Đã xóa phòng thành công!');
     }
   };
