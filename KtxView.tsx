@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock, Camera } from 'lucide-react';
 import { Button, Modal } from './components';
+import { useSharedKtxData } from './useSharedKtxData';
 
 // Interfaces
 interface Student {
@@ -67,12 +68,30 @@ interface Equipment {
 }
 
 const KtxView = () => {
-  // State management
+  // Use shared data context
+  const {
+    students,
+    rooms,
+    utilityBills,
+    meterHistory,
+    registrations,
+    syncStudents,
+    syncRooms,
+    syncUtilityBills,
+    syncMeterHistory,
+    syncRegistrations,
+    getStudentsByRoom,
+    getRoomByNumber,
+    getAvailableRooms,
+    getOccupiedRooms,
+    getBillsByRoom,
+    getUnpaidBills,
+    getMeterHistory: getMeterHistoryByRoom,
+    getLastReading: getLastReadingByRoom
+  } = useSharedKtxData();
+
+  // State management (local state only)
   const [activeTab, setActiveTab] = useState('overview');
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [utilityBills, setUtilityBills] = useState<UtilityBill[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   
   // Modal states
