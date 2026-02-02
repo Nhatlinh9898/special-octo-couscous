@@ -169,7 +169,7 @@ const KtxView = () => {
     waterImage?: string;
     notes?: string;
   }>}>({
-    // Mock history for some rooms
+    // Comprehensive history for all rooms
     'A0101': [
       { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
       { date: '2024-01-15', electricityReading: 1125, waterReading: 212, notes: 'Giữa kỳ' },
@@ -177,11 +177,98 @@ const KtxView = () => {
     ],
     'A0102': [
       { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
-      { date: '2024-02-01', electricityReading: 1048, waterReading: 188, notes: 'Cuối kỳ' }
+      { date: '2024-01-15', electricityReading: 1048, waterReading: 188, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1148, waterReading: 198, notes: 'Cuối kỳ' }
+    ],
+    'A0103': [
+      { date: '2024-01-01', electricityReading: 1100, waterReading: 220, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1235, waterReading: 235, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1370, waterReading: 250, notes: 'Cuối kỳ' }
+    ],
+    'A0104': [
+      { date: '2024-01-01', electricityReading: 900, waterReading: 170, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 998, waterReading: 178, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1098, waterReading: 188, notes: 'Cuối kỳ' }
+    ],
+    'A0105': [
+      { date: '2024-01-01', electricityReading: 1050, waterReading: 210, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1185, waterReading: 225, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1320, waterReading: 240, notes: 'Cuối kỳ' }
+    ],
+    'A0201': [
+      { date: '2024-01-01', electricityReading: 1200, waterReading: 240, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1335, waterReading: 255, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1470, waterReading: 270, notes: 'Cuối kỳ' }
+    ],
+    'A0202': [
+      { date: '2024-01-01', electricityReading: 850, waterReading: 160, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 938, waterReading: 168, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1028, waterReading: 178, notes: 'Cuối kỳ' }
+    ],
+    'A0203': [
+      { date: '2024-01-01', electricityReading: 1150, waterReading: 230, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1285, waterReading: 245, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1420, waterReading: 260, notes: 'Cuối kỳ' }
+    ],
+    'A0204': [
+      { date: '2024-01-01', electricityReading: 1000, waterReading: 200, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1115, waterReading: 212, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1230, waterReading: 225, notes: 'Cuối kỳ' }
+    ],
+    'A0205': [
+      { date: '2024-01-01', electricityReading: 950, waterReading: 190, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1058, waterReading: 202, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1168, waterReading: 215, notes: 'Cuối kỳ' }
     ],
     'B0101': [
+      { date: '2024-01-01', electricityReading: 1300, waterReading: 260, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1455, waterReading: 278, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1610, waterReading: 296, notes: 'Cuối kỳ' }
+    ],
+    'B0102': [
+      { date: '2024-01-01', electricityReading: 800, waterReading: 150, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 888, waterReading: 158, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 978, waterReading: 168, notes: 'Cuối kỳ' }
+    ],
+    'B0103': [
+      { date: '2024-01-01', electricityReading: 1250, waterReading: 250, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1405, waterReading: 268, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1560, waterReading: 286, notes: 'Cuối kỳ' }
+    ],
+    'B0104': [
+      { date: '2024-01-01', electricityReading: 900, waterReading: 170, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 998, waterReading: 178, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1098, waterReading: 188, notes: 'Cuối kỳ' }
+    ],
+    'B0105': [
       { date: '2024-01-01', electricityReading: 1100, waterReading: 220, notes: 'Đầu kỳ' },
-      { date: '2024-02-01', electricityReading: 1235, waterReading: 237, notes: 'Cuối kỳ' }
+      { date: '2024-01-15', electricityReading: 1235, waterReading: 235, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1370, waterReading: 250, notes: 'Cuối kỳ' }
+    ],
+    'B0201': [
+      { date: '2024-01-01', electricityReading: 1400, waterReading: 280, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1575, waterReading: 298, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1750, waterReading: 316, notes: 'Cuối kỳ' }
+    ],
+    'B0202': [
+      { date: '2024-01-01', electricityReading: 750, waterReading: 140, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 838, waterReading: 148, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 928, waterReading: 158, notes: 'Cuối kỳ' }
+    ],
+    'B0203': [
+      { date: '2024-01-01', electricityReading: 1350, waterReading: 270, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1525, waterReading: 288, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1700, waterReading: 306, notes: 'Cuối kỳ' }
+    ],
+    'B0204': [
+      { date: '2024-01-01', electricityReading: 950, waterReading: 180, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1058, waterReading: 192, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1168, waterReading: 205, notes: 'Cuối kỳ' }
+    ],
+    'B0205': [
+      { date: '2024-01-01', electricityReading: 1050, waterReading: 210, notes: 'Đầu kỳ' },
+      { date: '2024-01-15', electricityReading: 1185, waterReading: 225, notes: 'Giữa kỳ' },
+      { date: '2024-02-01', electricityReading: 1320, waterReading: 240, notes: 'Cuối kỳ' }
     ]
   });
 
