@@ -15,11 +15,14 @@ import {
   Bell,
   Handshake,
   CheckCircle,
-  Settings
+  Settings,
+  Filter,
+  Search
 } from 'lucide-react';
 import { Button, Modal } from './components';
+import { useSharedKtxData } from './useSharedKtxData';
 
-interface Room {
+interface FinanceRoom {
   id: number;
   number: string;
   type: 'KTX Standard' | 'KTX Premium' | 'Hotel Standard' | 'Hotel Deluxe' | 'Hotel Suite';
@@ -32,13 +35,13 @@ interface Room {
   currentOccupancy: number;
   maxOccupancy: number;
   status: 'Available' | 'Occupied' | 'Maintenance' | 'Cleaning' | 'Reserved';
-  currentTenants: string[]; // Array of tenant names
-  pendingMoveOuts: string[]; // Tenants planning to move out
-  pendingMoveIns: string[]; // Tenants waiting to move in
+  currentTenants: string[];
+  pendingMoveOuts: string[];
+  pendingMoveIns: string[];
   lastUpdated: string;
 }
 
-interface Tenant {
+interface FinanceTenant {
   id: number;
   name: string;
   type: 'Student' | 'Teacher' | 'Visitor';
@@ -48,138 +51,67 @@ interface Tenant {
   phone: string;
   balance: number;
   status: 'Active' | 'CheckedOut';
-  checkInDate: string;
-  checkOutDate?: string;
-  purpose?: string; // Study, Teaching, Visiting
 }
 
-interface Transaction {
+interface FinanceTransaction {
   id: number;
-  tenantName: string;
-  roomNumber: string;
-  building: string;
-  type: 'Rent' | 'Electricity' | 'Water' | 'Service';
+  type: 'Income' | 'Expense';
+  category: string;
+  description: string;
   amount: number;
   date: string;
-  status: 'Paid' | 'Unpaid';
-}
-
-interface Invoice {
-  id: number;
-  tenantName: string;
-  roomNumber: string;
-  building: string;
-  month: string;
-  total: number;
-  status: 'Sent' | 'Paid' | 'Overdue';
-  notificationsSent: boolean;
-}
-
-interface Partner {
-  id: number;
-  name: string;
-  type: 'Supplier' | 'Service Provider' | 'Utility';
-  category: string;
-  totalContracts: number;
-  totalValue: number;
-  status: 'Active' | 'Inactive';
+  status: 'Completed' | 'Pending' | 'Failed';
+  referenceId?: string;
+  referenceType?: string;
 }
 
 const IntegratedFinanceView = () => {
+  // Use shared data
+  const {
+    rooms,
+    students,
+    utilityBills,
+    getStudentsByRoom,
+    getAvailableRooms,
+    getOccupiedRooms,
+    getBillsByRoom,
+    getUnpaidBills
+  } = useSharedKtxData();
+
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [rooms, setRooms] = useState<Room[]>([]);
-  
-  // Modal states
-  const [showTenantModal, setShowTenantModal] = useState(false);
-  const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const [showPartnerModal, setShowPartnerModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [financeRooms, setFinanceRooms] = useState<FinanceRoom[]>([]);
+  const [financeTenants, setFinanceTenants] = useState<FinanceTenant[]>([]);
+  const [financeTransactions, setFinanceTransactions] = useState<FinanceTransaction[]>([]);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBuilding, setFilterBuilding] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [isEditing, setIsEditing] = useState(false);
-  
-  // Form states
-  const [tenantForm, setTenantForm] = useState({
-    name: '',
-    type: 'Student' as 'Student' | 'Teacher' | 'Visitor',
-    roomNumber: '',
-    building: 'KTX-A' as 'KTX-A' | 'KTX-B' | 'Hotel',
-    email: '',
-    phone: '',
-    balance: 0,
-    purpose: 'Study'
-  });
-  
-  const [transactionForm, setTransactionForm] = useState({
-    tenantName: '',
-    roomNumber: '',
-    building: '',
-    type: 'Rent' as 'Rent' | 'Electricity' | 'Water' | 'Service',
-    amount: 0,
-    date: '',
-    description: ''
-  });
-  
-  const [partnerForm, setPartnerForm] = useState({
-    name: '',
-    type: 'Supplier' as 'Supplier' | 'Service Provider' | 'Utility',
-    category: '',
-    contact: '',
-    phone: '',
-    email: '',
-    address: '',
-    taxCode: ''
-  });
 
+  // Initialize data with shared data
   useEffect(() => {
-    // Mock rooms data
-    const mockRooms: Room[] = [
-      {
-        id: 1,
-        number: 'A0101',
-        type: 'KTX Standard',
-        building: 'KTX-A',
-        floor: 1,
-        capacity: 4,
-        monthlyRent: 1200000,
-        electricityRate: 3500,
-        waterRate: 12000,
-        currentOccupancy: 4,
-        maxOccupancy: 4,
-        status: 'Occupied',
-        currentTenants: ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Văn Cường', 'Phạm Thị Dung'],
-        pendingMoveOuts: [],
-        pendingMoveIns: [],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 2,
-        number: 'A0102',
-        type: 'KTX Standard',
-        building: 'KTX-A',
-        floor: 1,
-        capacity: 4,
-        monthlyRent: 1200000,
-        electricityRate: 3500,
-        waterRate: 12000,
-        currentOccupancy: 3,
-        maxOccupancy: 4,
-        status: 'Available',
-        currentTenants: ['Hoàng Văn Em'],
-        pendingMoveOuts: [],
-        pendingMoveIns: ['Nguyễn Thị Phương'],
-        lastUpdated: new Date().toISOString()
-      },
-      {
+    // Convert shared rooms to finance format
+    const convertedRooms: FinanceRoom[] = rooms.map(room => ({
+      id: room.id,
+      number: room.roomNumber,
+      type: room.area === 'Hotel' 
+        ? (room.type === 'Deluxe' ? 'Hotel Deluxe' : room.type === 'Suite' ? 'Hotel Suite' : 'Hotel Standard')
+        : (room.type === 'Standard' ? 'KTX Standard' : 'KTX Premium'),
+      building: room.area === 'Hotel' ? 'Hotel' : `KTX-${room.area}` as 'KTX-A' | 'KTX-B' | 'Hotel',
+      floor: room.floor,
+      capacity: room.capacity,
+      monthlyRent: room.price,
+      electricityRate: room.electricityRate || 3000,
+      waterRate: room.waterRate || 25000,
+      currentOccupancy: room.currentOccupancy,
+      maxOccupancy: room.capacity,
+      status: room.status,
+      currentTenants: getStudentsByRoom(room.roomNumber).map(s => s.fullName),
+      pendingMoveOuts: [],
+      pendingMoveIns: [],
+      lastUpdated: new Date().toISOString()
+    }));
         id: 3,
         number: 'A0103',
         type: 'KTX Premium',
@@ -190,148 +122,6 @@ const IntegratedFinanceView = () => {
         electricityRate: 3500,
         waterRate: 12000,
         currentOccupancy: 2,
-        maxOccupancy: 2,
-        status: 'Occupied',
-        currentTenants: ['Ts. Nguyễn Văn Hùng'],
-        pendingMoveOuts: ['Ts. Nguyễn Văn Hùng'],
-        pendingMoveIns: [],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 4,
-        number: 'B0201',
-        type: 'KTX Standard',
-        building: 'KTX-B',
-        floor: 2,
-        capacity: 4,
-        monthlyRent: 1000000,
-        electricityRate: 3500,
-        waterRate: 12000,
-        currentOccupancy: 4,
-        maxOccupancy: 4,
-        status: 'Occupied',
-        currentTenants: ['Trần Thị Bình', 'Lê Thị Hoa', 'Ngô Đức Anh', 'Vũ Văn Long'],
-        pendingMoveOuts: ['Trần Thị Bình'],
-        pendingMoveIns: [],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 5,
-        number: 'B0202',
-        type: 'KTX Standard',
-        building: 'KTX-B',
-        floor: 2,
-        capacity: 4,
-        monthlyRent: 1000000,
-        electricityRate: 3500,
-        waterRate: 12000,
-        currentOccupancy: 2,
-        maxOccupancy: 4,
-        status: 'Available',
-        currentTenants: ['Vũ Thị Kim'],
-        pendingMoveOuts: [],
-        pendingMoveIns: ['Phạm Văn Quân', 'Lê Văn Sơn'],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 6,
-        number: 'H0101',
-        type: 'Hotel Standard',
-        building: 'Hotel',
-        floor: 1,
-        capacity: 2,
-        monthlyRent: 0,
-        electricityRate: 4000,
-        waterRate: 15000,
-        currentOccupancy: 1,
-        maxOccupancy: 2,
-        status: 'Occupied',
-        currentTenants: ['Ts. Nguyễn Văn Cường'],
-        pendingMoveOuts: [],
-        pendingMoveIns: [],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 7,
-        number: 'H0102',
-        type: 'Hotel Deluxe',
-        building: 'Hotel',
-        floor: 1,
-        capacity: 2,
-        monthlyRent: 0,
-        electricityRate: 4000,
-        waterRate: 15000,
-        currentOccupancy: 1,
-        maxOccupancy: 2,
-        status: 'Available',
-        currentTenants: [],
-        pendingMoveOuts: [],
-        pendingMoveIns: ['Dr. Sarah Johnson'],
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 8,
-        number: 'H0203',
-        type: 'Hotel Suite',
-        building: 'Hotel',
-        floor: 2,
-        capacity: 4,
-        monthlyRent: 0,
-        electricityRate: 5000,
-        waterRate: 20000,
-        currentOccupancy: 1,
-        maxOccupancy: 4,
-        status: 'Occupied',
-        currentTenants: ['Dr. Michael Brown'],
-        pendingMoveOuts: [],
-        pendingMoveIns: [],
-        lastUpdated: new Date().toISOString()
-      }
-    ];
-    setRooms(mockRooms);
-    setTenants([
-      {
-        id: 1,
-        name: 'Nguyễn Văn An',
-        type: 'Student',
-        roomNumber: 'A0101',
-        building: 'KTX-A',
-        email: 'an.nguyen@university.edu.vn',
-        phone: '0912345678',
-        balance: 1500000,
-        status: 'Active',
-        checkInDate: '2024-01-01',
-        purpose: 'Study'
-      },
-      {
-        id: 2,
-        name: 'Trần Thị Bình',
-        type: 'Student',
-        roomNumber: 'B0205',
-        building: 'KTX-B',
-        email: 'binh.tran@university.edu.vn',
-        phone: '0923456789',
-        balance: -500000,
-        status: 'Active',
-        checkInDate: '2024-01-01',
-        purpose: 'Study'
-      },
-      {
-        id: 3,
-        name: 'Ts. Nguyễn Văn Cường',
-        type: 'Teacher',
-        roomNumber: 'H0101',
-        building: 'Hotel',
-        email: 'cuong.nguyen@university.edu.vn',
-        phone: '0934567890',
-        balance: 0,
-        status: 'Active',
-        checkInDate: '2024-01-15',
-        checkOutDate: '2024-01-20',
-        purpose: 'Teaching'
-      },
-      {
-        id: 4,
         name: 'Dr. Sarah Johnson',
         type: 'Visitor',
         roomNumber: 'H0203',
