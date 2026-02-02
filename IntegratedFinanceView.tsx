@@ -112,1231 +112,473 @@ const IntegratedFinanceView = () => {
       pendingMoveIns: [],
       lastUpdated: new Date().toISOString()
     }));
-        id: 3,
-        number: 'A0103',
-        type: 'KTX Premium',
-        building: 'KTX-A',
-        floor: 1,
-        capacity: 2,
-        monthlyRent: 1500000,
-        electricityRate: 3500,
-        waterRate: 12000,
-        currentOccupancy: 2,
-        name: 'Dr. Sarah Johnson',
-        type: 'Visitor',
-        roomNumber: 'H0203',
-        building: 'Hotel',
-        email: 'sarah.johnson@university.edu',
-        phone: '+1-555-0123',
-        balance: 0,
-        status: 'Active',
-        checkInDate: '2024-01-18',
-        checkOutDate: '2024-01-22',
-        purpose: 'Visiting'
-      }
-    ]);
 
-    setTransactions([
-      {
-        id: 1,
-        tenantName: 'Nguyễn Văn An',
-        roomNumber: 'A0101',
-        building: 'KTX-A',
-        type: 'Rent',
-        amount: 1200000,
-        date: '2024-01-05',
-        status: 'Paid'
-      },
-      {
-        id: 2,
-        tenantName: 'Trần Thị Bình',
-        roomNumber: 'B0205',
-        building: 'KTX-B',
-        type: 'Electricity',
-        amount: 175000,
-        date: '2024-01-10',
-        status: 'Unpaid'
-      },
-      {
-        id: 3,
-        tenantName: 'Ts. Nguyễn Văn Cường',
-        roomNumber: 'H0101',
-        building: 'Hotel',
-        type: 'Service',
-        amount: 2500000,
-        date: '2024-01-15',
-        status: 'Paid'
-      },
-      {
-        id: 4,
-        tenantName: 'Dr. Sarah Johnson',
-        roomNumber: 'H0203',
-        building: 'Hotel',
-        type: 'Service',
-        amount: 3500000,
-        date: '2024-01-18',
-        status: 'Paid'
-      }
-    ]);
+    // Convert shared students to finance tenants
+    const convertedTenants: FinanceTenant[] = students.map(student => ({
+      id: student.id,
+      name: student.fullName,
+      type: 'Student' as const,
+      roomNumber: student.roomNumber || '',
+      building: student.roomNumber?.startsWith('H') ? 'Hotel' : 
+               student.roomNumber?.startsWith('A') ? 'KTX-A' : 'KTX-B',
+      email: student.email,
+      phone: student.phone,
+      balance: Math.floor(Math.random() * 1000000) - 500000, // Random balance
+      status: student.status === 'Active' ? 'Active' : 'CheckedOut'
+    }));
 
-    setInvoices([
-      {
-        id: 1,
-        tenantName: 'Nguyễn Văn An',
-        roomNumber: 'A0101',
-        building: 'KTX-A',
-        month: '2024-01',
-        total: 1725000,
-        status: 'Paid',
-        notificationsSent: true
-      }
-    ]);
+    // Convert utility bills to finance transactions
+    const convertedTransactions: FinanceTransaction[] = utilityBills.map(bill => ({
+      id: bill.id,
+      type: 'Income' as const,
+      category: 'Utility Bill',
+      description: `Hóa đơn điện nước phòng ${bill.roomNumber} - ${bill.month}/${bill.year}`,
+      amount: bill.totalAmount,
+      date: bill.dueDate,
+      status: bill.status === 'Paid' ? 'Completed' : 'Pending',
+      referenceId: bill.id.toString(),
+      referenceType: 'Utility'
+    }));
 
-    setPartners([
-      {
-        id: 1,
-        name: 'CleanPro Services',
-        type: 'Service Provider',
-        category: 'Cleaning',
-        totalContracts: 12,
-        totalValue: 240000000,
-        status: 'Active'
-      },
-      {
-        id: 2,
-        name: 'EVN Power Company',
-        type: 'Utility',
-        category: 'Electricity',
-        totalContracts: 6,
-        totalValue: 180000000,
-        status: 'Active'
-      }
-    ]);
-  }, []);
+    setFinanceRooms(convertedRooms);
+    setFinanceTenants(convertedTenants);
+    setFinanceTransactions(convertedTransactions);
+  }, [rooms, students, utilityBills]);
 
-  const getStats = () => {
-    const ktxRevenue = transactions
-      .filter(t => t.building.startsWith('KTX'))
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const hotelRevenue = transactions
-      .filter(t => t.building === 'Hotel')
-      .reduce((sum, t) => sum + t.amount, 0);
+  // Filter rooms
+  const filteredRooms = financeRooms.filter(room => {
+    const matchesSearch = room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         room.currentTenants.some(tenant => tenant.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesBuilding = filterBuilding === 'all' || room.building === filterBuilding;
+    const matchesStatus = filterStatus === 'all' || room.status === filterStatus;
+    return matchesSearch && matchesBuilding && matchesStatus;
+  });
 
-    const students = tenants.filter(t => t.type === 'Student');
-    const teachers = tenants.filter(t => t.type === 'Teacher');
-    const visitors = tenants.filter(t => t.type === 'Visitor');
+  // Filter tenants
+  const filteredTenants = financeTenants.filter(tenant => {
+    const matchesSearch = tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tenant.roomNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesBuilding = filterBuilding === 'all' || tenant.building === filterBuilding;
+    const matchesStatus = filterStatus === 'all' || tenant.status === filterStatus;
+    return matchesSearch && matchesBuilding && matchesStatus;
+  });
 
-    return {
-      totalRevenue: ktxRevenue + hotelRevenue,
-      ktxRevenue,
-      hotelRevenue,
-      totalTenants: tenants.length,
-      students: students.length,
-      teachers: teachers.length,
-      visitors: visitors.length,
-      activePartners: partners.filter(p => p.status === 'Active').length,
-      pendingInvoices: invoices.filter(i => i.status === 'Unpaid' || i.status === 'Overdue').length
-    };
-  };
+  // Filter transactions
+  const filteredTransactions = financeTransactions.filter(transaction => {
+    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterBuilding === 'all' || transaction.category === filterBuilding;
+    const matchesStatus = filterStatus === 'all' || transaction.status === filterStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
-  const sendBulkNotifications = (type: string) => {
-    alert(`Đã gửi thông báo ${type} cho tất cả người thuê!`);
-  };
+  // Calculate statistics
+  const totalRooms = financeRooms.length;
+  const occupiedRooms = financeRooms.filter(r => r.status === 'Occupied').length;
+  const availableRooms = financeRooms.filter(r => r.status === 'Available').length;
+  const maintenanceRooms = financeRooms.filter(r => r.status === 'Maintenance').length;
+  const reservedRooms = financeRooms.filter(r => r.status === 'Reserved').length;
+  const cleaningRooms = financeRooms.filter(r => r.status === 'Cleaning').length;
 
-  const generateBulkInvoices = () => {
-    alert('Đã tạo hóa đơn hàng loạt!');
-  };
-
-  // CRUD Handler Functions
-  const handleAddTenant = () => {
-    setIsEditing(false);
-    setTenantForm({
-      name: '',
-      type: 'Student',
-      roomNumber: '',
-      building: 'KTX-A',
-      email: '',
-      phone: '',
-      balance: 0,
-      purpose: 'Study'
-    });
-    setShowTenantModal(true);
-  };
-
-  const handleEditTenant = (tenant: Tenant) => {
-    setIsEditing(true);
-    setSelectedItem(tenant);
-    setTenantForm({
-      name: tenant.name,
-      type: tenant.type,
-      roomNumber: tenant.roomNumber,
-      building: tenant.building,
-      email: tenant.email,
-      phone: tenant.phone,
-      balance: tenant.balance,
-      purpose: tenant.purpose || 'Study'
-    });
-    setShowTenantModal(true);
-  };
-
-  const handleSaveTenant = () => {
-    if (!tenantForm.name || !tenantForm.roomNumber) {
-      alert('Vui lòng điền thông tin bắt buộc!');
-      return;
-    }
-
-    if (isEditing && selectedItem) {
-      // Update existing tenant
-      setTenants(prev => prev.map(t => 
-        t.id === selectedItem.id 
-          ? { ...t, ...tenantForm, id: t.id, status: 'Active' as const, checkInDate: t.checkInDate }
-          : t
-      ));
-      alert('Đã cập nhật thông tin người thuê!');
-    } else {
-      // Add new tenant
-      const newTenant: Tenant = {
-        id: Date.now(),
-        ...tenantForm,
-        status: 'Active',
-        checkInDate: new Date().toISOString().split('T')[0]
-      };
-      setTenants(prev => [...prev, newTenant]);
-      alert('Đã thêm người thuê mới!');
-    }
-    setShowTenantModal(false);
-  };
-
-  const handleDeleteTenant = (tenantId: number) => {
-    if (confirm('Bạn có chắc chắn muốn xóa người thuê này?')) {
-      setTenants(prev => prev.filter(t => t.id !== tenantId));
-      alert('Đã xóa người thuê!');
-    }
-  };
-
-  const handleAddTransaction = () => {
-    setIsEditing(false);
-    setTransactionForm({
-      tenantName: '',
-      roomNumber: '',
-      building: '',
-      type: 'Rent',
-      amount: 0,
-      date: new Date().toISOString().split('T')[0],
-      description: ''
-    });
-    setShowTransactionModal(true);
-  };
-
-  const handleSaveTransaction = () => {
-    if (!transactionForm.tenantName || !transactionForm.amount) {
-      alert('Vui lòng điền thông tin bắt buộc!');
-      return;
-    }
-
-    const newTransaction: Transaction = {
-      id: Date.now(),
-      ...transactionForm,
-      status: 'Unpaid'
-    };
-    setTransactions(prev => [...prev, newTransaction]);
-    setShowTransactionModal(false);
-    alert('Đã thêm giao dịch mới!');
-  };
-
-  const handleAddPartner = () => {
-    setIsEditing(false);
-    setPartnerForm({
-      name: '',
-      type: 'Supplier',
-      category: '',
-      contact: '',
-      phone: '',
-      email: '',
-      address: '',
-      taxCode: ''
-    });
-    setShowPartnerModal(true);
-  };
-
-  const handleSavePartner = () => {
-    if (!partnerForm.name || !partnerForm.contact) {
-      alert('Vui lòng điền thông tin bắt buộc!');
-      return;
-    }
-
-    const newPartner: Partner = {
-      id: Date.now(),
-      ...partnerForm,
-      totalContracts: 0,
-      totalValue: 0,
-      status: 'Active',
-      contracts: []
-    };
-    setPartners(prev => [...prev, newPartner]);
-    setShowPartnerModal(false);
-    alert('Đã thêm đối tác mới!');
-  };
-
-  const handleDeletePartner = (partnerId: number) => {
-    if (confirm('Bạn có chắc chắn muốn xóa đối tác này?')) {
-      setPartners(prev => prev.filter(p => p.id !== partnerId));
-      alert('Đã xóa đối tác!');
-    }
-  };
-
-  const stats = getStats();
+  const totalTenants = financeTenants.length;
+  const activeTenants = financeTenants.filter(t => t.status === 'Active').length;
+  const totalRevenue = financeTransactions
+    .filter(t => t.type === 'Income' && t.status === 'Completed')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = financeTransactions
+    .filter(t => t.type === 'Expense' && t.status === 'Completed')
+    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">Integrated Finance Management</h2>
-          <p className="text-gray-500">KTX + Hotel + Partners - Unified Financial System</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => sendBulkNotifications('invoice')}>
-            <Mail size={20}/> Gửi Hóa đơn
-          </Button>
-          <Button variant="secondary" onClick={() => sendBulkNotifications('payment')}>
-            <Bell size={20}/> Nhắc nợ
-          </Button>
-          <Button variant="secondary" onClick={generateBulkInvoices}>
-            <FileText size={20}/> Tạo HĐ hàng loạt
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600">Tổng Doanh thu</p>
-              <p className="text-2xl font-bold text-green-600">
-                {(stats.totalRevenue / 1000000).toFixed(1)}M
-              </p>
+              <h1 className="text-2xl font-bold text-gray-900">Integrated Finance Management</h1>
+              <p className="text-gray-600 mt-1">Quản lý tài chính tích hợp cho KTX và Hotel</p>
             </div>
-            <TrendingUp className="text-green-600" size={24} />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">KTX Revenue</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {(stats.ktxRevenue / 1000000).toFixed(1)}M
-              </p>
-            </div>
-            <Building2 className="text-blue-600" size={24} />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Hotel Revenue</p>
-              <p className="text-2xl font-bold text-purple-600">
-                {(stats.hotelRevenue / 1000000).toFixed(1)}M
-              </p>
-            </div>
-            <DollarSign className="text-purple-600" size={24} />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Học sinh KTX</p>
-              <p className="text-2xl font-bold text-orange-600">
-                {stats.students}
-              </p>
-            </div>
-            <Users className="text-orange-600" size={24} />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Giáo viên & Khách</p>
-              <p className="text-2xl font-bold text-teal-600">
-                {stats.teachers + stats.visitors}
-              </p>
-            </div>
-            <Handshake className="text-teal-600" size={24} />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">HĐ chờ TT</p>
-              <p className="text-2xl font-bold text-red-600">
-                {stats.pendingInvoices}
-              </p>
-            </div>
-            <Receipt className="text-red-600" size={24} />
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-            { id: 'rooms', label: 'Quản lý Phòng', icon: Building2 },
-            { id: 'tenants', label: 'Người thuê', icon: Users },
-            { id: 'transactions', label: 'Giao dịch', icon: Receipt },
-            { id: 'invoices', label: 'Hóa đơn', icon: FileText },
-            { id: 'partners', label: 'Đối tác', icon: Handshake }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <tab.icon size={16} />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Tab Content */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        {activeTab === 'dashboard' && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800">Tổng quan Tài chính Tích hợp</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-medium text-gray-700 mb-3">Phân bổ Doanh thu</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <span className="font-medium">KTX</span>
-                    <span className="text-blue-600 font-bold">
-                      {(stats.ktxRevenue / 1000000).toFixed(1)}M VNĐ
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                    <span className="font-medium">Hotel</span>
-                    <span className="text-purple-600 font-bold">
-                      {(stats.hotelRevenue / 1000000).toFixed(1)}M VNĐ
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-700 mb-3">Phân bổ Người thuê</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <span className="font-medium">Học sinh KTX</span>
-                    <span className="text-blue-600 font-bold">{stats.students}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span className="font-medium">Giáo viên</span>
-                    <span className="text-green-600 font-bold">{stats.teachers}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                    <span className="font-medium">Khách tham quan</span>
-                    <span className="text-purple-600 font-bold">{stats.visitors}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-700 mb-3">Đối tác</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-teal-50 rounded-lg">
-                    <span className="font-medium">Active</span>
-                    <span className="text-teal-600 font-bold">{stats.activePartners}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                    <span className="font-medium">HĐ chờ TT</span>
-                    <span className="text-red-600 font-bold">{stats.pendingInvoices}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'rooms' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Quản lý Phòng Chi tiết</h3>
-              <div className="flex gap-2">
-                <select
-                  value={filterBuilding}
-                  onChange={(e) => setFilterBuilding(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="all">Tất cả</option>
-                  <option value="KTX-A">KTX-A</option>
-                  <option value="KTX-B">KTX-B</option>
-                  <option value="Hotel">Hotel</option>
-                </select>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="all">Tất cả trạng thái</option>
-                  <option value="Available">Trống</option>
-                  <option value="Occupied">Đã ở</option>
-                  <option value="Maintenance">Bảo trì</option>
-                  <option value="Cleaning">Dọn dọn</option>
-                  <option value="Reserved">Đặt trước</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rooms.filter(room => 
-                (filterBuilding === 'all' || room.building === filterBuilding) &&
-                (filterStatus === 'all' || room.status === filterStatus)
-              ).map(room => (
-                <div key={room.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="font-medium text-gray-800">{room.number}</h4>
-                      <p className="text-sm text-gray-600">{room.type}</p>
-                      <p className="text-xs text-gray-500">Tầng {room.floor}</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      room.status === 'Available' ? 'bg-green-100 text-green-800' :
-                      room.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
-                      room.status === 'Maintenance' ? 'bg-orange-100 text-orange-800' :
-                      room.status === 'Cleaning' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-purple-100 text-purple-800'
-                    }`}>
-                      {room.status === 'Available' ? 'Trống' :
-                       room.status === 'Occupied' ? 'Đã ở' :
-                       room.status === 'Maintenance' ? 'Bảo trì' :
-                       room.status === 'Cleaning' ? 'Dọn dọn' : 'Đặt trước'}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Sức chứa:</span>
-                      <span className="font-medium">{room.currentOccupancy}/{room.maxOccupancy}</span>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Giá phòng:</span>
-                      <span className="font-medium">
-                        {room.monthlyRent > 0 ? `${room.monthlyRent.toLocaleString()}đ/tháng` : 'Theo ngày'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Điện:</span>
-                      <span className="font-medium">{room.electricityRate.toLocaleString()}đ/kWh</span>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Nước:</span>
-                      <span className="font-medium">{room.waterRate.toLocaleString()}đ/m³</span>
-                    </div>
-                  </div>
-
-                  {/* Current Tenants */}
-                  <div className="border-t border-gray-100 pt-3">
-                    <h5 className="font-medium text-gray-700 mb-2">Người đang ở ({room.currentTenants.length}/{room.maxOccupancy})</h5>
-                    <div className="space-y-1">
-                      {room.currentTenants.map((tenant, index) => (
-                        <div key={index} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-700">• {tenant}</span>
-                          <span className="text-xs text-gray-500">
-                            {tenants.find(t => t.name === tenant)?.balance < 0 && (
-                              <span className="text-red-600 font-medium"> (Nợ)</span>
-                            )}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Pending Move Outs */}
-                  {room.pendingMoveOuts.length > 0 && (
-                    <div className="border-t border-orange-100 pt-3">
-                      <h5 className="font-medium text-orange-700 mb-2">Sắp chuyển đi ({room.pendingMoveOuts.length})</h5>
-                      <div className="space-y-1">
-                        {room.pendingMoveOuts.map((tenant, index) => (
-                          <div key={index} className="flex justify-between items-center text-sm">
-                            <span className="text-orange-700">• {tenant}</span>
-                            <span className="text-xs text-orange-500">Sắp chuyển</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Pending Move Ins */}
-                  {room.pendingMoveIns.length > 0 && (
-                    <div className="border-t border-blue-100 pt-3">
-                      <h5 className="font-medium text-blue-700 mb-2">Chờ vào ({room.pendingMoveIns.length})</h5>
-                      <div className="space-y-1">
-                        {room.pendingMoveIns.map((tenant, index) => (
-                          <div key={index} className="flex justify-between items-center text-sm">
-                            <span className="text-blue-700">• {tenant}</span>
-                            <span className="text-xs text-blue-500">Chờ vào</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex justify-end gap-2 mt-3">
-                    <button className="text-blue-600 hover:text-blue-800 text-sm">
-                      <Eye size={14} className="mr-1" /> Chi tiết
-                    </button>
-                    <button className="text-green-600 hover:text-green-800 text-sm">
-                      <Edit size={14} className="mr-1" /> Sửa
-                    </button>
-                    <button className="text-purple-600 hover:text-purple-800 text-sm">
-                      <Settings size={14} /> Quản lý
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'tenants' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Người thuê (KTX + Hotel)</h3>
-              <Button onClick={handleAddTenant}>
-                <Plus size={20}/> Thêm Người thuê
+            <div className="flex gap-2">
+              <Button variant="secondary">
+                <Filter size={16} />
+                Filters
               </Button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4">Tên</th>
-                    <th className="text-left py-3 px-4">Loại</th>
-                    <th className="text-left py-3 px-4">Mục đích</th>
-                    <th className="text-left py-3 px-4">Phòng</th>
-                    <th className="text-left py-3 px-4">Tòa nhà</th>
-                    <th className="text-left py-3 px-4">Liên hệ</th>
-                    <th className="text-left py-3 px-4">Số dư</th>
-                    <th className="text-left py-3 px-4">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tenants.map(tenant => (
-                    <tr key={tenant.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 font-medium">{tenant.name}</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          tenant.type === 'Student' ? 'bg-blue-100 text-blue-800' :
-                          tenant.type === 'Teacher' ? 'bg-green-100 text-green-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {tenant.type === 'Student' ? 'Học sinh' :
-                           tenant.type === 'Teacher' ? 'Giáo viên' : 'Khách tham quan'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
-                          {tenant.purpose}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">{tenant.roomNumber}</td>
-                      <td className="py-3 px-4">{tenant.building}</td>
-                      <td className="py-3 px-4">
-                        <div className="text-sm">
-                          <p>{tenant.email}</p>
-                          <p className="text-xs text-gray-500">{tenant.phone}</p>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`font-medium ${tenant.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {tenant.balance.toLocaleString()}đ
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-2">
-                          <button 
-                            className="text-blue-600 hover:text-blue-800"
-                            onClick={() => handleEditTenant(tenant)}
-                          >
-                            <Eye size={16} />
-                          </button>
-                          <button 
-                            className="text-green-600 hover:text-green-800"
-                            onClick={() => handleEditTenant(tenant)}
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button 
-                            className="text-red-600 hover:text-red-800"
-                            onClick={() => handleDeleteTenant(tenant.id)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'transactions' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Giao dịch Tích hợp</h3>
-              <Button onClick={handleAddTransaction}>
-                <Plus size={20}/> Thêm Giao dịch
-              </Button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4">Ngày</th>
-                    <th className="text-left py-3 px-4">Người thuê</th>
-                    <th className="text-left py-3 px-4">Phòng</th>
-                    <th className="text-left py-3 px-4">Tòa nhà</th>
-                    <th className="text-left py-3 px-4">Loại</th>
-                    <th className="text-left py-3 px-4">Số tiền</th>
-                    <th className="text-left py-3 px-4">Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map(transaction => (
-                    <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4">{transaction.date}</td>
-                      <td className="py-3 px-4">{transaction.tenantName}</td>
-                      <td className="py-3 px-4">{transaction.roomNumber}</td>
-                      <td className="py-3 px-4">{transaction.building}</td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                          {transaction.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 font-medium">{transaction.amount.toLocaleString()}đ</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          transaction.status === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {transaction.status === 'Paid' ? 'Đã TT' : 'Chưa TT'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <Eye size={16} />
-                          </button>
-                          <button className="text-green-600 hover:text-green-800">
-                            <Edit size={16} />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'invoices' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Hóa đơn Tích hợp</h3>
               <Button>
-                <Plus size={20}/> Tạo Hóa đơn
+                <Plus size={16} />
+                Add Transaction
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Rooms</p>
+                <p className="text-2xl font-bold text-gray-900">{totalRooms}</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Building2 className="text-blue-600" size={20} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Occupied Rooms</p>
+                <p className="text-2xl font-bold text-green-600">{occupiedRooms}</p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-lg">
+                <Users className="text-green-600" size={20} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-blue-600">{totalRevenue.toLocaleString()}đ</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <DollarSign className="text-blue-600" size={20} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Active Tenants</p>
+                <p className="text-2xl font-bold text-purple-600">{activeTenants}</p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-lg">
+                <Users className="text-purple-600" size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Room Status Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Available</p>
+              <p className="text-xl font-bold text-green-600">{availableRooms}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Occupied</p>
+              <p className="text-xl font-bold text-blue-600">{occupiedRooms}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Maintenance</p>
+              <p className="text-xl font-bold text-orange-600">{maintenanceRooms}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Cleaning</p>
+              <p className="text-xl font-bold text-yellow-600">{cleaningRooms}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Reserved</p>
+              <p className="text-xl font-bold text-purple-600">{reservedRooms}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                  type="text"
+                  placeholder="Search rooms, tenants, transactions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4">Mã HD</th>
-                    <th className="text-left py-3 px-4">Người thuê</th>
-                    <th className="text-left py-3 px-4">Phòng</th>
-                    <th className="text-left py-3 px-4">Tòa nhà</th>
-                    <th className="text-left py-3 px-4">Tổng cộng</th>
-                    <th className="text-left py-3 px-4">Trạng thái</th>
-                    <th className="text-left py-3 px-4">Thông báo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.map(invoice => (
-                    <tr key={invoice.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 font-medium">INV-{invoice.id.toString().padStart(6, '0')}</td>
-                      <td className="py-3 px-4">{invoice.tenantName}</td>
-                      <td className="py-3 px-4">{invoice.roomNumber}</td>
-                      <td className="py-3 px-4">{invoice.building}</td>
-                      <td className="py-3 px-4 font-medium">{invoice.total.toLocaleString()}đ</td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                          {invoice.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {invoice.notificationsSent ? (
-                          <CheckCircle className="text-green-600" size={16} />
-                        ) : (
-                          <Bell className="text-red-600" size={16} />
-                        )}
-                      </td>
+            <select
+              value={filterBuilding}
+              onChange={(e) => setFilterBuilding(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Buildings</option>
+              <option value="KTX-A">KTX-A</option>
+              <option value="KTX-B">KTX-B</option>
+              <option value="Hotel">Hotel</option>
+            </select>
+            
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Reserved">Reserved</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('rooms')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'rooms'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Rooms ({filteredRooms.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('tenants')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'tenants'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Tenants ({filteredTenants.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('transactions')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'transactions'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Transactions ({filteredTransactions.length})
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'rooms' && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Room
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Building
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Occupancy
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Monthly Rent
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Current Tenants
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredRooms.map((room) => (
+                      <tr key={room.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {room.number}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {room.type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {room.building}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            room.status === 'Available' ? 'bg-green-100 text-green-800' :
+                            room.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
+                            room.status === 'Maintenance' ? 'bg-orange-100 text-orange-800' :
+                            room.status === 'Cleaning' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}>
+                            {room.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {room.currentOccupancy}/{room.maxOccupancy}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {room.monthlyRent.toLocaleString()}đ
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          <div className="max-w-xs truncate">
+                            {room.currentTenants.join(', ') || 'No tenants'}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-        {activeTab === 'partners' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-800">Quản lý Đối tác</h3>
-              <Button onClick={handleAddPartner}>
-                <Plus size={20}/> Thêm Đối tác
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {partners.map(partner => (
-                <div key={partner.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="font-medium text-gray-800">{partner.name}</h4>
-                      <p className="text-sm text-gray-600">{partner.category}</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      partner.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {partner.status}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <p><strong>Hợp đồng:</strong> {partner.totalContracts}</p>
-                    <p><strong>Giá trị:</strong> {(partner.totalValue / 1000000).toFixed(1)}M VNĐ</p>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-3">
-                    <button className="text-blue-600 hover:text-blue-800">
-                      <Eye size={16} />
-                    </button>
-                    <button className="text-green-600 hover:text-green-800">
-                      <Edit size={16} />
-                    </button>
-                    <button className="text-red-600 hover:text-red-800" onClick={() => handleDeletePartner(partner.id)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {activeTab === 'tenants' && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Room
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Building
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Balance
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contact
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredTenants.map((tenant) => (
+                      <tr key={tenant.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {tenant.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {tenant.type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {tenant.roomNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {tenant.building}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            tenant.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {tenant.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {tenant.balance.toLocaleString()}đ
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div>
+                            <div>{tenant.email}</div>
+                            <div>{tenant.phone}</div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {activeTab === 'transactions' && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Category
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredTransactions.map((transaction) => (
+                      <tr key={transaction.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {transaction.date}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            transaction.type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {transaction.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {transaction.category}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          <div className="max-w-xs truncate">
+                            {transaction.description}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {transaction.amount.toLocaleString()}đ
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            transaction.status === 'Completed' ? 'bg-green-100 text-green-800' :
+                            transaction.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {transaction.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Tenant Modal */}
-      {showTenantModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 99999
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            width: '90%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800">
-                {isEditing ? 'Cập nhật Người thuê' : 'Thêm Người thuê Mới'}
-              </h3>
-              <button 
-                onClick={() => setShowTenantModal(false)} 
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
-              >
-                <Plus size={20} className="rotate-45"/>
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto" style={{maxHeight: 'calc(90vh - 80px)'}}>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên *</label>
-                    <input
-                      type="text"
-                      value={tenantForm.name}
-                      onChange={(e) => setTenantForm({...tenantForm, name: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Nhập họ và tên"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại *</label>
-                    <select
-                      value={tenantForm.type}
-                      onChange={(e) => setTenantForm({...tenantForm, type: e.target.value as any})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="Student">Học sinh</option>
-                      <option value="Teacher">Giáo viên</option>
-                      <option value="Visitor">Khách tham quan</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phòng *</label>
-                    <input
-                      type="text"
-                      value={tenantForm.roomNumber}
-                      onChange={(e) => setTenantForm({...tenantForm, roomNumber: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="A0101"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tòa nhà *</label>
-                    <select
-                      value={tenantForm.building}
-                      onChange={(e) => setTenantForm({...tenantForm, building: e.target.value as any})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="KTX-A">KTX-A</option>
-                      <option value="KTX-B">KTX-B</option>
-                      <option value="Hotel">Hotel</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={tenantForm.email}
-                      onChange={(e) => setTenantForm({...tenantForm, email: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="email@example.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
-                    <input
-                      type="tel"
-                      value={tenantForm.phone}
-                      onChange={(e) => setTenantForm({...tenantForm, phone: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="09xxxxxxxx"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Số dư</label>
-                  <input
-                    type="number"
-                    value={tenantForm.balance}
-                    onChange={(e) => setTenantForm({...tenantForm, balance: parseInt(e.target.value) || 0})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button variant="secondary" onClick={() => setShowTenantModal(false)}>
-                    Hủy
-                  </Button>
-                  <Button onClick={handleSaveTenant}>
-                    {isEditing ? 'Cập nhật' : 'Thêm'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Transaction Modal */}
-      {showTransactionModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 99999
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            width: '90%',
-            maxWidth: '500px',
-            maxHeight: '90vh',
-            overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800">Thêm Giao dịch Mới</h3>
-              <button 
-                onClick={() => setShowTransactionModal(false)} 
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
-              >
-                <Plus size={20} className="rotate-45"/>
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Người thuê *</label>
-                  <input
-                    type="text"
-                    value={transactionForm.tenantName}
-                    onChange={(e) => setTransactionForm({...transactionForm, tenantName: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Nhập tên người thuê"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phòng</label>
-                    <input
-                      type="text"
-                      value={transactionForm.roomNumber}
-                      onChange={(e) => setTransactionForm({...transactionForm, roomNumber: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="A0101"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tòa nhà</label>
-                    <input
-                      type="text"
-                      value={transactionForm.building}
-                      onChange={(e) => setTransactionForm({...transactionForm, building: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="KTX-A"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại giao dịch</label>
-                    <select
-                      value={transactionForm.type}
-                      onChange={(e) => setTransactionForm({...transactionForm, type: e.target.value as any})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="Rent">Tiền phòng</option>
-                      <option value="Electricity">Tiền điện</option>
-                      <option value="Water">Tiền nước</option>
-                      <option value="Service">Dịch vụ</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền *</label>
-                    <input
-                      type="number"
-                      value={transactionForm.amount}
-                      onChange={(e) => setTransactionForm({...transactionForm, amount: parseInt(e.target.value) || 0})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày</label>
-                  <input
-                    type="date"
-                    value={transactionForm.date}
-                    onChange={(e) => setTransactionForm({...transactionForm, date: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-                  <textarea
-                    value={transactionForm.description}
-                    onChange={(e) => setTransactionForm({...transactionForm, description: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20"
-                    placeholder="Mô tả giao dịch..."
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button variant="secondary" onClick={() => setShowTransactionModal(false)}>
-                    Hủy
-                  </Button>
-                  <Button onClick={handleSaveTransaction}>
-                    Thêm
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Partner Modal */}
-      {showPartnerModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 99999
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            width: '90%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800">Thêm Đối tác Mới</h3>
-              <button 
-                onClick={() => setShowPartnerModal(false)} 
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition"
-              >
-                <Plus size={20} className="rotate-45"/>
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên đối tác *</label>
-                    <input
-                      type="text"
-                      value={partnerForm.name}
-                      onChange={(e) => setPartnerForm({...partnerForm, name: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="Nhập tên đối tác"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Loại</label>
-                    <select
-                      value={partnerForm.type}
-                      onChange={(e) => setPartnerForm({...partnerForm, type: e.target.value as any})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    >
-                      <option value="Supplier">Nhà cung cấp</option>
-                      <option value="Service Provider">Dịch vụ</option>
-                      <option value="Utility">Tiện ích</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Người liên hệ *</label>
-                  <input
-                    type="text"
-                    value={partnerForm.contact}
-                    onChange={(e) => setPartnerForm({...partnerForm, contact: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Tên người liên hệ"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Điện thoại</label>
-                    <input
-                      type="tel"
-                      value={partnerForm.phone}
-                      onChange={(e) => setPartnerForm({...partnerForm, phone: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="09xxxxxxxx"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={partnerForm.email}
-                      onChange={(e) => setPartnerForm({...partnerForm, email: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      placeholder="email@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
-                  <input
-                    type="text"
-                    value={partnerForm.address}
-                    onChange={(e) => setPartnerForm({...partnerForm, address: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Địa chỉ"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button variant="secondary" onClick={() => setShowPartnerModal(false)}>
-                    Hủy
-                  </Button>
-                  <Button onClick={handleSavePartner}>
-                    Thêm
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
