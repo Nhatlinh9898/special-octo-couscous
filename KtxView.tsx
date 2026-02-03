@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock, Camera } from 'lucide-react';
+import { Building2, Users, Bed, FileText, Upload, Calendar, DollarSign, Settings, Package, Zap, Droplets, Wind, Plus, Search, Filter, Edit, Trash2, Eye, Download, CheckCircle, AlertCircle, XCircle, Clock, Camera, BookOpen, Smartphone, QrCode } from 'lucide-react';
 import { Button, Modal } from './components';
 import { useSharedKtxData } from './useSharedKtxData';
 
@@ -54,12 +54,46 @@ interface UtilityBill {
   water: number;
   electricityCost: number;
   waterCost: number;
+  roomCost: number;
   totalAmount: number;
   status: 'Paid' | 'Unpaid' | 'Partial';
   dueDate: string;
   paidDate?: string;
   paymentMethod?: string;
   notes?: string;
+  splitAmounts?: { [studentId: string]: number }; // Phân chia cho từng sinh viên
+  individualPayments?: IndividualPayment[]; // Thanh toán của từng sinh viên
+}
+
+interface IndividualPayment {
+  id: string;
+  billId: number;
+  studentId: string;
+  studentName: string;
+  amount: number;
+  status: 'Pending' | 'Paid' | 'Overdue';
+  paidDate?: string;
+  paymentMethod?: string;
+  notificationSent: boolean;
+  reminderCount: number;
+}
+
+interface PaymentNotification {
+  id: string;
+  studentId: string;
+  billId: number;
+  type: 'NewBill' | 'Reminder' | 'Overdue' | 'Paid';
+  message: string;
+  sentDate: string;
+  read: boolean;
+}
+
+interface PaymentMethod {
+  id: string;
+  name: string;
+  type: 'BankTransfer' | 'EWallet' | 'Cash' | 'CreditCard';
+  accountInfo: string;
+  isActive: boolean;
 }
 
 interface Equipment {
@@ -166,9 +200,45 @@ const KtxView = () => {
     water: 0,
     electricityCost: 3000,
     waterCost: 25000,
+    roomCost: 0,
     totalAmount: 0,
     status: 'Unpaid' as 'Paid' | 'Unpaid' | 'Overdue'
   });
+
+  // Payment system states
+  const [individualPayments, setIndividualPayments] = useState<IndividualPayment[]>([]);
+  const [paymentNotifications, setPaymentNotifications] = useState<PaymentNotification[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+    {
+      id: '1',
+      name: 'Chuyển khoản ngân hàng',
+      type: 'BankTransfer',
+      accountInfo: 'VCB - 1234567890 - Nguyễn Văn A',
+      isActive: true
+    },
+    {
+      id: '2',
+      name: 'MoMo',
+      type: 'EWallet',
+      accountInfo: '0912345678',
+      isActive: true
+    },
+    {
+      id: '3',
+      name: 'Tiền mặt',
+      type: 'Cash',
+      accountInfo: 'Nộp tại văn phòng KTX',
+      isActive: true
+    }
+  ]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [selectedBillForPayment, setSelectedBillForPayment] = useState<UtilityBill | null>(null);
+  
+  // Payment processing states (similar to Canteen)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cash' | 'transfer' | 'qr'>('transfer');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // Current meter readings state
   const [meterReadings, setMeterReadings] = useState({
@@ -176,6 +246,13 @@ const KtxView = () => {
     currentWater: 0,
     electricityImage: '',
     waterImage: ''
+  });
+
+  // Capture state to prevent conflicts
+  const [captureState, setCaptureState] = useState({
+    isCapturing: false,
+    currentMeterType: null as 'electricity' | 'water' | null,
+    lastCaptureTime: 0
   });
 
   // Selected reading for detail view
@@ -223,47 +300,7 @@ const KtxView = () => {
   }, [newlyCreatedRooms]);
 
   const initializeMockData = () => {
-    // Generate 200 rooms for Area A
-    const areaARooms: Room[] = [];
-    for (let i = 1; i <= 200; i++) {
-      const floor = Math.ceil(i / 20);
-      areaARooms.push({
-        id: i,
-        roomNumber: `A${floor.toString().padStart(2, '0')}${(i % 20 || 20).toString().padStart(2, '0')}`,
-        area: 'A',
-        floor,
-        capacity: 4,
-        currentOccupancy: Math.floor(Math.random() * 5),
-        type: i <= 50 ? 'Premium' : i <= 150 ? 'Standard' : 'VIP',
-        status: Math.random() > 0.7 ? 'Occupied' : Math.random() > 0.5 ? 'Available' : 'Maintenance',
-        price: i <= 50 ? 1500000 : i <= 150 ? 1200000 : 2000000,
-        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
-        students: []
-      });
-    }
-
-    // Generate 300 rooms for Area B
-    const areaBRooms: Room[] = [];
-    for (let i = 1; i <= 300; i++) {
-      const floor = Math.ceil(i / 25);
-      areaBRooms.push({
-        id: 200 + i,
-        roomNumber: `B${floor.toString().padStart(2, '0')}${(i % 25 || 25).toString().padStart(2, '0')}`,
-        area: 'B',
-        floor,
-        capacity: 6,
-        currentOccupancy: Math.floor(Math.random() * 7),
-        type: i <= 100 ? 'Standard' : i <= 250 ? 'Premium' : 'VIP',
-        status: Math.random() > 0.6 ? 'Occupied' : Math.random() > 0.4 ? 'Available' : 'Reserved',
-        price: i <= 100 ? 1000000 : i <= 250 ? 1300000 : 1800000,
-        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
-        students: []
-      });
-    }
-
-    syncRooms([...areaARooms, ...areaBRooms]);
-
-    // Mock students
+    // Mock students first (needed for room assignment)
     const mockStudents: Student[] = [
       {
         id: 1,
@@ -304,6 +341,72 @@ const KtxView = () => {
     ];
 
     syncStudents(mockStudents);
+
+    // Generate 200 rooms for Area A
+    const areaARooms: Room[] = [];
+    for (let i = 1; i <= 200; i++) {
+      const floor = Math.ceil(i / 20);
+      areaARooms.push({
+        id: i,
+        roomNumber: `A${floor.toString().padStart(2, '0')}${(i % 20 || 20).toString().padStart(2, '0')}`,
+        area: 'A',
+        floor,
+        capacity: 4,
+        currentOccupancy: Math.floor(Math.random() * 5),
+        type: i <= 50 ? 'Premium' : i <= 150 ? 'Standard' : 'VIP',
+        status: Math.random() > 0.7 ? 'Occupied' : Math.random() > 0.5 ? 'Available' : 'Maintenance',
+        price: i <= 50 ? 1500000 : i <= 150 ? 1200000 : 2000000,
+        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học'],
+        students: []
+      });
+    }
+
+    // Generate 300 rooms for Area B
+    const areaBRooms: Room[] = [];
+    for (let i = 1; i <= 300; i++) {
+      const floor = Math.ceil(i / 25);
+      areaBRooms.push({
+        id: 200 + i,
+        roomNumber: `B${floor.toString().padStart(2, '0')}${(i % 25 || 25).toString().padStart(2, '0')}`,
+        area: 'B',
+        floor,
+        capacity: 6,
+        currentOccupancy: Math.floor(Math.random() * 7),
+        type: i <= 100 ? 'Standard' : i <= 250 ? 'Premium' : 'VIP',
+        status: Math.random() > 0.6 ? 'Occupied' : Math.random() > 0.4 ? 'Available' : 'Reserved',
+        price: i <= 100 ? 1000000 : i <= 250 ? 1300000 : 1800000,
+        facilities: ['Điều hòa', 'Tủ lạnh', 'Giường', 'Bàn học', 'Tủ quần áo'],
+        students: []
+      });
+    }
+
+    // Add students to rooms for payment testing
+    const updatedRoomsWithStudents = [...areaARooms, ...areaBRooms].map(room => {
+      if (room.roomNumber === 'A0101') {
+        return {
+          ...room,
+          currentOccupancy: 2,
+          status: 'Occupied' as 'Available' | 'Occupied' | 'Maintenance' | 'Reserved',
+          students: [
+            mockStudents[0], // Nguyễn Văn Minh
+            mockStudents[1]  // Trần Thị Lan
+          ]
+        };
+      }
+      if (room.roomNumber === 'A0102') {
+        return {
+          ...room,
+          currentOccupancy: 1,
+          status: 'Occupied' as 'Available' | 'Occupied' | 'Maintenance' | 'Reserved',
+          students: [
+            mockStudents[2]  // Lê Văn Hùng
+          ]
+        };
+      }
+      return room;
+    });
+
+    syncRooms(updatedRoomsWithStudents);
 
     // Mock registrations
     const mockRegistrations: Registration[] = [
@@ -353,6 +456,7 @@ const KtxView = () => {
         water: 15,
         electricityCost: 3000,
         waterCost: 25000,
+        roomCost: 1200000,
         totalAmount: 361000,
         status: 'Paid',
         dueDate: '2024-01-31'
@@ -367,6 +471,7 @@ const KtxView = () => {
         water: 12,
         electricityCost: 3000,
         waterCost: 25000,
+        roomCost: 1200000,
         totalAmount: 294000,
         status: 'Unpaid',
         dueDate: '2024-01-31'
@@ -404,6 +509,95 @@ const KtxView = () => {
     ];
 
     setEquipment(mockEquipment);
+
+    // Initialize individual payments for existing bills
+    const mockIndividualPayments: IndividualPayment[] = [];
+    
+    // Add payments for bill A0101 (2 students)
+    mockIndividualPayments.push(
+      {
+        id: '1_1',
+        billId: 1,
+        studentId: '1',
+        studentName: 'Nguyễn Văn Minh',
+        amount: 180500, // Half of 361000
+        status: 'Paid',
+        paidDate: '2024-01-25',
+        paymentMethod: 'Chuyển khoản ngân hàng',
+        notificationSent: true,
+        reminderCount: 0
+      },
+      {
+        id: '1_2',
+        billId: 1,
+        studentId: '2',
+        studentName: 'Trần Thị Lan',
+        amount: 180500, // Half of 361000
+        status: 'Paid',
+        paidDate: '2024-01-26',
+        paymentMethod: 'MoMo',
+        notificationSent: true,
+        reminderCount: 0
+      }
+    );
+    
+    // Add payments for bill A0102 (1 student)
+    mockIndividualPayments.push(
+      {
+        id: '2_3',
+        billId: 2,
+        studentId: '3',
+        studentName: 'Lê Văn Hùng',
+        amount: 294000, // Full amount (only 1 student)
+        status: 'Pending',
+        notificationSent: true,
+        reminderCount: 1
+      }
+    );
+    
+    setIndividualPayments(mockIndividualPayments);
+
+    // Initialize mock notifications
+    const mockNotifications: PaymentNotification[] = [
+      {
+        id: 'notif_1',
+        studentId: '1',
+        billId: 1,
+        type: 'Paid',
+        message: '✅ Thanh toán thành công!\n\nHóa đơn tháng 01/2024\nSố tiền: 180500đ\nCảm ơn bạn đã thanh toán đúng hạn!',
+        sentDate: '2024-01-25T10:00:00',
+        read: true
+      },
+      {
+        id: 'notif_2',
+        studentId: '3',
+        billId: 2,
+        type: 'Reminder',
+        message: '⏰ Nhắc nhở thanh toán hóa đơn tháng 01/2024\n\nSố tiền: 294000đ\nHạn thanh toán: 2024-01-31\n\nCòn 3 ngày nữa đến hạn thanh toán!',
+        sentDate: '2024-01-28T09:00:00',
+        read: false
+      },
+      {
+        id: 'notif_3',
+        studentId: '2',
+        billId: 1,
+        type: 'NewBill',
+        message: '📄 Hóa đơn mới tháng 02/2024 phòng A0101\n\nSố tiền cần thanh toán: 185000đ\nHạn thanh toán: 2024-02-05\n\nVui lòng thanh toán đúng hạn!',
+        sentDate: '2024-02-01T08:00:00',
+        read: false
+      },
+      {
+        id: 'notif_4',
+        studentId: '1',
+        billId: 1,
+        type: 'Overdue',
+        message: '⚠️ HÓA ĐƠN QUÁ HẠN!\n\nTháng 12/2023 phòng A0101\nSố tiền: 175000đ\nQuá hạn: 2024-01-05\n\nVui lòng thanh toán ngay để tránh phí phạt!',
+        sentDate: '2024-01-10T14:00:00',
+        read: true
+      }
+    ];
+    
+    setPaymentNotifications(mockNotifications);
   };
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -624,6 +818,69 @@ const KtxView = () => {
     setShowRegistrationModal(false);
   };
 
+  // Payment system functions
+  const createIndividualPayments = (bill: UtilityBill) => {
+    const selectedRoom = rooms.find(r => r.id === bill.roomId);
+    if (!selectedRoom || selectedRoom.students.length === 0) return [];
+
+    const studentsInRoom = selectedRoom.students;
+    const amountPerPerson = Math.floor(bill.totalAmount / studentsInRoom.length);
+    const remainder = bill.totalAmount - (amountPerPerson * studentsInRoom.length);
+
+    return studentsInRoom.map((student, index) => ({
+      id: `${bill.id}_${student.id}`,
+      billId: bill.id,
+      studentId: student.id,
+      studentName: student.fullName,
+      amount: amountPerPerson + (index === 0 ? remainder : 0), // First student pays remainder
+      status: 'Pending' as 'Pending' | 'Paid' | 'Overdue',
+      notificationSent: false,
+      reminderCount: 0
+    }));
+  };
+
+  const sendPaymentNotifications = async (bill: UtilityBill, type: 'NewBill' | 'Reminder' | 'Overdue' | 'Paid') => {
+    const selectedRoom = rooms.find(r => r.id === bill.roomId);
+    if (!selectedRoom) return;
+
+    const studentsInRoom = selectedRoom.students;
+    const newNotifications: PaymentNotification[] = [];
+
+    studentsInRoom.forEach(student => {
+      const individualPayment = individualPayments.find(p => p.studentId === student.id && p.billId === bill.id);
+      const amount = individualPayment?.amount || 0;
+
+      let message = '';
+      switch (type) {
+        case 'NewBill':
+          message = `📄 Hóa đơn mới tháng ${bill.month}/${bill.year} phòng ${bill.roomNumber}\n\nSố tiền cần thanh toán: ${amount.toLocaleString()}đ\nHạn thanh toán: ${bill.dueDate}\n\nVui lòng thanh toán đúng hạn!`;
+          break;
+        case 'Reminder':
+          message = `⏰ Nhắc nhở thanh toán hóa đơn tháng ${bill.month}/${bill.year}\n\nSố tiền: ${amount.toLocaleString()}đ\nHạn thanh toán: ${bill.dueDate}\n\nCòn 3 ngày nữa đến hạn thanh toán!`;
+          break;
+        case 'Overdue':
+          message = `⚠️ HÓA ĐƠN QUÁ HẠN!\n\nTháng ${bill.month}/${bill.year} phòng ${bill.roomNumber}\nSố tiền: ${amount.toLocaleString()}đ\nQuá hạn: ${bill.dueDate}\n\nVui lòng thanh toán ngay để tránh phí phạt!`;
+          break;
+        case 'Paid':
+          message = `✅ Thanh toán thành công!\n\nHóa đơn tháng ${bill.month}/${bill.year}\nSố tiền: ${amount.toLocaleString()}đ\nCảm ơn bạn đã thanh toán đúng hạn!`;
+          break;
+      }
+
+      newNotifications.push({
+        id: `${bill.id}_${student.id}_${type}_${Date.now()}`,
+        studentId: student.id,
+        billId: bill.id,
+        type,
+        message,
+        sentDate: new Date().toISOString(),
+        read: false
+      });
+    });
+
+    setPaymentNotifications(prev => [...prev, ...newNotifications]);
+    console.log(`Sent ${newNotifications.length} ${type} notifications for bill ${bill.id}`);
+  };
+
   const handleAddUtilityBill = () => {
     console.log('Adding utility bill:', utilityForm);
     console.log('Room selected:', utilityForm.roomId, utilityForm.roomNumber);
@@ -650,11 +907,14 @@ const KtxView = () => {
       return;
     }
     
-    // Calculate total amount
+    // Calculate total amount including room cost
+    const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+    const roomCost = selectedRoom ? selectedRoom.price : 0;
     const totalAmount = (utilityForm.electricity * utilityForm.electricityCost) + 
-                       (utilityForm.water * utilityForm.waterCost);
+                       (utilityForm.water * utilityForm.waterCost) + roomCost;
     
     console.log('Calculated total amount:', totalAmount);
+    console.log('Room cost:', roomCost);
     
     const newBill: UtilityBill = {
       id: utilityBills.length + 1,
@@ -666,6 +926,7 @@ const KtxView = () => {
       water: utilityForm.water,
       electricityCost: utilityForm.electricityCost,
       waterCost: utilityForm.waterCost,
+      roomCost,
       totalAmount,
       status: utilityForm.status,
       dueDate: new Date(utilityForm.year, new Date(utilityForm.month).getMonth() + 1, 5).toISOString().split('T')[0]
@@ -676,7 +937,14 @@ const KtxView = () => {
     syncUtilityBills([...utilityBills, newBill]);
     console.log('Updated utility bills:', [...utilityBills, newBill]);
     
-    alert(`Đã tạo hóa đơn thành công!\n\nPhòng: ${utilityForm.roomNumber}\nTháng: ${utilityForm.month}/${utilityForm.year}\nTiền điện: ${utilityForm.electricity} kWh × ${utilityForm.electricityCost.toLocaleString()}đ = ${(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ\nTiền nước: ${utilityForm.water} m³ × ${utilityForm.waterCost.toLocaleString()}đ = ${(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ\nTổng cộng: ${totalAmount.toLocaleString()}đ`);
+    // Create individual payments and send notifications
+    const payments = createIndividualPayments(newBill);
+    setIndividualPayments(prev => [...prev, ...payments]);
+    
+    // Send notifications to all students in the room
+    sendPaymentNotifications(newBill, 'NewBill');
+    
+    alert(`Đã tạo hóa đơn thành công!\n\nPhòng: ${utilityForm.roomNumber}\nTháng: ${utilityForm.month}/${utilityForm.year}\nTiền phòng: ${roomCost.toLocaleString()}đ\nTiền điện: ${utilityForm.electricity} kWh × ${utilityForm.electricityCost.toLocaleString()}đ = ${(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ\nTiền nước: ${utilityForm.water} m³ × ${utilityForm.waterCost.toLocaleString()}đ = ${(utilityForm.water * utilityForm.waterCost).toLocaleString()}đ\nTổng cộng: ${totalAmount.toLocaleString()}đ\n\n📧 Đã gửi thông báo cho ${payments.length} sinh viên trong phòng!`);
     
     // Reset form and close modal
     setUtilityForm({
@@ -688,12 +956,207 @@ const KtxView = () => {
       water: 0,
       electricityCost: 3000,
       waterCost: 25000,
+      roomCost: 0,
       totalAmount: 0,
       status: 'Unpaid'
     });
     setShowUtilityModal(false);
     console.log('Form reset and modal closed');
   };
+
+  // Handle individual student payment
+  const handleStudentPayment = (paymentId: string, paymentMethodId: string) => {
+    const payment = individualPayments.find(p => p.id === paymentId);
+    const method = paymentMethods.find(m => m.id === paymentMethodId);
+    
+    if (!payment || !method) return;
+    
+    // Update payment status
+    const updatedPayments = individualPayments.map(p => 
+      p.id === paymentId 
+        ? { ...p, status: 'Paid' as 'Paid' | 'Pending' | 'Overdue', paidDate: new Date().toISOString().split('T')[0], paymentMethod: method.name }
+        : p
+    );
+    setIndividualPayments(updatedPayments);
+    
+    // Update bill status if all payments are done
+    const bill = utilityBills.find(b => b.id === payment.billId);
+    if (bill) {
+      const billPayments = updatedPayments.filter(p => p.billId === bill.id);
+      const allPaid = billPayments.every(p => p.status === 'Paid');
+      
+      if (allPaid) {
+        const updatedBills = utilityBills.map(b => 
+          b.id === bill.id 
+            ? { ...b, status: 'Paid' as 'Paid' | 'Unpaid' | 'Partial', paidDate: new Date().toISOString().split('T')[0] }
+            : b
+        );
+        syncUtilityBills(updatedBills);
+        
+        // Send payment confirmation notifications
+        sendPaymentNotifications(bill, 'Paid');
+      }
+    }
+    
+    alert(`✅ Thanh toán thành công!\n\nSinh viên: ${payment.studentName}\nSố tiền: ${payment.amount.toLocaleString()}đ\nPhương thức: ${method.name}\n\nĐã gửi xác nhận thanh toán!`);
+    setShowPaymentModal(false);
+  };
+
+  // Payment processing functions (similar to Canteen)
+  const handlePaymentMethodSelect = (method: 'cash' | 'transfer' | 'qr') => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const getTransferInfo = () => {
+    const selectedPayment = individualPayments.find(p => 
+      p.billId === selectedBillForPayment?.id && p.status === 'Pending'
+    );
+    
+    return {
+      bank: 'Vietcombank',
+      accountNumber: '1234567890',
+      accountName: 'Trường Đại học ABC - KTX',
+      amount: selectedPayment?.amount || 0,
+      description: `KTX ${selectedPayment?.studentCode} ${selectedBillForPayment?.month}/${selectedBillForPayment?.year}`
+    };
+  };
+
+  const processPayment = async (paymentId: string) => {
+    setIsProcessingPayment(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsProcessingPayment(false);
+    setPaymentSuccess(true);
+    
+    // Create financial transaction record
+    createKtxTransaction(paymentId);
+    
+    // Update payment status
+    const payment = individualPayments.find(p => p.id === paymentId);
+    if (payment) {
+      const updatedPayments = individualPayments.map(p => 
+        p.id === paymentId 
+          ? { 
+              ...p, 
+              status: 'Paid' as 'Paid' | 'Pending' | 'Overdue', 
+              paidDate: new Date().toISOString().split('T')[0], 
+              paymentMethod: selectedPaymentMethod === 'transfer' ? 'Bank Transfer' : 
+                           selectedPaymentMethod === 'qr' ? 'E-Wallet' : 'Cash'
+            }
+          : p
+      );
+      setIndividualPayments(updatedPayments);
+      
+      // Update bill status if all payments are done
+      const bill = utilityBills.find(b => b.id === payment.billId);
+      if (bill) {
+        const billPayments = updatedPayments.filter(p => p.billId === bill.id);
+        const allPaid = billPayments.every(p => p.status === 'Paid');
+        
+        if (allPaid) {
+          const updatedBills = utilityBills.map(b => 
+            b.id === bill.id 
+              ? { ...b, status: 'Paid' as 'Paid' | 'Unpaid' | 'Partial', paidDate: new Date().toISOString().split('T')[0] }
+              : b
+          );
+          syncUtilityBills(updatedBills);
+          
+          // Send payment confirmation notifications
+          sendPaymentNotifications(bill, 'Paid');
+        }
+      }
+    }
+    
+    // Reset after successful payment
+    setTimeout(() => {
+      setPaymentSuccess(false);
+      setShowPaymentModal(false);
+      setSelectedPaymentMethod('transfer');
+    }, 3000);
+  };
+
+  const createKtxTransaction = (paymentId: string) => {
+    const payment = individualPayments.find(p => p.id === paymentId);
+    if (!payment) return;
+    
+    // Create transaction record for KTX payments
+    const transaction = {
+      id: Date.now(),
+      type: 'income' as 'income' | 'expense',
+      category: 'ktx' as any,
+      amount: payment.amount,
+      description: `Thu tiền KTX phòng ${selectedBillForPayment?.roomNumber} - ${payment.studentName} - ${selectedBillForPayment?.month}/${selectedBillForPayment?.year}`,
+      date: new Date().toISOString().split('T')[0],
+      reference: `KTX-${payment.studentCode}-${Date.now()}`,
+      status: 'completed' as 'completed' | 'pending' | 'cancelled',
+      paymentMethod: selectedPaymentMethod as 'cash' | 'transfer' | 'qr',
+      createdBy: 'KTX Admin',
+      createdAt: new Date().toISOString()
+    };
+
+    // Store transaction in localStorage for FinanceView to access
+    const existingTransactions = JSON.parse(localStorage.getItem('ktxFinancialTransactions') || '[]');
+    localStorage.setItem('ktxFinancialTransactions', JSON.stringify([transaction, ...existingTransactions]));
+  };
+
+  // Get payment details for a bill
+  const getBillPaymentDetails = (billId: number) => {
+    const bill = utilityBills.find(b => b.id === billId);
+    const payments = individualPayments.filter(p => p.billId === billId);
+    
+    return { bill, payments };
+  };
+
+  // Check for overdue bills and send reminders
+  const checkOverdueBills = () => {
+    const today = new Date();
+    const overdueBills = utilityBills.filter(bill => {
+      const dueDate = new Date(bill.dueDate);
+      return bill.status === 'Unpaid' && dueDate < today;
+    });
+    
+    overdueBills.forEach(bill => {
+      sendPaymentNotifications(bill, 'Overdue');
+    });
+    
+    if (overdueBills.length > 0) {
+      console.log(`Sent overdue notifications for ${overdueBills.length} bills`);
+    }
+  };
+
+  // Check for bills due soon (3 days) and send reminders
+  const checkUpcomingBills = () => {
+    const today = new Date();
+    const threeDaysFromNow = new Date(today.getTime() + (3 * 24 * 60 * 60 * 1000));
+    
+    const upcomingBills = utilityBills.filter(bill => {
+      const dueDate = new Date(bill.dueDate);
+      return bill.status === 'Unpaid' && dueDate <= threeDaysFromNow && dueDate >= today;
+    });
+    
+    upcomingBills.forEach(bill => {
+      const payments = individualPayments.filter(p => p.billId === bill.id && p.status === 'Pending');
+      if (payments.length > 0) {
+        sendPaymentNotifications(bill, 'Reminder');
+      }
+    });
+    
+    if (upcomingBills.length > 0) {
+      console.log(`Sent reminder notifications for ${upcomingBills.length} upcoming bills`);
+    }
+  };
+
+  // Auto-check for overdue and upcoming bills daily
+  useEffect(() => {
+    const checkInterval = setInterval(() => {
+      checkOverdueBills();
+      checkUpcomingBills();
+    }, 24 * 60 * 60 * 1000); // Check every 24 hours
+    
+    return () => clearInterval(checkInterval);
+  }, [utilityBills, individualPayments]);
 
   const handleCloseUtilityModal = () => {
     // Reset form when closing modal
@@ -706,175 +1169,218 @@ const KtxView = () => {
       water: 0,
       electricityCost: 3000,
       waterCost: 25000,
+      roomCost: 0,
       totalAmount: 0,
       status: 'Unpaid'
     });
     setShowUtilityModal(false);
   };
 
-  // Handle image capture and meter reading
-  const handleImageCapture = (meterType: 'electricity' | 'water') => {
+  // Handle image capture and meter reading - IMPROVED
+  const handleImageCapture = async (meterType: 'electricity' | 'water') => {
     console.log('handleImageCapture called with meterType:', meterType);
-    console.log('Current utilityForm:', utilityForm);
     
-    const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
-    console.log('Selected room:', selectedRoom);
-    
-    if (!selectedRoom) {
-      console.log('No selected room found');
-      alert('❌ Vui lòng chọn phòng trước khi chụp công-tơ!');
+    // Prevent concurrent captures
+    if (captureState.isCapturing) {
+      console.log('Capture already in progress, ignoring request');
+      alert('⚠️ Đang chụp công-tơ, vui lòng đợi hoàn thành trước khi chụp tiếp!');
       return;
     }
 
-    const roomNumber = selectedRoom.roomNumber;
-    const roomHistory = meterHistory[roomNumber] || [];
-    const currentDate = new Date().toISOString().split('T')[0];
-    const timestamp = Date.now();
-    
-    console.log('Room number:', roomNumber);
-    console.log('Room history:', roomHistory);
-    console.log('Current date:', currentDate);
-    console.log('Timestamp:', timestamp);
-    
-    // Get last reading from history
-    const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
-    const previousElectricity = lastReading ? lastReading.electricityReading : 0;
-    const previousWater = lastReading ? lastReading.waterReading : 0;
-    
-    console.log('Last reading:', lastReading);
-    console.log('Previous readings:', { previousElectricity, previousWater });
-    
-    // Check if we already captured this meter type today
-    const todayReadings = roomHistory.filter(r => r.date === currentDate);
-    const alreadyCapturedElectricity = todayReadings.some(r => r.electricityImage);
-    const alreadyCapturedWater = todayReadings.some(r => r.waterImage);
-    
-    console.log('Today readings:', todayReadings);
-    console.log('Already captured electricity:', alreadyCapturedElectricity);
-    console.log('Already captured water:', alreadyCapturedWater);
-    
-    // Prevent duplicate capture for same meter type on same day
-    if (meterType === 'electricity' && alreadyCapturedElectricity) {
-      alert('⚠️ Đã chụp công-tơ điện cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentElectricity + ' kWh\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
+    // Prevent rapid successive captures (minimum 2 seconds between captures)
+    const currentTime = Date.now();
+    if (currentTime - captureState.lastCaptureTime < 2000) {
+      console.log('Capture too soon after previous capture');
+      alert('⚠️ Vui lòng đợi 2 giây giữa các lần chụp để đảm bảo xử lý đúng!');
       return;
     }
-    
-    if (meterType === 'water' && alreadyCapturedWater) {
-      alert('⚠️ Đã chụp đồng hồ nước cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentWater + ' m³\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
-      return;
+
+    // Set capture state
+    setCaptureState({
+      isCapturing: true,
+      currentMeterType: meterType,
+      lastCaptureTime: currentTime
+    });
+
+    try {
+      console.log('Current utilityForm:', utilityForm);
+      
+      const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
+      console.log('Selected room:', selectedRoom);
+      
+      if (!selectedRoom) {
+        console.log('No selected room found');
+        alert('❌ Vui lòng chọn phòng trước khi chụp công-tơ!');
+        return;
+      }
+
+      const roomNumber = selectedRoom.roomNumber;
+      const roomHistory = meterHistory && meterHistory[roomNumber] ? meterHistory[roomNumber] : [];
+      const currentDate = new Date().toISOString().split('T')[0];
+      const timestamp = Date.now();
+      
+      console.log('Room number:', roomNumber);
+      console.log('Room history:', roomHistory);
+      console.log('Current date:', currentDate);
+      console.log('Timestamp:', timestamp);
+      
+      // Get last reading from history
+      const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+      const previousElectricity = lastReading ? lastReading.electricityReading : 0;
+      const previousWater = lastReading ? lastReading.waterReading : 0;
+      
+      console.log('Last reading:', lastReading);
+      console.log('Previous readings:', { previousElectricity, previousWater });
+      
+      // Check if we already captured this meter type today
+      const todayReadings = roomHistory.filter(r => r.date === currentDate);
+      const alreadyCapturedElectricity = todayReadings.some(r => r.electricityImage);
+      const alreadyCapturedWater = todayReadings.some(r => r.waterImage);
+      
+      console.log('Today readings:', todayReadings);
+      console.log('Already captured electricity:', alreadyCapturedElectricity);
+      console.log('Already captured water:', alreadyCapturedWater);
+      
+      // Prevent duplicate capture for same meter type on same day
+      if (meterType === 'electricity' && alreadyCapturedElectricity) {
+        alert('⚠️ Đã chụp công-tơ điện cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentElectricity + ' kWh\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
+        return;
+      }
+      
+      if (meterType === 'water' && alreadyCapturedWater) {
+        alert('⚠️ Đã chụp đồng hồ nước cho phòng này hôm nay rồi!\n\nChỉ số hiện tại: ' + meterReadings.currentWater + ' m³\n\nNếu muốn chụp lại, vui lòng xóa bản ghi cũ hoặc chụp vào ngày khác.');
+        return;
+      }
+      
+      // Add small delay to simulate camera processing and ensure clean state
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Preserve the other meter's current reading when switching
+      let currentElectricity = meterReadings.currentElectricity;
+      let currentWater = meterReadings.currentWater;
+      let electricityImage = meterReadings.electricityImage;
+      let waterImage = meterReadings.waterImage;
+      
+      console.log('Preserving current readings:', { currentElectricity, currentWater });
+      
+      // Simulate current reading (in real app, this would come from image OCR)
+      if (meterType === 'electricity') {
+        console.log('Processing electricity meter capture');
+        currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
+        // Keep water reading unchanged
+        electricityImage = `electricity_meter_${roomNumber}_${timestamp}.jpg`;
+        
+        console.log('Generated current electricity reading:', currentElectricity);
+        
+        // Update current reading state
+        setMeterReadings(prev => ({
+          ...prev,
+          currentElectricity,
+          electricityImage
+        }));
+        
+        console.log('Updated current electricity reading');
+        
+        // Update history - FIXED: Preserve existing readings
+        const existingLastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+        const newReading = {
+          date: currentDate,
+          electricityReading: currentElectricity,
+          waterReading: existingLastReading?.waterReading || 0, // Keep existing water reading from last record
+          electricityImage,
+          notes: `Chụp ngày ${currentDate}`
+        };
+        
+        console.log('New electricity reading to add:', newReading);
+        
+        const updatedHistory = {
+          ...meterHistory,
+          [roomNumber]: [...(meterHistory && meterHistory[roomNumber] ? meterHistory[roomNumber] : []), newReading]
+        };
+        
+        syncMeterHistory(updatedHistory);
+        
+        console.log('Updated meter history for room:', roomNumber);
+        
+        // Update utility form with calculated usage
+        const usage = currentElectricity - previousElectricity;
+        console.log('Calculated electricity usage:', usage);
+        
+        setUtilityForm(prev => ({
+          ...prev,
+          electricity: Math.max(0, usage)
+        }));
+        
+        console.log('Updated utility form with electricity usage');
+        
+        alert(`📸 Đã chụp công-tơ điện phòng ${roomNumber}!\n\nChỉ số trước: ${previousElectricity} kWh\nChỉ số hiện tại: ${currentElectricity} kWh\nTiêu thụ kỳ này: ${usage} kWh\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
+        
+      } else {
+        console.log('Processing water meter capture');
+        currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
+        // Keep electricity reading unchanged
+        waterImage = `water_meter_${roomNumber}_${timestamp}.jpg`;
+        
+        console.log('Generated current water reading:', currentWater);
+        
+        // Update current reading state
+        setMeterReadings(prev => ({
+          ...prev,
+          currentWater,
+          waterImage
+        }));
+        
+        console.log('Updated current water reading');
+        
+        // Update history - FIXED: Preserve existing readings
+        const existingLastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
+        const newReading = {
+          date: currentDate,
+          electricityReading: existingLastReading?.electricityReading || 0, // Keep existing electricity reading from last record
+          waterReading: currentWater,
+          waterImage,
+          notes: `Chụp ngày ${currentDate}`
+        };
+        
+        console.log('New water reading to add:', newReading);
+        
+        const updatedHistory = {
+          ...meterHistory,
+          [roomNumber]: [...(meterHistory && meterHistory[roomNumber] ? meterHistory[roomNumber] : []), newReading]
+        };
+        
+        syncMeterHistory(updatedHistory);
+        
+        console.log('Updated meter history for room:', roomNumber);
+        
+        // Update utility form with calculated usage
+        const usage = currentWater - previousWater;
+        console.log('Calculated water usage:', usage);
+        
+        setUtilityForm(prev => ({
+          ...prev,
+          water: Math.max(0, usage)
+        }));
+        
+        console.log('Updated utility form with water usage');
+        
+        alert(`📸 Đã chụp đồng hồ nước phòng ${roomNumber}!\n\nChỉ số trước: ${previousWater} m³\nChỉ số hiện tại: ${currentWater} m³\nTiêu thụ kỳ này: ${usage} m³\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
+      }
+      
+      console.log('handleImageCapture completed successfully');
+      
+    } catch (error) {
+      console.error('Error during image capture:', error);
+      alert('❌ Đã xảy ra lỗi khi chụp công-tơ. Vui lòng thử lại!');
+    } finally {
+      // Reset capture state
+      setCaptureState(prev => ({
+        ...prev,
+        isCapturing: false,
+        currentMeterType: null
+      }));
+      console.log('Capture state reset');
     }
-    
-    // Preserve the other meter's current reading when switching
-    let currentElectricity = meterReadings.currentElectricity;
-    let currentWater = meterReadings.currentWater;
-    let electricityImage = meterReadings.electricityImage;
-    let waterImage = meterReadings.waterImage;
-    
-    console.log('Preserving current readings:', { currentElectricity, currentWater });
-    
-    // Simulate current reading (in real app, this would come from image OCR)
-    if (meterType === 'electricity') {
-      console.log('Processing electricity meter capture');
-      currentElectricity = previousElectricity + Math.floor(Math.random() * 200) + 50; // Add 50-250 kWh
-      // Keep water reading unchanged
-      electricityImage = `electricity_meter_${roomNumber}_${timestamp}.jpg`;
-      
-      console.log('Generated current electricity reading:', currentElectricity);
-      
-      // Update current reading state
-      setMeterReadings(prev => ({
-        ...prev,
-        currentElectricity,
-        electricityImage
-      }));
-      
-      console.log('Updated current electricity reading');
-      
-      // Update history
-      const newReading = {
-        date: currentDate,
-        electricityReading: currentElectricity,
-        waterReading: currentWater, // Keep existing water reading
-        electricityImage,
-        notes: `Chụp ngày ${currentDate}`
-      };
-      
-      console.log('New electricity reading to add:', newReading);
-      
-      const updatedHistory = {
-        ...meterHistory,
-        [roomNumber]: [...(meterHistory[roomNumber] || []), newReading]
-      };
-      
-      syncMeterHistory(updatedHistory);
-      
-      console.log('Updated meter history for room:', roomNumber);
-      
-      // Update utility form with calculated usage
-      const usage = currentElectricity - previousElectricity;
-      console.log('Calculated electricity usage:', usage);
-      
-      setUtilityForm(prev => ({
-        ...prev,
-        electricity: Math.max(0, usage)
-      }));
-      
-      console.log('Updated utility form with electricity usage');
-      
-      alert(`📸 Đã chụp công-tơ điện phòng ${roomNumber}!\n\nChỉ số trước: ${previousElectricity} kWh\nChỉ số hiện tại: ${currentElectricity} kWh\nTiêu thụ kỳ này: ${usage} kWh\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
-      
-    } else {
-      console.log('Processing water meter capture');
-      currentWater = previousWater + Math.floor(Math.random() * 20) + 5; // Add 5-25 m³
-      // Keep electricity reading unchanged
-      waterImage = `water_meter_${roomNumber}_${timestamp}.jpg`;
-      
-      console.log('Generated current water reading:', currentWater);
-      
-      // Update current reading state
-      setMeterReadings(prev => ({
-        ...prev,
-        currentWater,
-        waterImage
-      }));
-      
-      console.log('Updated current water reading');
-      
-      // Update history
-      const newReading = {
-        date: currentDate,
-        electricityReading: currentElectricity, // Keep existing electricity reading
-        waterReading: currentWater,
-        waterImage,
-        notes: `Chụp ngày ${currentDate}`
-      };
-      
-      console.log('New water reading to add:', newReading);
-      
-      const updatedHistory = {
-        ...meterHistory,
-        [roomNumber]: [...(meterHistory[roomNumber] || []), newReading]
-      };
-      
-      syncMeterHistory(updatedHistory);
-      
-      console.log('Updated meter history for room:', roomNumber);
-      
-      // Update utility form with calculated usage
-      const usage = currentWater - previousWater;
-      console.log('Calculated water usage:', usage);
-      
-      setUtilityForm(prev => ({
-        ...prev,
-        water: Math.max(0, usage)
-      }));
-      
-      console.log('Updated utility form with water usage');
-      
-      alert(`📸 Đã chụp đồng hồ nước phòng ${roomNumber}!\n\nChỉ số trước: ${previousWater} m³\nChỉ số hiện tại: ${currentWater} m³\nTiêu thụ kỳ này: ${usage} m³\n\nLịch sử đã được lưu và số liệu tự động cập nhật!`);
-    }
-    
-    console.log('handleImageCapture completed successfully');
   };
 
   // Get last reading for selected room - FIXED
@@ -886,7 +1392,7 @@ const KtxView = () => {
     }
     
     const roomNumber = selectedRoom.roomNumber;
-    const roomHistory = meterHistory[roomNumber] || [];
+    const roomHistory = meterHistory && meterHistory[roomNumber] ? meterHistory[roomNumber] : [];
     console.log('Room history for', roomNumber, ':', roomHistory);
     
     const lastReading = roomHistory.length > 0 ? roomHistory[roomHistory.length - 1] : null;
@@ -900,7 +1406,7 @@ const KtxView = () => {
     const selectedRoom = rooms.find(r => r.id === utilityForm.roomId);
     if (!selectedRoom || !utilityForm.month) return;
     
-    const roomHistory = meterHistory[selectedRoom.roomNumber] || [];
+    const roomHistory = meterHistory && meterHistory[selectedRoom.roomNumber] ? meterHistory[selectedRoom.roomNumber] : [];
     const billingPeriod = utilityForm.month; // e.g., "2024-02"
     
     // Find readings within the billing period
@@ -957,19 +1463,26 @@ const KtxView = () => {
         setMeterReadings(prev => ({
           ...prev,
           previousElectricity: lastReading.electricityReading,
-          previousWater: lastReading.waterReading
+          previousWater: lastReading.waterReading,
+          currentElectricity: lastReading.electricityReading, // Sync current with last reading
+          currentWater: lastReading.waterReading // Sync current with last reading
         }));
         console.log('Updated meter readings from history:', {
           previousElectricity: lastReading.electricityReading,
-          previousWater: lastReading.waterReading
+          previousWater: lastReading.waterReading,
+          currentElectricity: lastReading.electricityReading,
+          currentWater: lastReading.waterReading
         });
       } else {
         // Reset to 0 if no history
         setMeterReadings(prev => ({
           ...prev,
           previousElectricity: 0,
-          previousWater: 0
+          previousWater: 0,
+          currentElectricity: 0,
+          currentWater: 0
         }));
+        console.log('Reset meter readings to 0 (no history)');
       }
     }
   }, [utilityForm.roomId]);
@@ -1040,7 +1553,7 @@ const KtxView = () => {
 
   // Get usage statistics for a room
   const getRoomUsageStats = (roomNumber: string) => {
-    const roomHistory = meterHistory[roomNumber] || [];
+    const roomHistory = meterHistory && meterHistory[roomNumber] ? meterHistory[roomNumber] : [];
     if (roomHistory.length < 2) return null;
     
     const firstReading = roomHistory[0];
@@ -1132,7 +1645,7 @@ const KtxView = () => {
         console.log('Created rooms:', newRooms.length);
         
         // Add all new rooms to existing rooms
-        setRooms([...rooms, ...newRooms]);
+        syncRooms([...rooms, ...newRooms]);
         
         // Track newly created room IDs
         const newRoomIds = newRooms.map(room => room.id);
@@ -1167,7 +1680,7 @@ const KtxView = () => {
       };
       
       console.log('Test room created:', testRoom);
-      setRooms([...rooms, testRoom]);
+      syncRooms([...rooms, testRoom]);
       setNewlyCreatedRooms([testRoom.id]);
       console.log('Set newly created rooms:', [testRoom.id]);
       
@@ -1305,6 +1818,7 @@ const KtxView = () => {
             { id: 'rooms', label: 'Quản lý phòng', icon: Bed },
             { id: 'registrations', label: 'Đăng ký phòng', icon: FileText },
             { id: 'utilities', label: 'Điện nước', icon: Zap },
+            { id: 'payments', label: 'Thanh toán', icon: DollarSign },
             { id: 'equipment', label: 'Kho thiết bị', icon: Package }
           ].map(tab => (
             <button
@@ -1787,6 +2301,440 @@ const KtxView = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'payments' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800">Quản lý Thanh toán</h3>
+              <div className="flex gap-2">
+                <Button 
+                  variant="secondary" 
+                  onClick={() => setShowNotificationModal(true)}
+                >
+                  <AlertCircle size={20} /> Xem thông báo
+                </Button>
+                <Button 
+                  variant="primary" 
+                  onClick={() => setShowUtilityModal(true)}
+                >
+                  <Plus size={20} /> Tạo hóa đơn
+                </Button>
+              </div>
+            </div>
+
+            {/* Payment Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Tổng hóa đơn</p>
+                    <p className="text-2xl font-bold text-blue-600">{utilityBills.length}</p>
+                  </div>
+                  <FileText className="text-blue-600" size={24} />
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Chờ thanh toán</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {individualPayments.filter(p => p.status === 'Pending').length}
+                    </p>
+                  </div>
+                  <Clock className="text-yellow-600" size={24} />
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Đã thanh toán</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {individualPayments.filter(p => p.status === 'Paid').length}
+                    </p>
+                  </div>
+                  <CheckCircle className="text-green-600" size={24} />
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Quá hạn</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {individualPayments.filter(p => p.status === 'Overdue').length}
+                    </p>
+                  </div>
+                  <XCircle className="text-red-600" size={24} />
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Guide Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-4 flex items-center gap-2">
+                <AlertCircle size={20} />
+                Hướng dẫn thanh toán tiền phòng & điện nước
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Quy trình thanh toán */}
+                <div className="space-y-3">
+                  <h5 className="font-medium text-blue-700 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs">1</span>
+                    Quy trình thanh toán
+                  </h5>
+                  <div className="bg-white p-4 rounded-lg border border-blue-100 text-sm">
+                    <ol className="space-y-2 text-gray-700">
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span><strong>Nhận thông báo:</strong> Hệ thống tự động gửi thông báo khi có hóa đơn mới</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span><strong>Kiểm tra chi tiết:</strong> Xem số tiền cần thanh toán và hạn thanh toán</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span><strong>Chọn phương thức:</strong> Chọn 1 trong 3 phương thức thanh toán</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span><strong>Thực hiện giao dịch:</strong> Giao dịch theo thông tin đã cung cấp</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span><strong>Xác nhận thanh toán:</strong> Admin sẽ xác nhận và cập nhật trạng thái</span>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* Phương thức thanh toán */}
+                <div className="space-y-3">
+                  <h5 className="font-medium text-blue-700 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs">2</span>
+                    Phương thức thanh toán
+                  </h5>
+                  <div className="space-y-3">
+                    {paymentMethods.filter(m => m.isActive).map((method, index) => (
+                      <div key={method.id} className="bg-white p-3 rounded-lg border border-blue-100">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                            index === 0 ? 'bg-green-500' : index === 1 ? 'bg-blue-500' : 'bg-orange-500'
+                          }`}>
+                            {method.type === 'BankTransfer' ? '🏦' : method.type === 'EWallet' ? '📱' : '💵'}
+                          </div>
+                          <div className="flex-1">
+                            <h6 className="font-medium text-gray-800">{method.name}</h6>
+                            <p className="text-sm text-gray-600 mt-1">{method.accountInfo}</p>
+                            {method.type === 'BankTransfer' && (
+                              <div className="mt-2 p-2 bg-green-50 rounded text-xs text-green-700">
+                                <strong>Lưu ý:</strong> Ghi rõ "Mã SV + Số tiền" trong nội dung chuyển khoản
+                              </div>
+                            )}
+                            {method.type === 'EWallet' && (
+                              <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                                <strong>Lưu ý:</strong> Chụp ảnh màn hình giao dịch thành công để xác nhận
+                              </div>
+                            )}
+                            {method.type === 'Cash' && (
+                              <div className="mt-2 p-2 bg-orange-50 rounded text-xs text-orange-700">
+                                <strong>Lưu ý:</strong> Đến văn phòng KTX trong giờ hành chính (8:00-17:00)
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Important Notes */}
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h5 className="font-medium text-yellow-800 mb-2 flex items-center gap-2">
+                  <AlertCircle size={16} />
+                  Lưu ý quan trọng
+                </h5>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  <li>• <strong>Hạn thanh toán:</strong> Thanh toán trước ngày 5 hàng tháng tiếp theo</li>
+                  <li>• <strong>Phí trễ:</strong> Phạt 0.5%/ngày trên số tiền chậm thanh toán</li>
+                  <li>• <strong>Xác nhận:</strong> Thanh toán sẽ được xác nhận trong vòng 24h</li>
+                  <li>• <strong>Lưu trữ:</strong> Giữ lại biên lai/giao dịch để đối chiếu khi cần</li>
+                  <li>• <strong>Hỗ trợ:</strong> Liên hệ hotline 1900-XXXX nếu gặp vấn đề</li>
+                </ul>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button 
+                  onClick={() => setShowNotificationModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2"
+                >
+                  <Eye size={16} /> Xem thông báo của bạn
+                </button>
+                <button 
+                  onClick={() => {
+                    const pendingPayments = individualPayments.filter(p => p.status === 'Pending');
+                    if (pendingPayments.length > 0) {
+                      const bill = utilityBills.find(b => b.id === pendingPayments[0].billId);
+                      if (bill) {
+                        setSelectedBillForPayment(bill);
+                        setShowPaymentModal(true);
+                      }
+                    } else {
+                      alert('Bạn không có hóa đơn nào cần thanh toán!');
+                    }
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-2"
+                >
+                  <DollarSign size={16} /> Thanh toán ngay
+                </button>
+                <button 
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm flex items-center gap-2"
+                >
+                  <Download size={16} /> In hướng dẫn
+                </button>
+              </div>
+            </div>
+
+            {/* Bills Table */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Phòng</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Kỳ</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Tổng tiền</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Trạng thái</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Hạn thanh toán</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {utilityBills.map(bill => {
+                    const payments = individualPayments.filter(p => p.billId === bill.id);
+                    const paidCount = payments.filter(p => p.status === 'Paid').length;
+                    const totalCount = payments.length;
+                    
+                    return (
+                      <tr key={bill.id} className="hover:bg-gray-50">
+                        <td className="py-3 px-4">{bill.roomNumber}</td>
+                        <td className="py-3 px-4">{bill.month}/{bill.year}</td>
+                        <td className="py-3 px-4 font-medium">{bill.totalAmount.toLocaleString()}đ</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            bill.status === 'Paid' ? 'bg-green-100 text-green-800' :
+                            bill.status === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {bill.status === 'Paid' ? 'Đã thanh toán' :
+                             bill.status === 'Partial' ? 'Thanh toán một phần' : 'Chờ thanh toán'}
+                          </span>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {paidCount}/{totalCount} SV đã thanh toán
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">{bill.dueDate}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedBillForPayment(bill);
+                                setShowPaymentModal(true);
+                              }}
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                              title="Quản lý thanh toán"
+                            >
+                              <DollarSign size={16} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                const details = getBillPaymentDetails(bill.id);
+                                console.log('Bill details:', details);
+                              }}
+                              className="text-green-600 hover:text-green-800 text-sm"
+                              title="Xem chi tiết"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Recent Notifications */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-3">Thông báo gần đây</h4>
+              <div className="space-y-2">
+                {paymentNotifications.slice(-5).reverse().map(notification => (
+                  <div key={notification.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${
+                        notification.type === 'Overdue' ? 'bg-red-500' :
+                        notification.type === 'Reminder' ? 'bg-yellow-500' :
+                        notification.type === 'Paid' ? 'bg-green-500' :
+                        'bg-blue-500'
+                      }`}></span>
+                      <span>{notification.message.split('\n')[0]}</span>
+                    </div>
+                    <span className="text-gray-500 text-xs">
+                      {new Date(notification.sentDate).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Detailed Transaction Guide */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <BookOpen size={20} />
+                Hướng dẫn chi tiết thực hiện giao dịch
+              </h4>
+              
+              <div className="space-y-6">
+                {/* Bank Transfer Guide */}
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h5 className="font-medium text-green-700 mb-3 flex items-center gap-2">
+                    🏦 Chuyển khoản ngân hàng
+                  </h5>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h6 className="font-medium text-green-800 mb-2">Thông tin tài khoản:</h6>
+                        <div className="space-y-1 text-sm">
+                          <p><strong>Ngân hàng:</strong> Vietcombank</p>
+                          <p><strong>Số tài khoản:</strong> 1234567890</p>
+                          <p><strong>Chủ tài khoản:</strong> Nguyễn Văn A</p>
+                          <p><strong>Chi nhánh:</strong> Hà Nội</p>
+                        </div>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-green-800 mb-2">Các bước thực hiện:</h6>
+                        <ol className="text-sm space-y-1">
+                          <li>1. Mở app ngân hàng hoặc đến quầy giao dịch</li>
+                          <li>2. Chọn "Chuyển khoản" → "Chuyển khoản nội bộ"</li>
+                          <li>3. Nhập số tài khoản: <code>1234567890</code></li>
+                          <li>4. Nhập số tiền cần thanh toán</li>
+                          <li>5. <strong>Quan trọng:</strong> Nội dung: <code>"SV2024001 180500"</code> (Mã SV + Số tiền)</li>
+                          <li>6. Xác nhận và lưu lại biên lai</li>
+                        </ol>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-2 bg-green-100 rounded text-xs text-green-700">
+                      💡 <strong>Mẹo:</strong> Ghi đúng nội dung chuyển khoản giúp admin xác nhận nhanh hơn!
+                    </div>
+                  </div>
+                </div>
+
+                {/* E-Wallet Guide */}
+                <div className="border-l-4 border-blue-500 pl-4">
+                  <h5 className="font-medium text-blue-700 mb-3 flex items-center gap-2">
+                    📱 Ví điện tử (MoMo/ZaloPay/VNPay)
+                  </h5>
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h6 className="font-medium text-blue-800 mb-2">Thông tin ví:</h6>
+                        <div className="space-y-1 text-sm">
+                          <p><strong>Số điện thoại:</strong> 0912345678</p>
+                          <p><strong>Tên ví:</strong> Nguyễn Văn A</p>
+                          <p><strong>Loại ví:</strong> MoMo/ZaloPay/VNPay</p>
+                        </div>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-blue-800 mb-2">Các bước thực hiện:</h6>
+                        <ol className="text-sm space-y-1">
+                          <li>1. Mở ứng dụng ví điện tử</li>
+                          <li>2. Chọn "Chuyển tiền" → "Chuyển tiền đến số điện thoại"</li>
+                          <li>3. Nhập SĐT: <code>0912345678</code></li>
+                          <li>4. Nhập số tiền cần thanh toán</li>
+                          <li>5. Nhập lời nhắn: <code>"SV2024001 180500"</code></li>
+                          <li>6. Xác nhận và <strong>chụp màn hình</strong> giao dịch thành công</li>
+                        </ol>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-2 bg-blue-100 rounded text-xs text-blue-700">
+                      📸 <strong>Bắt buộc:</strong> Chụp màn hình giao dịch thành công để làm bằng chứng!
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cash Payment Guide */}
+                <div className="border-l-4 border-orange-500 pl-4">
+                  <h5 className="font-medium text-orange-700 mb-3 flex items-center gap-2">
+                    💵 Thanh toán tiền mặt
+                  </h5>
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h6 className="font-medium text-orange-800 mb-2">Địa chỉ & Thời gian:</h6>
+                        <div className="space-y-1 text-sm">
+                          <p><strong>Địa chỉ:</strong> Văn phòng KTX Tầng 1, Phòng A101</p>
+                          <p><strong>Giờ làm việc:</strong> 8:00 - 17:00 (Thứ 2 - Thứ 6)</p>
+                          <p><strong>Sáng thứ 7:</strong> 8:00 - 12:00</p>
+                          <p><strong>Nghỉ:</strong> Chủ nhật và ngày lễ</p>
+                        </div>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-orange-800 mb-2">Khi đến thanh toán:</h6>
+                        <ol className="text-sm space-y-1">
+                          <li>1. Mang theo thẻ sinh viên/CCCD</li>
+                          <li>2. Báo mã sinh viên và phòng ở</li>
+                          <li>3. Nhân viên kiểm tra thông tin hóa đơn</li>
+                          <li>4. Thanh toán và nhận biên lai</li>
+                          <li>5. Giữ lại biên lai để đối chiếu</li>
+                        </ol>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-2 bg-orange-100 rounded text-xs text-orange-700">
+                      🏢 <strong>Lưu ý:</strong> Đến đúng giờ hành chính để được phục vụ nhanh nhất!
+                    </div>
+                  </div>
+                </div>
+
+                {/* Troubleshooting */}
+                <div className="border-l-4 border-red-500 pl-4">
+                  <h5 className="font-medium text-red-700 mb-3 flex items-center gap-2">
+                    ⚠️ Các vấn đề thường gặp & Cách xử lý
+                  </h5>
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <h6 className="font-medium text-red-800 mb-2">Vấn đề:</h6>
+                        <ul className="space-y-1">
+                          <li>• Chuyển khoản sai nội dung</li>
+                          <li>• Quá hạn thanh toán</li>
+                          <li>• Không nhận được thông báo</li>
+                          <li>• Thanh toán nhưng chưa được xác nhận</li>
+                          <li>• Quên số tiền cần thanh toán</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-red-800 mb-2">Giải pháp:</h6>
+                        <ul className="space-y-1">
+                          <li>• Liên hệ ngay admin qua hotline</li>
+                          <li>• Cung cấp mã giao dịch để kiểm tra</li>
+                          <li>• Chụp lại biên lai/giao dịch</li>
+                          <li>• Đến văn phòng KTX để xử lý trực tiếp</li>
+                          <li>• Kiểm tra lại email/thông báo trong hệ thống</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -2426,7 +3374,7 @@ const KtxView = () => {
             </div>
             
             {/* Meter History Section */}
-            {utilityForm.roomNumber && meterHistory[utilityForm.roomNumber] && (
+            {utilityForm.roomNumber && meterHistory && meterHistory[utilityForm.roomNumber] && (
               <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
                 <h4 className="font-semibold text-purple-800 mb-3">📊 Lịch sử dụng công-tơ phòng {utilityForm.roomNumber}</h4>
                 <div className="max-h-48 overflow-y-auto">
@@ -2441,7 +3389,7 @@ const KtxView = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {meterHistory[utilityForm.roomNumber].map((reading, index) => (
+                      {meterHistory && meterHistory[utilityForm.roomNumber] && meterHistory[utilityForm.roomNumber].map((reading, index) => (
                         <tr key={index} className="border-b border-purple-200 hover:bg-purple-50">
                           <td className="py-2 px-2">{reading.date}</td>
                           <td className="py-2 px-2">{reading.electricityReading}</td>
@@ -2467,7 +3415,7 @@ const KtxView = () => {
                   </table>
                 </div>
                 <div className="mt-2 p-2 bg-purple-100 rounded text-xs text-purple-700">
-                  📈 <strong>Thông tin:</strong> Hiển thị {meterHistory[utilityForm.roomNumber].length} lần ghi chỉ số
+                  📈 <strong>Thông tin:</strong> Hiển thị {meterHistory && meterHistory[utilityForm.roomNumber] ? meterHistory[utilityForm.roomNumber].length : 0} lần ghi chỉ số
                 </div>
               </div>
             )}
@@ -2476,15 +3424,48 @@ const KtxView = () => {
             <div className="bg-green-50 p-4 rounded-lg border border-green-100">
               <h4 className="font-semibold text-green-800 mb-3">📸 Chụp hình công-tơ (Tự động tính toán)</h4>
               
+              {/* Capture Status Alert */}
+              {captureState.isCapturing && (
+                <div className="mb-3 p-2 bg-orange-100 border border-orange-300 rounded-lg">
+                  <div className="flex items-center gap-2 text-orange-800">
+                    <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm font-medium">
+                      Đang chụp công-tơ {captureState.currentMeterType === 'electricity' ? 'điện' : 'nước'}... 
+                      Vui lòng đợi hoàn thành trước khi chụp tiếp theo!
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               {/* Electricity Meter */}
               <div className="mb-4 p-3 bg-white rounded-lg border border-green-200">
                 <div className="flex justify-between items-center mb-2">
                   <h5 className="font-medium text-green-700">⚡ Công-tơ điện</h5>
                   <button
                     onClick={() => handleImageCapture('electricity')}
-                    className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                    disabled={captureState.isCapturing}
+                    className={`px-3 py-1 text-white text-sm rounded-lg flex items-center gap-1 transition-all ${
+                      captureState.isCapturing && captureState.currentMeterType === 'electricity'
+                        ? 'bg-orange-500 cursor-not-allowed'
+                        : captureState.isCapturing
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
                   >
-                    <Camera size={14} /> Chụp công-tơ
+                    {captureState.isCapturing && captureState.currentMeterType === 'electricity' ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Đang chụp...
+                      </>
+                    ) : captureState.isCapturing ? (
+                      <>
+                        <Camera size={14} /> Chụp công-tơ
+                      </>
+                    ) : (
+                      <>
+                        <Camera size={14} /> Chụp công-tơ
+                      </>
+                    )}
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -2510,9 +3491,29 @@ const KtxView = () => {
                   <h5 className="font-medium text-green-700">💧 Đồng hồ nước</h5>
                   <button
                     onClick={() => handleImageCapture('water')}
-                    className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                    disabled={captureState.isCapturing}
+                    className={`px-3 py-1 text-white text-sm rounded-lg flex items-center gap-1 transition-all ${
+                      captureState.isCapturing && captureState.currentMeterType === 'water'
+                        ? 'bg-orange-500 cursor-not-allowed'
+                        : captureState.isCapturing
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
                   >
-                    <Camera size={14} /> Chụp đồng hồ
+                    {captureState.isCapturing && captureState.currentMeterType === 'water' ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Đang chụp...
+                      </>
+                    ) : captureState.isCapturing ? (
+                      <>
+                        <Camera size={14} /> Chụp đồng hồ
+                      </>
+                    ) : (
+                      <>
+                        <Camera size={14} /> Chụp đồng hồ
+                      </>
+                    )}
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -2545,7 +3546,7 @@ const KtxView = () => {
                   console.log('Current utilityForm.roomId:', utilityForm.roomId);
                   console.log('Current meterHistory:', meterHistory);
                   
-                  if (utilityForm.roomNumber && meterHistory[utilityForm.roomNumber]) {
+                  if (utilityForm.roomNumber && meterHistory && meterHistory[utilityForm.roomNumber]) {
                     const firstReading = meterHistory[utilityForm.roomNumber][0];
                     console.log('Testing with first reading:', firstReading);
                     handleViewReadingDetails(utilityForm.roomNumber, firstReading, 0);
@@ -2564,6 +3565,10 @@ const KtxView = () => {
               <h4 className="font-semibold text-gray-800 mb-2">Chi tiết hóa đơn</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
+                  <span>Tiền phòng:</span>
+                  <span>{(rooms.find(r => r.id === utilityForm.roomId)?.price || 0).toLocaleString()}đ</span>
+                </div>
+                <div className="flex justify-between">
                   <span>Tiền điện:</span>
                   <span>{utilityForm.electricity} kWh × {utilityForm.electricityCost.toLocaleString()}đ = {(utilityForm.electricity * utilityForm.electricityCost).toLocaleString()}đ</span>
                 </div>
@@ -2573,8 +3578,13 @@ const KtxView = () => {
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2">
                   <span>Tổng cộng:</span>
-                  <span>{((utilityForm.electricity * utilityForm.electricityCost) + (utilityForm.water * utilityForm.waterCost)).toLocaleString()}đ</span>
+                  <span>{((utilityForm.electricity * utilityForm.electricityCost) + (utilityForm.water * utilityForm.waterCost) + (rooms.find(r => r.id === utilityForm.roomId)?.price || 0)).toLocaleString()}đ</span>
                 </div>
+                {utilityForm.roomId && (
+                  <div className="text-xs text-gray-600 mt-2 bg-blue-50 p-2 rounded">
+                    💡 <strong>Phân chia:</strong> {(rooms.find(r => r.id === utilityForm.roomId)?.students.length || 0)} sinh viên × {Math.floor(((utilityForm.electricity * utilityForm.electricityCost) + (utilityForm.water * utilityForm.waterCost) + (rooms.find(r => r.id === utilityForm.roomId)?.price || 0)) / (rooms.find(r => r.id === utilityForm.roomId)?.students.length || 1)).toLocaleString()}đ/người
+                  </div>
+                )}
               </div>
             </div>
             
@@ -2681,7 +3691,9 @@ const KtxView = () => {
               <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
                 <h4 className="font-semibold text-yellow-800 mb-3">📈 Phân tích tiêu thụ</h4>
                 {(() => {
-                  const previousReading = meterHistory[selectedReading.roomNumber][selectedReading.index - 1];
+                  const previousReading = meterHistory && meterHistory[selectedReading.roomNumber] && selectedReading.index > 0 
+                    ? meterHistory[selectedReading.roomNumber][selectedReading.index - 1] 
+                    : null;
                   const usage = calculateUsageBetweenReadings(previousReading, selectedReading.reading);
                   return (
                     <div className="space-y-2 text-sm">
@@ -2769,6 +3781,227 @@ const KtxView = () => {
           </div>
         </Modal>
       )}
+
+      {/* Payment Modal */}
+      {selectedBillForPayment && (
+        <Modal 
+          isOpen={showPaymentModal} 
+          title="💳 Thanh toán hóa đơn" 
+          onClose={() => setShowPaymentModal(false)}
+        >
+          <div className="p-6 max-w-md w-full">
+            {!paymentSuccess ? (
+              <>
+                {/* Bill Summary */}
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Phòng:</span>
+                    <span className="font-medium">{selectedBillForPayment.roomNumber}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Kỳ:</span>
+                    <span className="font-medium">{selectedBillForPayment.month}/{selectedBillForPayment.year}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-lg font-bold text-gray-800">
+                    <span>Tổng cộng:</span>
+                    <span className="text-green-600">{selectedBillForPayment.totalAmount.toLocaleString()}đ</span>
+                  </div>
+                </div>
+
+                {/* Pending Payments */}
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-700 mb-2">Sinh viên cần thanh toán:</h4>
+                  {getBillPaymentDetails(selectedBillForPayment.id).payments
+                    .filter(p => p.status === 'Pending')
+                    .map(payment => (
+                    <div key={payment.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="font-medium">{payment.studentName}</span>
+                          <span className="ml-2 text-sm text-gray-600">({payment.studentCode})</span>
+                        </div>
+                        <div className="font-bold text-yellow-700">{payment.amount.toLocaleString()}đ</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Payment Methods */}
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-medium text-gray-700 mb-2">Chọn phương thức thanh toán:</h4>
+                  
+                  {/* Cash Payment */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('cash')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'cash' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <DollarSign size={24} className={selectedPaymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Tiền mặt</p>
+                      <p className="text-sm text-gray-500">Thanh toán tại văn phòng KTX</p>
+                    </div>
+                    {selectedPaymentMethod === 'cash' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Bank Transfer */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('transfer')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'transfer' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Smartphone size={24} className={selectedPaymentMethod === 'transfer' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Chuyển khoản</p>
+                      <p className="text-sm text-gray-500">Chuyển khoản ngân hàng</p>
+                    </div>
+                    {selectedPaymentMethod === 'transfer' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* QR Code */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect('qr')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition ${
+                      selectedPaymentMethod === 'qr' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <QrCode size={24} className={selectedPaymentMethod === 'qr' ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-gray-800">Quét mã QR</p>
+                      <p className="text-sm text-gray-500">Quét mã QR để thanh toán</p>
+                    </div>
+                    {selectedPaymentMethod === 'qr' && (
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+                </div>
+
+                {/* Payment Details */}
+                {selectedPaymentMethod === 'transfer' && (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                    <h4 className="font-medium text-blue-800 mb-2">Thông tin chuyển khoản:</h4>
+                    <div className="space-y-1 text-sm">
+                      <p><span className="font-medium">Ngân hàng:</span> {getTransferInfo().bank}</p>
+                      <p><span className="font-medium">Số tài khoản:</span> {getTransferInfo().accountNumber}</p>
+                      <p><span className="font-medium">Chủ tài khoản:</span> {getTransferInfo().accountName}</p>
+                      <p><span className="font-medium">Số tiền:</span> {getTransferInfo().amount.toLocaleString()}đ</p>
+                      <p><span className="font-medium">Nội dung:</span> {getTransferInfo().description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedPaymentMethod === 'qr' && (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6 text-center">
+                    <QrCode size={120} className="mx-auto mb-2 text-blue-600" />
+                    <p className="text-sm text-blue-800">Quét mã QR để thanh toán</p>
+                    <p className="text-xs text-blue-600 mt-1">{getTransferInfo().amount.toLocaleString()}đ</p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={() => setShowPaymentModal(false)}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => {
+                      const pendingPayments = getBillPaymentDetails(selectedBillForPayment.id).payments
+                        .filter(p => p.status === 'Pending');
+                      if (pendingPayments.length > 0) {
+                        processPayment(pendingPayments[0].id);
+                      }
+                    }}
+                    disabled={isProcessingPayment}
+                  >
+                    {isProcessingPayment ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              /* Success State */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle size={32} className="text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Thanh toán thành công!</h3>
+                <p className="text-gray-600 mb-4">Giao dịch đã được xử lý thành công</p>
+                <div className="text-sm text-gray-500">
+                  <p>Mã giao dịch: KTX-{Date.now()}</p>
+                  <p>Thời gian: {new Date().toLocaleString('vi-VN')}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {/* Notification Modal */}
+      <Modal 
+        isOpen={showNotificationModal} 
+        title="📬 Thông báo thanh toán" 
+        onClose={() => setShowNotificationModal(false)}
+      >
+          <div className="space-y-3">
+            {paymentNotifications.slice(-10).reverse().map(notification => (
+              <div key={notification.id} className={`border rounded-lg p-3 ${
+                notification.type === 'Overdue' ? 'border-red-200 bg-red-50' :
+                notification.type === 'Reminder' ? 'border-yellow-200 bg-yellow-50' :
+                notification.type === 'Paid' ? 'border-green-200 bg-green-50' :
+                'border-blue-200 bg-blue-50'
+              }`}>
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`px-2 py-1 text-xs rounded ${
+                    notification.type === 'Overdue' ? 'bg-red-100 text-red-800' :
+                    notification.type === 'Reminder' ? 'bg-yellow-100 text-yellow-800' :
+                    notification.type === 'Paid' ? 'bg-green-100 text-green-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {notification.type === 'Overdue' ? '⚠️ Quá hạn' :
+                     notification.type === 'Reminder' ? '⏰ Nhắc nhở' :
+                     notification.type === 'Paid' ? '✅ Đã thanh toán' :
+                     '📄 Hóa đơn mới'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(notification.sentDate).toLocaleDateString('vi-VN')}
+                  </span>
+                </div>
+                <div className="text-sm whitespace-pre-line">{notification.message}</div>
+                <div className="text-xs text-gray-600 mt-1">
+                  SV: {notification.studentId} | HĐ: #{notification.billId}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="secondary" onClick={() => setShowNotificationModal(false)}>
+              Đóng
+            </Button>
+          </div>
+        </Modal>
     </div>
   );
 };

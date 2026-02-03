@@ -33,7 +33,9 @@ import {
   Mail,
   Settings,
   Bell,
-  Handshake
+  Handshake,
+  Smartphone,
+  QrCode
 } from 'lucide-react';
 import { Button, Modal } from './components';
 import { useSharedKtxData } from './useSharedKtxData';
@@ -190,6 +192,12 @@ const HotelManagementView = () => {
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   
+  // Payment processing states (similar to Canteen)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cash' | 'transfer' | 'qr'>('transfer');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [selectedTransactionForPayment, setSelectedTransactionForPayment] = useState<Transaction | null>(null);
+  
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
@@ -228,7 +236,7 @@ const HotelManagementView = () => {
         nextMaintenance: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       });
     }
-    setRooms(mockRooms);
+    // Hotel rooms are managed separately from KTX rooms
 
     // Mock guests
     const mockGuests: Guest[] = [
@@ -388,6 +396,80 @@ const HotelManagementView = () => {
   };
 
   const stats = getFinancialStats();
+
+  // Payment processing functions (similar to Canteen)
+  const handlePaymentMethodSelect = (method: 'cash' | 'transfer' | 'qr') => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const getTransferInfo = () => {
+    return {
+      bank: 'Vietcombank',
+      accountNumber: '1234567890',
+      accountName: 'ABC Hotel Management',
+      amount: selectedTransactionForPayment?.amount || 0,
+      description: `HOTEL ${selectedTransactionForPayment?.guestName} ${selectedTransactionForPayment?.id}`
+    };
+  };
+
+  const processPayment = async (transactionId: number) => {
+    setIsProcessingPayment(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsProcessingPayment(false);
+    setPaymentSuccess(true);
+    
+    // Create financial transaction record
+    createHotelTransaction(transactionId);
+    
+    // Update transaction status
+    const updatedTransactions = transactions.map(t => 
+      t.id === transactionId 
+        ? { 
+            ...t, 
+            status: 'completed' as 'pending' | 'completed' | 'cancelled',
+            paymentMethod: selectedPaymentMethod === 'transfer' ? 'Bank Transfer' : 
+                         selectedPaymentMethod === 'qr' ? 'E-Wallet' : 'Cash',
+            updatedAt: new Date().toISOString()
+          }
+        : t
+    );
+    setTransactions(updatedTransactions);
+    
+    // Reset after successful payment
+    setTimeout(() => {
+      setPaymentSuccess(false);
+      setShowTransactionModal(false);
+      setSelectedPaymentMethod('transfer');
+      setSelectedTransactionForPayment(null);
+    }, 3000);
+  };
+
+  const createHotelTransaction = (transactionId: number) => {
+    const transaction = transactions.find(t => t.id === transactionId);
+    if (!transaction) return;
+    
+    // Create transaction record for hotel payments
+    const financialTransaction = {
+      id: Date.now(),
+      type: 'income' as 'income' | 'expense',
+      category: 'hotel' as any,
+      amount: transaction.amount,
+      description: `Thu tiền khách sạn ${transaction.guestName} - Phòng ${transaction.roomNumber}`,
+      date: new Date().toISOString().split('T')[0],
+      reference: `HOTEL-${transaction.id}-${Date.now()}`,
+      status: 'completed' as 'completed' | 'pending' | 'cancelled',
+      paymentMethod: selectedPaymentMethod as 'cash' | 'transfer' | 'qr',
+      createdBy: 'Hotel Admin',
+      createdAt: new Date().toISOString()
+    };
+
+    // Store transaction in localStorage for FinanceView to access
+    const existingTransactions = JSON.parse(localStorage.getItem('hotelFinancialTransactions') || '[]');
+    localStorage.setItem('hotelFinancialTransactions', JSON.stringify([financialTransaction, ...existingTransactions]));
+  };
 
   return (
     <div className="space-y-6">

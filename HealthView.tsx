@@ -16,6 +16,27 @@ const HealthView = () => {
   const [healthResult, setHealthResult] = useState<AIAnalysisResult | null>(null);
   const [showHealthModal, setShowHealthModal] = useState(false);
 
+  // Modal States
+  const [showAddRecordModal, setShowAddRecordModal] = useState(false);
+  const [showAddIncidentModal, setShowAddIncidentModal] = useState(false);
+  const [newRecord, setNewRecord] = useState({
+    studentId: 0,
+    bloodType: '',
+    condition: '',
+    allergies: '',
+    lastCheckup: '',
+    notes: ''
+  });
+  const [newIncident, setNewIncident] = useState({
+    studentId: 0,
+    type: '',
+    description: '',
+    date: '',
+    severity: 'Medium',
+    treatment: '',
+    followUp: ''
+  });
+
   useEffect(() => {
     api.getMedicalRecords().then(setRecords);
     api.getHealthIncidents().then(setIncidents);
@@ -35,6 +56,47 @@ const HealthView = () => {
   };
 
   const getStudentName = (id: number) => MOCK_STUDENTS.find(s => s.id === id)?.fullName || "Unknown";
+
+  // Handler functions
+  const handleAddRecord = () => {
+    const record: MedicalRecord = {
+      id: Date.now(),
+      ...newRecord,
+      studentId: newRecord.studentId || 1
+    };
+    setRecords([...records, record]);
+    setShowAddRecordModal(false);
+    setNewRecord({
+      studentId: 0,
+      bloodType: '',
+      condition: '',
+      allergies: '',
+      lastCheckup: '',
+      notes: ''
+    });
+    alert('Đã thêm hồ sơ y tế thành công!');
+  };
+
+  const handleAddIncident = () => {
+    const incident: HealthIncident = {
+      id: Date.now(),
+      ...newIncident,
+      studentId: newIncident.studentId || 1,
+      date: newIncident.date || new Date().toISOString().split('T')[0]
+    };
+    setIncidents([...incidents, incident]);
+    setShowAddIncidentModal(false);
+    setNewIncident({
+      studentId: 0,
+      type: '',
+      description: '',
+      date: '',
+      severity: 'Medium',
+      treatment: '',
+      followUp: ''
+    });
+    alert('Đã ghi nhận sự cố thành công!');
+  };
 
   const filteredRecords = records.filter(r => {
     const studentName = getStudentName(r.studentId).toLowerCase();
@@ -107,7 +169,12 @@ const HealthView = () => {
                 {isAnalyzing ? <Loader2 size={18} className="animate-spin"/> : <Stethoscope size={18}/>}
                 {isAnalyzing ? 'Đang phân tích...' : 'AI Phân tích Dịch tễ'}
               </Button>
-              <Button className="bg-rose-600 hover:bg-rose-700 shadow-rose-200"><Plus size={20}/> Thêm Hồ sơ</Button>
+              <Button 
+                className="bg-rose-600 hover:bg-rose-700 shadow-rose-200"
+                onClick={() => setShowAddRecordModal(true)}
+              >
+                <Plus size={20}/> Thêm Hồ sơ
+              </Button>
            </div>
 
            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -142,7 +209,12 @@ const HealthView = () => {
       {activeTab === 'incidents' && (
          <div className="space-y-4">
             <div className="flex justify-end">
-               <Button className="bg-rose-600 hover:bg-rose-700 shadow-rose-200"><Plus size={20}/> Ghi nhận sự cố</Button>
+               <Button 
+                 className="bg-rose-600 hover:bg-rose-700 shadow-rose-200"
+                 onClick={() => setShowAddIncidentModal(true)}
+               >
+                 <Plus size={20}/> Ghi nhận sự cố
+               </Button>
             </div>
             <div className="grid grid-cols-1 gap-4">
                {incidents.map(inc => (
@@ -206,6 +278,162 @@ const HealthView = () => {
                </div>
             </div>
          )}
+      </Modal>
+
+      {/* Add Record Modal */}
+      <Modal isOpen={showAddRecordModal} onClose={() => setShowAddRecordModal(false)} title="Thêm Hồ sơ Y tế">
+         <div className="space-y-4">
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Học sinh</label>
+               <select 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newRecord.studentId}
+                 onChange={(e) => setNewRecord({...newRecord, studentId: parseInt(e.target.value)})}
+               >
+                 <option value="">Chọn học sinh</option>
+                 {MOCK_STUDENTS.map(student => (
+                   <option key={student.id} value={student.id}>{student.fullName}</option>
+                 ))}
+               </select>
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Nhóm máu</label>
+               <input 
+                 type="text" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newRecord.bloodType}
+                 onChange={(e) => setNewRecord({...newRecord, bloodType: e.target.value})}
+                 placeholder="A+, B+, O+, AB+..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Tình trạng / Bệnh lý</label>
+               <input 
+                 type="text" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newRecord.condition}
+                 onChange={(e) => setNewRecord({...newRecord, condition: e.target.value})}
+                 placeholder="Bệnh nền, tình trạng sức khỏe..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Dị ứng</label>
+               <input 
+                 type="text" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newRecord.allergies}
+                 onChange={(e) => setNewRecord({...newRecord, allergies: e.target.value})}
+                 placeholder="Phấn hoa, thực phẩm, thuốc..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Khám lần cuối</label>
+               <input 
+                 type="date" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newRecord.lastCheckup}
+                 onChange={(e) => setNewRecord({...newRecord, lastCheckup: e.target.value})}
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+               <textarea 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 rows={3}
+                 value={newRecord.notes}
+                 onChange={(e) => setNewRecord({...newRecord, notes: e.target.value})}
+                 placeholder="Ghi chú thêm..."
+               />
+            </div>
+            <div className="flex justify-end gap-2">
+               <Button variant="secondary" onClick={() => setShowAddRecordModal(false)}>Hủy</Button>
+               <Button onClick={handleAddRecord}>Thêm Hồ sơ</Button>
+            </div>
+         </div>
+      </Modal>
+
+      {/* Add Incident Modal */}
+      <Modal isOpen={showAddIncidentModal} onClose={() => setShowAddIncidentModal(false)} title="Ghi nhận Sự cố">
+         <div className="space-y-4">
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Học sinh</label>
+               <select 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newIncident.studentId}
+                 onChange={(e) => setNewIncident({...newIncident, studentId: parseInt(e.target.value)})}
+               >
+                 <option value="">Chọn học sinh</option>
+                 {MOCK_STUDENTS.map(student => (
+                   <option key={student.id} value={student.id}>{student.fullName}</option>
+                 ))}
+               </select>
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Loại sự cố</label>
+               <input 
+                 type="text" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newIncident.type}
+                 onChange={(e) => setNewIncident({...newIncident, type: e.target.value})}
+                 placeholder="Tai nạn, ngất xỉu, đau bụng..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả chi tiết</label>
+               <textarea 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 rows={3}
+                 value={newIncident.description}
+                 onChange={(e) => setNewIncident({...newIncident, description: e.target.value})}
+                 placeholder="Mô tả sự cố..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Ngày xảy ra</label>
+               <input 
+                 type="date" 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newIncident.date}
+                 onChange={(e) => setNewIncident({...newIncident, date: e.target.value})}
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Mức độ nghiêm trọng</label>
+               <select 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 value={newIncident.severity}
+                 onChange={(e) => setNewIncident({...newIncident, severity: e.target.value})}
+               >
+                 <option value="Low">Thấp</option>
+                 <option value="Medium">Trung bình</option>
+                 <option value="High">Cao</option>
+               </select>
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Xử lý ban đầu</label>
+               <textarea 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 rows={2}
+                 value={newIncident.treatment}
+                 onChange={(e) => setNewIncident({...newIncident, treatment: e.target.value})}
+                 placeholder="Các biện pháp đã thực hiện..."
+               />
+            </div>
+            <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Theo dõi tiếp theo</label>
+               <textarea 
+                 className="w-full p-2 border border-gray-300 rounded-lg"
+                 rows={2}
+                 value={newIncident.followUp}
+                 onChange={(e) => setNewIncident({...newIncident, followUp: e.target.value})}
+                 placeholder="Kế hoạch theo dõi..."
+               />
+            </div>
+            <div className="flex justify-end gap-2">
+               <Button variant="secondary" onClick={() => setShowAddIncidentModal(false)}>Hủy</Button>
+               <Button onClick={handleAddIncident}>Ghi nhận</Button>
+            </div>
+         </div>
       </Modal>
     </div>
   );
