@@ -18,6 +18,8 @@ import { connectRedis } from '@/config/redis';
 import authRoutes from '@/routes/auth';
 import userRoutes from '@/routes/users';
 import schoolRoutes from '@/routes/schools';
+import ktxRoutes from '@/routes/ktx';
+import hotelRoutes from '@/routes/hotel';
 import { classes, students, subjects, schedules, lms, exams, grades, attendance, finance, messages, notifications, ai } from '@/routes/placeholder';
 
 // Load environment variables
@@ -99,6 +101,8 @@ app.get('/ready', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/schools', schoolRoutes);
+app.use('/api/v1/ktx', ktxRoutes);
+app.use('/api/v1/hotel', hotelRoutes);
 app.use('/api/v1/classes', classes);
 app.use('/api/v1/students', students);
 app.use('/api/v1/subjects', subjects);
