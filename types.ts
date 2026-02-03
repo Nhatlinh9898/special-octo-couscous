@@ -160,7 +160,11 @@ export interface TransportRoute {
   licensePlate: string;
   capacity: number;
   studentCount: number;
-  status: 'ON_ROUTE' | 'IDLE';
+  status: 'ON_ROUTE' | 'IDLE' | 'WAITING';
+  startTime?: string;
+  endTime?: string;
+  routeDescription?: string;
+  pickupPoints?: string[];
 }
 
 export interface Staff {
