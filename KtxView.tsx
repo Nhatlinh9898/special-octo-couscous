@@ -143,6 +143,18 @@ const KtxView = () => {
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   
+  // Equipment form states
+  const [equipmentForm, setEquipmentForm] = useState({
+    name: '',
+    category: 'ELECTRONICS',
+    quantity: 0,
+    location: '',
+    condition: 'GOOD',
+    purchaseDate: '',
+    warranty: '',
+    notes: ''
+  });
+  
   // Form states
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -1720,6 +1732,36 @@ const KtxView = () => {
     const missingRooms = totalExpectedRooms - total;
     
     return { total, occupied, available, maintenance, reserved, missingRooms };
+  };
+
+  // Equipment handlers
+  const handleAddEquipment = () => {
+    const newEquipment: Equipment = {
+      id: Date.now(),
+      name: equipmentForm.name,
+      category: equipmentForm.category,
+      quantity: equipmentForm.quantity,
+      unit: 'cái',
+      location: equipmentForm.location,
+      status: 'Available',
+      purchaseDate: equipmentForm.purchaseDate || new Date().toISOString().split('T')[0],
+      warranty: equipmentForm.warranty,
+      supplier: 'Nhà cung cấp KTX'
+    };
+    
+    setEquipment([...equipment, newEquipment]);
+    setShowEquipmentModal(false);
+    setEquipmentForm({
+      name: '',
+      category: 'ELECTRONICS',
+      quantity: 0,
+      location: '',
+      condition: 'GOOD',
+      purchaseDate: '',
+      warranty: '',
+      notes: ''
+    });
+    alert('Đã thêm thiết bị mới thành công!');
   };
 
   const stats = getRoomStats();
@@ -3959,11 +4001,12 @@ const KtxView = () => {
       )}
 
       {/* Notification Modal */}
-      <Modal 
-        isOpen={showNotificationModal} 
-        title="📬 Thông báo thanh toán" 
-        onClose={() => setShowNotificationModal(false)}
-      >
+      {showNotificationModal && (
+        <Modal 
+          isOpen={showNotificationModal} 
+          title="📬 Thông báo thanh toán" 
+          onClose={() => setShowNotificationModal(false)}
+        >
           <div className="space-y-3">
             {paymentNotifications.slice(-10).reverse().map(notification => (
               <div key={notification.id} className={`border rounded-lg p-3 ${
@@ -4001,7 +4044,145 @@ const KtxView = () => {
               Đóng
             </Button>
           </div>
+      </Modal>
+      )}
+
+      {/* Equipment Modal */}
+      {showEquipmentModal && (
+        <Modal isOpen={showEquipmentModal} onClose={() => {
+          setShowEquipmentModal(false);
+          setEquipmentForm({
+            name: '',
+            category: 'ELECTRONICS',
+            quantity: 0,
+            location: '',
+            condition: 'GOOD',
+            purchaseDate: '',
+            warranty: '',
+            notes: ''
+          });
+        }} title="Thêm Thiết Bị Mới">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên thiết bị *</label>
+                <input 
+                  type="text" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.name}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, name: e.target.value})}
+                  placeholder="Nhập tên thiết bị..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số lượng *</label>
+                <input 
+                  type="number" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.quantity}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, quantity: parseInt(e.target.value) || 0})}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục *</label>
+                <select 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.category}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, category: e.target.value})}
+                >
+                  <option value="ELECTRONICS">Điện tử</option>
+                  <option value="FURNITURE">Nội thất</option>
+                  <option value="SPORTS">Thể thao</option>
+                  <option value="LAB">Thiết bị lab</option>
+                  <option value="OFFICE">Văn phòng</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tình trạng *</label>
+                <select 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.condition}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, condition: e.target.value})}
+                >
+                  <option value="GOOD">Tốt</option>
+                  <option value="FAIR">Khá</option>
+                  <option value="POOR">Kém</option>
+                  <option value="MAINTENANCE">Bảo trì</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vị trí *</label>
+              <input 
+                type="text" 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                value={equipmentForm.location}
+                onChange={(e) => setEquipmentForm({...equipmentForm, location: e.target.value})}
+                placeholder="Phòng A1, KTX Tầng 1..."
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày mua</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.purchaseDate}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, purchaseDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bảo hành</label>
+                <input 
+                  type="text" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={equipmentForm.warranty}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, warranty: e.target.value})}
+                  placeholder="12 tháng, 24 tháng..."
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+              <textarea 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                rows={3}
+                value={equipmentForm.notes}
+                onChange={(e) => setEquipmentForm({...equipmentForm, notes: e.target.value})}
+                placeholder="Ghi chú về thiết bị..."
+              />
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => {
+                setShowEquipmentModal(false);
+                setEquipmentForm({
+                  name: '',
+                  category: 'ELECTRONICS',
+                  quantity: 0,
+                  location: '',
+                  condition: 'GOOD',
+                  purchaseDate: '',
+                  warranty: '',
+                  notes: ''
+                });
+              }}>
+                Hủy
+              </Button>
+              <Button onClick={handleAddEquipment}>
+                <Plus size={16}/> Thêm thiết bị
+              </Button>
+            </div>
+          </div>
         </Modal>
+      )}
     </div>
   );
 };

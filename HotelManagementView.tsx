@@ -192,6 +192,18 @@ const HotelManagementView = () => {
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   
+  // Inventory form states
+  const [inventoryForm, setInventoryForm] = useState({
+    name: '',
+    category: 'ELECTRONICS',
+    quantity: 0,
+    location: '',
+    condition: 'GOOD',
+    purchaseDate: '',
+    warranty: '',
+    notes: ''
+  });
+  
   // Payment processing states (similar to Canteen)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cash' | 'transfer' | 'qr'>('transfer');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -381,6 +393,40 @@ const HotelManagementView = () => {
       }
     ];
     setFinancialReports(mockReports);
+  };
+
+  // Inventory handlers
+  const handleAddInventory = () => {
+    const newItem: Inventory = {
+      id: Date.now(),
+      name: inventoryForm.name,
+      category: inventoryForm.category,
+      quantity: inventoryForm.quantity,
+      unit: 'cái',
+      unitPrice: 0,
+      totalValue: 0,
+      minStock: 1,
+      maxStock: inventoryForm.quantity * 2,
+      location: inventoryForm.location,
+      supplier: 'Nhà cung cấp Hotel',
+      lastRestocked: inventoryForm.purchaseDate || new Date().toISOString().split('T')[0],
+      expiryDate: '',
+      status: inventoryForm.quantity > 0 ? 'In Stock' : 'Out of Stock'
+    };
+    
+    setInventory([...inventory, newItem]);
+    setShowInventoryModal(false);
+    setInventoryForm({
+      name: '',
+      category: 'ELECTRONICS',
+      quantity: 0,
+      location: '',
+      condition: 'GOOD',
+      purchaseDate: '',
+      warranty: '',
+      notes: ''
+    });
+    alert('Đã thêm vật tư mới thành công!');
   };
 
   const getFinancialStats = () => {
@@ -939,6 +985,143 @@ const HotelManagementView = () => {
           </div>
         )}
       </div>
+
+      {/* Inventory Modal */}
+      {showInventoryModal && (
+        <Modal isOpen={showInventoryModal} onClose={() => {
+          setShowInventoryModal(false);
+          setInventoryForm({
+            name: '',
+            category: 'ELECTRONICS',
+            quantity: 0,
+            location: '',
+            condition: 'GOOD',
+            purchaseDate: '',
+            warranty: '',
+            notes: ''
+          });
+        }} title="Thêm Vật Tư Mới">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên vật tư *</label>
+                <input 
+                  type="text" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.name}
+                  onChange={(e) => setInventoryForm({...inventoryForm, name: e.target.value})}
+                  placeholder="Nhập tên vật tư..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số lượng *</label>
+                <input 
+                  type="number" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.quantity}
+                  onChange={(e) => setInventoryForm({...inventoryForm, quantity: parseInt(e.target.value) || 0})}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục *</label>
+                <select 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.category}
+                  onChange={(e) => setInventoryForm({...inventoryForm, category: e.target.value})}
+                >
+                  <option value="ELECTRONICS">Điện tử</option>
+                  <option value="FURNITURE">Nội thất</option>
+                  <option value="SPORTS">Thể thao</option>
+                  <option value="LAB">Thiết bị lab</option>
+                  <option value="OFFICE">Văn phòng</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tình trạng *</label>
+                <select 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.condition}
+                  onChange={(e) => setInventoryForm({...inventoryForm, condition: e.target.value})}
+                >
+                  <option value="GOOD">Tốt</option>
+                  <option value="FAIR">Khá</option>
+                  <option value="POOR">Kém</option>
+                  <option value="MAINTENANCE">Bảo trì</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vị trí *</label>
+              <input 
+                type="text" 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                value={inventoryForm.location}
+                onChange={(e) => setInventoryForm({...inventoryForm, location: e.target.value})}
+                placeholder="Kho, phòng, khu vực..."
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày mua</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.purchaseDate}
+                  onChange={(e) => setInventoryForm({...inventoryForm, purchaseDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bảo hành</label>
+                <input 
+                  type="text" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={inventoryForm.warranty}
+                  onChange={(e) => setInventoryForm({...inventoryForm, warranty: e.target.value})}
+                  placeholder="12 tháng, 24 tháng..."
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+              <textarea 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                rows={3}
+                value={inventoryForm.notes}
+                onChange={(e) => setInventoryForm({...inventoryForm, notes: e.target.value})}
+                placeholder="Ghi chú về vật tư..."
+              />
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => {
+                setShowInventoryModal(false);
+                setInventoryForm({
+                  name: '',
+                  category: 'ELECTRONICS',
+                  quantity: 0,
+                  location: '',
+                  condition: 'GOOD',
+                  purchaseDate: '',
+                  warranty: '',
+                  notes: ''
+                });
+              }}>
+                Hủy
+              </Button>
+              <Button onClick={handleAddInventory}>
+                <Plus size={16}/> Thêm vật tư
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

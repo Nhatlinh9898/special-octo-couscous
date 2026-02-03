@@ -253,6 +253,9 @@ export interface InventoryItem {
   quantity?: number;
   location?: string;
   condition?: 'GOOD' | 'FAIR' | 'POOR' | 'MAINTENANCE';
+  purchaseDate?: string;
+  warranty?: string;
+  notes?: string;
 }
 
 export interface ProfitAnalysis {
