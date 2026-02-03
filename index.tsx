@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AppProvider, AppContext } from './context';
+import { SharedDataProvider } from './sharedDataContext';
 import { NotificationToast } from './components';
 import { Sidebar, Header } from './Layout';
 import LoginScreen from './LoginScreen';
@@ -128,4 +129,8 @@ const App = () => (
 );
 
 const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+root.render(
+  <SharedDataProvider>
+    <App />
+  </SharedDataProvider>
+);

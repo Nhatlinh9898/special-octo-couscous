@@ -28,9 +28,11 @@ import {
   Settings,
   Printer,
   Bell,
-  Mail
+  Handshake,
+  Building2
 } from 'lucide-react';
 import { Button, Modal } from './components';
+import { useSharedKtxData } from './useSharedKtxData';
 
 // Interfaces
 interface Transaction {
@@ -69,61 +71,57 @@ interface UtilityBill {
 }
 
 const KtxFinanceView = () => {
+  // Use shared data
+  const {
+    students,
+    rooms,
+    utilityBills,
+    getStudentsByRoom,
+    getBillsByRoom,
+    getUnpaidBills
+  } = useSharedKtxData();
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [utilityBills, setUtilityBills] = useState<UtilityBill[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Initialize data with shared data
   useEffect(() => {
-    // Mock data
-    setTransactions([
-      {
-        id: 1,
-        studentId: 1,
-        studentName: 'Nguyễn Văn An',
-        roomNumber: 'A0101',
-        type: 'Rent',
-        amount: 1200000,
-        date: '2024-01-05',
-        dueDate: '2024-01-05',
-        status: 'Paid',
-        paymentMethod: 'Bank Transfer',
-        description: 'Tiền phòng tháng 1/2024'
-      }
-    ]);
+    // Convert utility bills to transactions
+    const convertedTransactions: Transaction[] = utilityBills.map(bill => ({
+      id: bill.id,
+      studentId: 1, // Will be updated with actual student ID
+      studentName: getStudentsByRoom(bill.roomNumber)[0]?.fullName || 'Unknown',
+      roomNumber: bill.roomNumber,
+      type: 'Electricity' as const,
+      amount: bill.electricity * bill.electricityCost,
+      date: bill.dueDate,
+      status: bill.status === 'Paid' ? 'Completed' : 'Pending' as const,
+      description: `Tiền điện ${bill.month}/${bill.year}`
+    }));
 
-    setInvoices([
-      {
-        id: 1,
-        studentId: 1,
-        studentName: 'Nguyễn Văn An',
-        roomNumber: 'A0101',
-        month: '2024-01',
-        total: 1845000,
-        status: 'Paid',
-        dueDate: '2024-02-10'
-      }
-    ]);
+    // Also create water transactions
+    const waterTransactions: Transaction[] = utilityBills.map(bill => ({
+      id: bill.id + 1000,
+      studentId: 1,
+      studentName: getStudentsByRoom(bill.roomNumber)[0]?.fullName || 'Unknown',
+      roomNumber: bill.roomNumber,
+      type: 'Water' as const,
+      amount: bill.water * bill.waterCost,
+      date: bill.dueDate,
+      status: bill.status === 'Paid' ? 'Completed' : 'Pending' as const,
+      description: `Tiền nước ${bill.month}/${bill.year}`
+    }));
 
-    setUtilityBills([
-      {
-        id: 1,
-        roomNumber: 'A0101',
-        month: '2024-01',
-        electricity: 150,
-        water: 10,
-        totalCost: 645000,
-        status: 'Generated'
-      }
-    ]);
-  }, []);
+    setTransactions([...convertedTransactions, ...waterTransactions]);
+  }, [utilityBills, students]);
 
   const stats = {
-    revenue: 450000000,
-    expenses: 150000000,
-    income: 300000000,
-    collection: 92.5,
+    revenue: utilityBills.reduce((sum, bill) => sum + bill.totalAmount, 0),
+    expenses: utilityBills.reduce((sum, bill) => sum + (bill.electricity * bill.electricityCost + bill.water * bill.waterCost), 0),
+    income: utilityBills.filter(bill => bill.status === 'Paid').reduce((sum, bill) => sum + bill.totalAmount, 0),
+    collection: utilityBills.length > 0 ? (utilityBills.filter(bill => bill.status === 'Paid').length / utilityBills.length) * 100 : 0,
     overdue: 35000000
   };
 

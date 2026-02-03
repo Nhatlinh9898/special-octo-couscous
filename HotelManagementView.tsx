@@ -28,13 +28,15 @@ import {
   XCircle,
   Clock,
   MapPin,
+  Star,
   Phone,
   Mail,
-  Star,
   Settings,
-  Printer
+  Bell,
+  Handshake
 } from 'lucide-react';
 import { Button, Modal } from './components';
+import { useSharedKtxData } from './useSharedKtxData';
 
 // Interfaces
 interface Guest {
@@ -159,9 +161,20 @@ interface FinancialReport {
 }
 
 const HotelManagementView = () => {
+  // Use shared data
+  const {
+    rooms,
+    students,
+    utilityBills,
+    getStudentsByRoom,
+    getAvailableRooms,
+    getOccupiedRooms,
+    getBillsByRoom,
+    getUnpaidBills
+  } = useSharedKtxData();
+
   // State management
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [rooms, setRooms] = useState<Room[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
