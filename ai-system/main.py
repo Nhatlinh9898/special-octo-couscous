@@ -38,6 +38,9 @@ from agents.academic_agent import AcademicAgent
 from agents.student_agent import StudentAgent
 from agents.other_agents import TeacherAgent, ParentAgent, AdminAgent, FinanceAgent, AnalyticsAgent
 from agents.library_agent import LibraryAgent
+from agents.distributed_data_agent import DistributedDataAgent
+from agents.specialized_agents import DataReaderAgent, DataFilterAgent, DataDedupAgent
+from agents.advanced_agents import VerificationAgent, EvaluationAgent, StorageAgent, UtilizationAgent
 
 # Request/Response models
 class AIRequest(BaseModel):
@@ -57,6 +60,7 @@ class AIResponse(BaseModel):
 class AgentManager:
     def __init__(self):
         self.agents = {
+            # Core educational agents
             "academic": AcademicAgent(),
             "student": StudentAgent(),
             "teacher": TeacherAgent(),
@@ -64,7 +68,21 @@ class AgentManager:
             "admin": AdminAgent(),
             "finance": FinanceAgent(),
             "analytics": AnalyticsAgent(),
-            "library": LibraryAgent()
+            "library": LibraryAgent(),
+            
+            # Distributed data processing agents
+            "distributed_data": DistributedDataAgent(),
+            
+            # Specialized data processing agents
+            "data_reader": DataReaderAgent(),
+            "data_filter": DataFilterAgent(),
+            "data_dedup": DataDedupAgent(),
+            
+            # Advanced processing agents
+            "verification": VerificationAgent(),
+            "evaluation": EvaluationAgent(),
+            "storage": StorageAgent(),
+            "utilization": UtilizationAgent()
         }
     
     def get_agent(self, agent_name: str):
