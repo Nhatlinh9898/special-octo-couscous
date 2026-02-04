@@ -96,6 +96,13 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
   isMe: boolean;
+  status?: 'sent' | 'delivered' | 'read';
+  attachment?: {
+    name: string;
+    size: number;
+    type: string;
+  };
+  voiceMessage?: boolean;
 }
 
 export interface Notification {
@@ -140,6 +147,9 @@ export interface SchoolEvent {
   date: string;
   type: 'ACADEMIC' | 'HOLIDAY' | 'ACTIVITY';
   description: string;
+  location?: string;
+  time?: string;
+  maxParticipants?: number;
 }
 
 export interface Exam {

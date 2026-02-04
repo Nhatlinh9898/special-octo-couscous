@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, Loader2 } from 'lucide-react';
+import { Plus, Users, Loader2, Edit, Trash2, Calendar, MapPin, Clock } from 'lucide-react';
 import { api } from './data';
 import { SchoolEvent, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
@@ -11,6 +11,19 @@ const EventsView = () => {
   const [isPredicting, setIsPredicting] = useState(false);
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
   const [showAIModal, setShowAIModal] = useState(false);
+  
+  // Event management states
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<SchoolEvent | null>(null);
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    description: '',
+    date: '',
+    type: 'ACTIVITY',
+    location: '',
+    time: '',
+    maxParticipants: 0
+  });
 
   useEffect(() => {
     api.getEvents().then(setEvents);
@@ -23,6 +36,93 @@ const EventsView = () => {
       setAiResult(res);
       setShowAIModal(true);
     } catch (e) { console.error(e); } finally { setIsPredicting(false); }
+  };
+
+  // Event management handlers
+  const handleAddEvent = () => {
+    setEditingEvent(null);
+    setEventForm({
+      title: '',
+      description: '',
+      date: '',
+      type: 'ACTIVITY',
+      location: '',
+      time: '',
+      maxParticipants: 0
+    });
+    setShowEventModal(true);
+  };
+
+  const handleEditEvent = (event: SchoolEvent) => {
+    setEditingEvent(event);
+    setEventForm({
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      type: event.type,
+      location: event.location || '',
+      time: event.time || '',
+      maxParticipants: event.maxParticipants || 0
+    });
+    setShowEventModal(true);
+  };
+
+  const handleSaveEvent = () => {
+    if (!eventForm.title || !eventForm.date) {
+      alert('Vui lòng nhập tên và ngày sự kiện!');
+      return;
+    }
+
+    if (editingEvent) {
+      // Update existing event
+      setEvents(events.map(evt => 
+        evt.id === editingEvent.id 
+          ? { 
+              ...evt, 
+              title: eventForm.title,
+              description: eventForm.description,
+              date: eventForm.date,
+              type: eventForm.type,
+              location: eventForm.location,
+              time: eventForm.time,
+              maxParticipants: eventForm.maxParticipants
+            }
+          : evt
+      ));
+      alert('Cập nhật sự kiện thành công!');
+    } else {
+      // Add new event
+      const newEvent: SchoolEvent = {
+        id: Date.now(),
+        title: eventForm.title,
+        description: eventForm.description,
+        date: eventForm.date,
+        type: eventForm.type,
+        location: eventForm.location,
+        time: eventForm.time,
+        maxParticipants: eventForm.maxParticipants
+      };
+      setEvents([...events, newEvent]);
+      alert('Thêm sự kiện thành công!');
+    }
+
+    setShowEventModal(false);
+    setEventForm({
+      title: '',
+      description: '',
+      date: '',
+      type: 'ACTIVITY',
+      location: '',
+      time: '',
+      maxParticipants: 0
+    });
+  };
+
+  const handleDeleteEvent = (eventId: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
+      setEvents(events.filter(evt => evt.id !== eventId));
+      alert('Xóa sự kiện thành công!');
+    }
   };
 
   const getTypeColor = (type: string) => {
@@ -51,7 +151,7 @@ const EventsView = () => {
              {isPredicting ? <Loader2 size={18} className="animate-spin"/> : <Users size={18}/>}
              {isPredicting ? 'AI Đang dự báo...' : 'AI Dự báo Tham gia'}
            </Button>
-           <Button><Plus size={20}/> Thêm Sự Kiện</Button>
+           <Button onClick={handleAddEvent}><Plus size={20}/> Thêm Sự Kiện</Button>
         </div>
       </div>
 
@@ -71,6 +171,41 @@ const EventsView = () => {
                  </div>
                  <h3 className="font-bold text-lg text-gray-800">{evt.title}</h3>
                  <p className="text-sm text-gray-600 mt-1">{evt.description}</p>
+                 {evt.location && (
+                   <div className="flex items-center gap-1 text-xs text-gray-500 mt-2">
+                     <MapPin size={12} />
+                     <span>{evt.location}</span>
+                   </div>
+                 )}
+                 {evt.time && (
+                   <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                     <Clock size={12} />
+                     <span>{evt.time}</span>
+                   </div>
+                 )}
+                 {evt.maxParticipants && evt.maxParticipants > 0 && (
+                   <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                     <Users size={12} />
+                     <span>Tối đa {evt.maxParticipants} người</span>
+                   </div>
+                 )}
+                 <div className="flex gap-2 mt-3">
+                   <Button 
+                     variant="secondary" 
+                     size="sm"
+                     onClick={() => handleEditEvent(evt)}
+                   >
+                     <Edit size={14} /> Sửa
+                   </Button>
+                   <Button 
+                     variant="secondary" 
+                     size="sm"
+                     className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
+                     onClick={() => handleDeleteEvent(evt.id)}
+                   >
+                     <Trash2 size={14} /> Xóa
+                   </Button>
+                 </div>
               </div>
            </div>
          ))}
@@ -100,6 +235,108 @@ const EventsView = () => {
             </div>
          )}
       </Modal>
+
+      {/* Event Modal */}
+      {showEventModal && (
+        <Modal 
+          isOpen={showEventModal} 
+          onClose={() => setShowEventModal(false)} 
+          title={editingEvent ? 'Chỉnh sửa Sự Kiện' : 'Thêm Sự Kiện Mới'}
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tên sự kiện *</label>
+              <input 
+                type="text" 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                value={eventForm.title}
+                onChange={(e) => setEventForm({...eventForm, title: e.target.value})}
+                placeholder="Nhập tên sự kiện..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày *</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={eventForm.date}
+                  onChange={(e) => setEventForm({...eventForm, date: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                <input 
+                  type="time" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={eventForm.time}
+                  onChange={(e) => setEventForm({...eventForm, time: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Loại sự kiện</label>
+                <select 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={eventForm.type}
+                  onChange={(e) => setEventForm({...eventForm, type: e.target.value as 'ACADEMIC' | 'HOLIDAY' | 'ACTIVITY'})}
+                >
+                  <option value="ACTIVITY">Hoạt động</option>
+                  <option value="ACADEMIC">Học thuật</option>
+                  <option value="HOLIDAY">Nghỉ lễ</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Số người tối đa</label>
+                <input 
+                  type="number" 
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={eventForm.maxParticipants}
+                  onChange={(e) => setEventForm({...eventForm, maxParticipants: parseInt(e.target.value) || 0})}
+                  placeholder="0 = không giới hạn"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+              <input 
+                type="text" 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                value={eventForm.location}
+                onChange={(e) => setEventForm({...eventForm, location: e.target.value})}
+                placeholder="Hội trường A, Giảng đường B..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+              <textarea 
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                rows={3}
+                value={eventForm.description}
+                onChange={(e) => setEventForm({...eventForm, description: e.target.value})}
+                placeholder="Mô tả chi tiết về sự kiện..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="secondary" 
+                onClick={() => setShowEventModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button onClick={handleSaveEvent}>
+                {editingEvent ? 'Cập nhật' : 'Thêm sự kiện'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
