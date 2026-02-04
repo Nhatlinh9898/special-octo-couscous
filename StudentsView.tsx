@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, ChevronLeft, Printer, ShieldAlert, Loader2 } from 'lucide-react';
+import { Plus, Search, Edit, ChevronLeft, Printer, ShieldAlert, Loader2, Eye } from 'lucide-react';
 import { api, MOCK_CLASSES, MOCK_INVOICES } from './data';
 import { Student, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
@@ -226,7 +226,16 @@ const StudentsView = () => {
                   <td className="p-4 text-gray-500">{s.dob}</td>
                   <td className="p-4"><span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">{s.status === 'Active' ? 'Đang học' : 'Nghỉ'}</span></td>
                   <td className="p-4 text-right">
-                     <button onClick={() => setSelectedStudent(s)} className="text-gray-400 hover:text-indigo-600"><Edit size={18}/></button>
+                     <button 
+                       onClick={() => window.location.href = `/student/${s.id}`} 
+                       className="text-gray-400 hover:text-indigo-600 mr-2"
+                       title="Xem chi tiết"
+                     >
+                       <Eye size={18}/>
+                     </button>
+                     <button onClick={() => setSelectedStudent(s)} className="text-gray-400 hover:text-indigo-600" title="Chỉnh sửa">
+                       <Edit size={18}/>
+                     </button>
                   </td>
                 </tr>
                )
