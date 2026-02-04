@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AppContext } from './context';
+import { gradesService, GradeData } from './gradesService';
 import { 
   User, 
   BookOpen, 
@@ -56,31 +57,6 @@ interface StudentDetail {
   totalStudents: number;
 }
 
-interface Grade {
-  id: number;
-  subject: string;
-  subjectCode: string;
-  score: number;
-  maxScore: number;
-  percentage: number;
-  letterGrade: string;
-  semester: string;
-  academicYear: string;
-  type: string;
-  gradedAt: string;
-  teacher: string;
-}
-
-interface AttendanceRecord {
-  id: number;
-  date: string;
-  status: string;
-  period: number;
-  subject: string;
-  notes?: string;
-  teacher: string;
-}
-
 interface Analytics {
   overallGPA: number;
   attendanceRate: number;
@@ -99,13 +75,23 @@ interface Analytics {
   }[];
 }
 
+interface AttendanceRecord {
+  id: number;
+  date: string;
+  status: string;
+  period: number;
+  subject: string;
+  notes?: string;
+  teacher: string;
+}
+
 const StudentDetailView: React.FC = () => {
   const { selectedStudentId, setShowStudentDetail } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState('info');
   const [selectedSemester, setSelectedSemester] = useState('2024-1');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [student, setStudent] = useState<StudentDetail | null>(null);
-  const [grades, setGrades] = useState<Grade[]>([]);
+  const [grades, setGrades] = useState<GradeData[]>([]);
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -144,64 +130,8 @@ const StudentDetailView: React.FC = () => {
         totalStudents: 120
       };
 
-      const mockGrades: Grade[] = [
-        {
-          id: 1,
-          subject: "Toán",
-          subjectCode: "MAT",
-          score: 8.5,
-          maxScore: 10,
-          percentage: 85,
-          letterGrade: "B+",
-          semester: "2024-1",
-          academicYear: "2024",
-          type: "MIDTERM",
-          gradedAt: "2024-03-15",
-          teacher: "Thầy Nguyễn Văn Toán"
-        },
-        {
-          id: 2,
-          subject: "Vật Lý",
-          subjectCode: "PHY",
-          score: 9.0,
-          maxScore: 10,
-          percentage: 90,
-          letterGrade: "A",
-          semester: "2024-1",
-          academicYear: "2024",
-          type: "FINAL",
-          gradedAt: "2024-03-20",
-          teacher: "Thầy Trần Thị Lý"
-        },
-        {
-          id: 3,
-          subject: "Hóa Học",
-          subjectCode: "CHE",
-          score: 7.5,
-          maxScore: 10,
-          percentage: 75,
-          letterGrade: "B",
-          semester: "2024-1",
-          academicYear: "2024",
-          type: "ASSIGNMENT",
-          gradedAt: "2024-03-18",
-          teacher: "Cô Lê Văn Hóa"
-        },
-        {
-          id: 4,
-          subject: "Ngữ Văn",
-          subjectCode: "LIT",
-          score: 8.0,
-          maxScore: 10,
-          percentage: 80,
-          letterGrade: "B+",
-          semester: "2024-1",
-          academicYear: "2024",
-          type: "QUIZ",
-          gradedAt: "2024-03-22",
-          teacher: "Cô Phạm Thị Văn"
-        }
-      ];
+      // Get grades from service
+      const studentGrades = gradesService.getStudentGrades(selectedStudentId || 1, selectedSemester, selectedYear);
 
       const mockAttendance: AttendanceRecord[] = [
         {
@@ -260,12 +190,24 @@ const StudentDetailView: React.FC = () => {
       };
 
       setStudent(mockStudent);
-      setGrades(mockGrades);
+      setGrades(studentGrades);
       setAttendance(mockAttendance);
       setAnalytics(mockAnalytics);
       setLoading(false);
     }, 1000);
-  }, []);
+  }, [selectedStudentId, selectedSemester, selectedYear]);
+
+  // Subscribe to grade changes
+  useEffect(() => {
+    const unsubscribe = gradesService.subscribe(() => {
+      if (selectedStudentId) {
+        const updatedGrades = gradesService.getStudentGrades(selectedStudentId, selectedSemester, selectedYear);
+        setGrades(updatedGrades);
+      }
+    });
+
+    return unsubscribe;
+  }, [selectedStudentId, selectedSemester, selectedYear]);
 
   const tabs = [
     { id: 'info', label: 'Thông tin chi tiết', icon: User },
@@ -275,15 +217,11 @@ const StudentDetailView: React.FC = () => {
     { id: 'activities', label: 'Hoạt động', icon: Activity }
   ];
 
-  const getGradeColor = (grade: string) => {
-    switch (grade) {
-      case 'A': return 'text-green-600 bg-green-100';
-      case 'B+': return 'text-blue-600 bg-blue-100';
-      case 'B': return 'text-cyan-600 bg-cyan-100';
-      case 'C+': return 'text-yellow-600 bg-yellow-100';
-      case 'C': return 'text-orange-600 bg-orange-100';
-      case 'D': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case 'up': return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'down': return <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />;
+      default: return <Activity className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -294,14 +232,6 @@ const StudentDetailView: React.FC = () => {
       case 'LATE': return <AlertCircle className="w-4 h-4 text-yellow-500" />;
       case 'EXCUSED': return <Clock className="w-4 h-4 text-blue-500" />;
       default: return <Clock className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'up': return <TrendingUp className="w-4 h-4 text-green-500" />;
-      case 'down': return <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />;
-      default: return <Activity className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -578,54 +508,95 @@ const StudentDetailView: React.FC = () => {
 
               {/* Grades Table */}
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="text-left p-3 border border-gray-200">Môn học</th>
-                      <th className="text-left p-3 border border-gray-200">Loại điểm</th>
-                      <th className="text-center p-3 border border-gray-200">Điểm</th>
-                      <th className="text-center p-3 border border-gray-200">Thang điểm</th>
-                      <th className="text-center p-3 border border-gray-200">%</th>
-                      <th className="text-center p-3 border border-gray-200">Điểm chữ</th>
-                      <th className="text-left p-3 border border-gray-200">Giáo viên</th>
-                      <th className="text-left p-3 border border-gray-200">Ngày chấm</th>
+                <table className="w-full text-left min-w-[800px] border-collapse">
+                  <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
+                    <tr>
+                      <th className="p-4 sticky left-0 bg-gray-50 border-r">Môn học</th>
+                      <th className="p-4 text-center">Miệng</th>
+                      <th className="p-4 text-center">15 phút (1)</th>
+                      <th className="p-4 text-center">15 phút (2)</th>
+                      <th className="p-4 text-center">1 tiết</th>
+                      <th className="p-4 text-center">Giữa kỳ</th>
+                      <th className="p-4 text-center">Cuối kỳ</th>
+                      <th className="p-4 text-center font-bold">TB Môn</th>
+                      <th className="p-4 text-left">Giáo viên</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     {grades.map(grade => (
                       <tr key={grade.id} className="hover:bg-gray-50">
-                        <td className="p-3 border border-gray-200">
+                        <td className="p-4 font-medium sticky left-0 bg-white border-r shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">
                           <div>
                             <p className="font-medium">{grade.subject}</p>
                             <p className="text-sm text-gray-500">{grade.subjectCode}</p>
                           </div>
                         </td>
-                        <td className="p-3 border border-gray-200">
-                          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                            {grade.type === 'MIDTERM' ? 'Giữa kỳ' : 
-                             grade.type === 'FINAL' ? 'Cuối kỳ' : 
-                             grade.type === 'QUIZ' ? 'Kiểm tra' : 'Bài tập'}
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.oral >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.oral >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.oral || '-'}
                           </span>
                         </td>
-                        <td className="p-3 border border-gray-200 text-center font-medium">
-                          {grade.score}
-                        </td>
-                        <td className="p-3 border border-gray-200 text-center">
-                          {grade.maxScore}
-                        </td>
-                        <td className="p-3 border border-gray-200 text-center">
-                          {grade.percentage}%
-                        </td>
-                        <td className="p-3 border border-gray-200 text-center">
-                          <span className={`px-2 py-1 text-xs rounded-full ${getGradeColor(grade.letterGrade)}`}>
-                            {grade.letterGrade}
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.quiz1 >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.quiz1 >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.quiz1 || '-'}
                           </span>
                         </td>
-                        <td className="p-3 border border-gray-200">
-                          <p className="text-sm">{grade.teacher}</p>
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.quiz2 >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.quiz2 >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.quiz2 || '-'}
+                          </span>
                         </td>
-                        <td className="p-3 border border-gray-200 text-sm">
-                          {grade.gradedAt}
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.oneHour >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.oneHour >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.oneHour || '-'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.midterm >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.midterm >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.midterm || '-'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.final >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.final >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.final || '-'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center font-bold text-indigo-600">
+                          <span className={`inline-block w-12 h-8 leading-8 text-center border rounded ${
+                            grade.average >= 8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            grade.average >= 6.5 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {grade.average}
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm text-gray-600">
+                          <p>{grade.teacher}</p>
+                          <p className="text-xs text-gray-400">{grade.gradedAt}</p>
                         </td>
                       </tr>
                     ))}

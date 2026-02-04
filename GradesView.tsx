@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Upload, Download, Printer, FileSpreadsheet, LineChart, Loader2 } from 'lucide-react';
 import { api, MOCK_CLASSES, MOCK_SUBJECTS } from './data';
 import { Student, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
+import { gradesService } from './gradesService';
+import { AppContext } from './context';
 
 const GradesView = () => {
+  const { user } = useContext(AppContext);
   const [selectedClassId, setSelectedClassId] = useState<number>(MOCK_CLASSES[0]?.id || 1);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number>(MOCK_SUBJECTS[0]?.id || 1);
   const [students, setStudents] = useState<Student[]>([]);
+  const [gradesData, setGradesData] = useState<any[]>([]);
 
   // AI
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -21,6 +25,19 @@ const GradesView = () => {
     });
   }, [selectedClassId]);
 
+  // Load grades data and subscribe to changes
+  useEffect(() => {
+    const loadGrades = () => {
+      const grades = gradesService.getClassGrades(selectedClassId, selectedSubjectId);
+      setGradesData(grades);
+    };
+
+    loadGrades();
+    
+    const unsubscribe = gradesService.subscribe(loadGrades);
+    return unsubscribe;
+  }, [selectedClassId, selectedSubjectId]);
+
   const handleAIAnalyze = async () => {
     setIsAnalyzing(true);
     try {
@@ -30,15 +47,32 @@ const GradesView = () => {
     } catch (e) { console.error(e); } finally { setIsAnalyzing(false); }
   };
 
+  const handleGradeChange = (studentId: number, gradeType: string, value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= 10) {
+      gradesService.updateGrade({
+        studentId,
+        subjectId: selectedSubjectId,
+        gradeType: gradeType as any,
+        value: numValue,
+        semester: "2024-1", // Could be dynamic
+        academicYear: "2024"
+      });
+    }
+  };
+
+  const getStudentGrade = (studentId: number, gradeType: string) => {
+    const grade = gradesData.find(g => g.studentId === studentId);
+    return grade ? (grade as any)[gradeType] || 0 : 0;
+  };
+
   const handlePrint = () => {
     window.print();
   };
 
   const handleExportExcel = () => {
-    const headers = ["ID,Student Name,Math,Literature,English,Physics\n"];
-    const rows = students.map(s => `${s.code},${s.fullName},8.5,7.0,9.0,8.0`).join("\n");
-    const csvContent = "data:text/csv;charset=utf-8," + headers + rows;
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = gradesService.exportToCSV(undefined, selectedClassId, selectedSubjectId);
+    const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "bang_diem.csv");
@@ -114,19 +148,56 @@ const GradesView = () => {
             {students.map((s, idx) => (
               <tr key={s.id} className="hover:bg-gray-50">
                 <td className="p-4 font-medium sticky left-0 bg-white border-r shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">{s.fullName}</td>
-                {/* Mock inputs for grades */}
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <td key={i} className="p-2 text-center">
-                    <input 
-                       className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
-                       placeholder="-"
-                       defaultValue={Math.floor(Math.random() * 3 + 7)} // Mock grade
-                    />
-                  </td>
-                ))}
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'oral') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'oral', e.target.value)}
+                  />
+                </td>
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'quiz1') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'quiz1', e.target.value)}
+                  />
+                </td>
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'quiz2') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'quiz2', e.target.value)}
+                  />
+                </td>
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'oneHour') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'oneHour', e.target.value)}
+                  />
+                </td>
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'midterm') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'midterm', e.target.value)}
+                  />
+                </td>
+                <td className="p-2 text-center">
+                  <input 
+                    className="w-12 h-8 text-center border border-gray-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none" 
+                    placeholder="-"
+                    value={getStudentGrade(s.id, 'final') || ''}
+                    onChange={(e) => handleGradeChange(s.id, 'final', e.target.value)}
+                  />
+                </td>
                 <td className="p-4 text-center font-bold text-indigo-600">
-                   {/* Mock Average */}
-                   {(Math.random() * 2 + 7).toFixed(1)}
+                   {getStudentGrade(s.id, 'average').toFixed(1)}
                 </td>
               </tr>
             ))}
