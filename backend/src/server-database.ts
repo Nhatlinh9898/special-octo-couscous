@@ -7,9 +7,9 @@ import { createServer } from 'http';
 import dotenv from 'dotenv';
 
 // Import routes (ready for database integration)
-import studentRoutes from '@/routes/students-real';
-import classRoutes from '@/routes/classes-real';
-import subjectRoutes from '@/routes/subjects-real';
+import studentRoutes from './routes/students-real';
+import classRoutes from './routes/classes-real';
+import subjectRoutes from './routes/subjects-real';
 
 // Load environment variables
 dotenv.config();

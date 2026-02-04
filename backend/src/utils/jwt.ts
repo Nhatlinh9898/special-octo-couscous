@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { logger } from '@/utils/logger';
+import { logger } from './logger';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key';

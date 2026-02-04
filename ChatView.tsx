@@ -3,6 +3,7 @@ import { Search, Phone, Video, AlertCircle, Paperclip, Send, MessageCircle, Smil
 import { AppContext } from './context';
 import { MOCK_TEACHERS, MOCK_STUDENTS, MOCK_CHAT_HISTORY } from './data';
 import { ChatMessage } from './types';
+import CallModal from './CallModal';
 
 const ChatView = () => {
   const { user } = useContext(AppContext);
@@ -17,6 +18,9 @@ const ChatView = () => {
   const [selectedMessages, setSelectedMessages] = useState<number[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [isVideoCall, setIsVideoCall] = useState(false);
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSend = () => {
@@ -126,6 +130,30 @@ const ChatView = () => {
     }
   };
 
+  // Call handling functions
+  const handleVoiceCall = () => {
+    setIsVideoCall(false);
+    setIsIncomingCall(false);
+    setShowCallModal(true);
+  };
+
+  const handleVideoCall = () => {
+    setIsVideoCall(true);
+    setIsIncomingCall(false);
+    setShowCallModal(true);
+  };
+
+  const simulateIncomingCall = () => {
+    // Simulate incoming call after 3 seconds
+    setTimeout(() => {
+      const randomContact = MOCK_TEACHERS[Math.floor(Math.random() * MOCK_TEACHERS.length)];
+      setActiveContact(randomContact.id);
+      setIsVideoCall(Math.random() > 0.5);
+      setIsIncomingCall(true);
+      setShowCallModal(true);
+    }, 3000);
+  };
+
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -211,14 +239,14 @@ const ChatView = () => {
                   <div className="flex gap-2 text-gray-400">
                      <button 
                        className="p-2 hover:bg-gray-100 rounded-full transition-colors" 
-                       onClick={() => alert('Tính năng gọi điện đang phát triển!')}
+                       onClick={handleVoiceCall}
                        title="Gọi điện"
                      >
                        <Phone size={20}/>
                      </button>
                      <button 
                        className="p-2 hover:bg-gray-100 rounded-full transition-colors" 
-                       onClick={() => alert('Tính năng gọi video đang phát triển!')}
+                       onClick={handleVideoCall}
                        title="Gọi video"
                      >
                        <Video size={20}/>
@@ -413,9 +441,25 @@ const ChatView = () => {
              <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
                 <MessageCircle size={64} className="mb-4 opacity-20"/>
                 <p>Chọn một liên hệ để bắt đầu trò chuyện</p>
+                <button 
+                  onClick={simulateIncomingCall}
+                  className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                >
+                  📞 Mô phỏng cuộc gọi đến
+                </button>
              </div>
           )}
        </div>
+
+       {/* Call Modal */}
+       <CallModal
+         isOpen={showCallModal}
+         onClose={() => setShowCallModal(false)}
+         contactName={MOCK_TEACHERS.find(t => t.id === activeContact)?.fullName || 'Người dùng'}
+         contactAvatar={MOCK_TEACHERS.find(t => t.id === activeContact)?.avatar || ''}
+         isVideoCall={isVideoCall}
+         isIncoming={isIncomingCall}
+       />
     </div>
   );
 };

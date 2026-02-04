@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken, JWTPayload } from '@/utils/jwt';
-import { prisma } from '@/config/database';
+import { verifyToken, JWTPayload } from '../utils/jwt';
+import { prisma } from '../config/database';
 
 // Extend Request interface to include user
 declare global {
