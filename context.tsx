@@ -12,6 +12,10 @@ interface AppState {
   isMobileMenuOpen: boolean;
   toggleMobileMenu: () => void;
   updateUserProfile: (data: Partial<User>) => void;
+  showStudentDetail: boolean;
+  setShowStudentDetail: (show: boolean) => void;
+  selectedStudentId: number | null;
+  setSelectedStudentId: (id: number | null) => void;
 }
 
 export const AppContext = createContext<AppState>({} as AppState);
@@ -21,6 +25,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showStudentDetail, setShowStudentDetail] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -74,7 +80,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       user, activeTab, setActiveTab, login, logout, 
       notifications, addNotification, 
       isMobileMenuOpen, toggleMobileMenu,
-      updateUserProfile
+      updateUserProfile,
+      showStudentDetail, setShowStudentDetail,
+      selectedStudentId, setSelectedStudentId
     }}>
       {children}
     </AppContext.Provider>

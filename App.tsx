@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { SharedDataProvider } from './sharedDataContext';
 import SmartCampusView from './SmartCampusView';
 import LoginScreen from './LoginScreen';
-import StudentDetailView from './StudentDetailView';
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginScreen />} />
             <Route path="/dashboard" element={<SmartCampusView />} />
-            <Route path="/student/:id" element={<StudentDetailView />} />
           </Routes>
         </div>
       </Router>

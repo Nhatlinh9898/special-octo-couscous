@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Search, Edit, ChevronLeft, Printer, ShieldAlert, Loader2, Eye } from 'lucide-react';
+import { AppContext } from './context';
 import { api, MOCK_CLASSES, MOCK_INVOICES } from './data';
 import { Student, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { aiService } from './aiService';
 
 const StudentsView = () => {
+  const { setShowStudentDetail, setSelectedStudentId } = useContext(AppContext);
   const [students, setStudents] = useState<Student[]>([]);
   const [filterClass, setFilterClass] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -227,7 +229,10 @@ const StudentsView = () => {
                   <td className="p-4"><span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">{s.status === 'Active' ? 'Đang học' : 'Nghỉ'}</span></td>
                   <td className="p-4 text-right">
                      <button 
-                       onClick={() => window.location.href = `/student/${s.id}`} 
+                       onClick={() => {
+                         setSelectedStudentId(s.id);
+                         setShowStudentDetail(true);
+                       }} 
                        className="text-gray-400 hover:text-indigo-600 mr-2"
                        title="Xem chi tiết"
                      >

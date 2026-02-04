@@ -45,12 +45,22 @@ import KtxView from './KtxView';
 import HotelManagementView from './HotelManagementView';
 import KtxFinanceView from './KtxFinanceView';
 import IntegratedFinanceView from './IntegratedFinanceView';
+import StudentDetailView from './StudentDetailView';
 
 const AppContent: React.FC = () => {
-  const { user, activeTab, isMobileMenuOpen, toggleMobileMenu } = useContext(AppContext);
+  const { user, activeTab, isMobileMenuOpen, toggleMobileMenu, showStudentDetail, selectedStudentId } = useContext(AppContext);
 
   if (!user) {
     return <LoginScreen />;
+  }
+
+  // Show student detail view when active
+  if (showStudentDetail && selectedStudentId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <StudentDetailView />
+      </div>
+    );
   }
 
   const renderContent = () => {

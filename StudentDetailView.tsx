@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { AppContext } from './context';
 import { 
   User, 
   BookOpen, 
@@ -100,8 +100,7 @@ interface Analytics {
 }
 
 const StudentDetailView: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const { selectedStudentId, setShowStudentDetail } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState('info');
   const [selectedSemester, setSelectedSemester] = useState('2024-1');
   const [selectedYear, setSelectedYear] = useState('2024');
@@ -116,7 +115,7 @@ const StudentDetailView: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       const mockStudent: StudentDetail = {
-        id: parseInt(id || '1'),
+        id: selectedStudentId || 1,
         fullName: "Nguyễn Văn An",
         code: "HS001",
         email: "an.nguyen@school.edu.vn",
@@ -329,7 +328,7 @@ const StudentDetailView: React.FC = () => {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => navigate('/dashboard')}
+              onClick={() => setShowStudentDetail(false)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Quay lại"
             >
