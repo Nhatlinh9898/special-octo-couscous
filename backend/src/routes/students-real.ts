@@ -1,8 +1,8 @@
 import { Router } from 'express';
 const { body, query, validationResult } = require('express-validator') as any;
-import { asyncHandler } from '@/middleware/errorHandler';
-import { authenticate, authorize } from '@/middleware/auth';
-import { prisma } from '@/config/database';
+import { asyncHandler } from '../middleware/errorHandler';
+import { authenticate, authorize } from '../middleware/auth';
+import { prisma } from '../config/database';
 
 const router = Router();
 
@@ -294,12 +294,12 @@ router.get('/:id',
             },
             score: true,
             maxScore: true,
-            gradeType: true,
+            type: true,
             semester: true,
             academicYear: true,
-            gradedAt: true,
+            updatedAt: true,
           },
-          orderBy: { gradedAt: 'desc' },
+          orderBy: { updatedAt: 'desc' },
           take: 10,
         },
         attendanceRecords: {
