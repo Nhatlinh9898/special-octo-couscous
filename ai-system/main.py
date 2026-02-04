@@ -42,6 +42,7 @@ from agents.distributed_data_agent import DistributedDataAgent
 from agents.specialized_agents import DataReaderAgent, DataFilterAgent, DataDedupAgent
 from agents.advanced_agents import VerificationAgent, EvaluationAgent, StorageAgent, UtilizationAgent
 from agents.higher_education_agents import CurriculumDesignAgent, FacultyManagementAgent, ExpertiseDevelopmentAgent
+from agents.comprehensive_course_catalog_agent import ComprehensiveCourseCatalogAgent
 
 # Request/Response models
 class AIRequest(BaseModel):
@@ -88,7 +89,10 @@ class AgentManager:
             # Higher education agents
             "curriculum_design": CurriculumDesignAgent(),
             "faculty_management": FacultyManagementAgent(),
-            "expertise_development": ExpertiseDevelopmentAgent()
+            "expertise_development": ExpertiseDevelopmentAgent(),
+            
+            # Course catalog agent
+            "course_catalog": ComprehensiveCourseCatalogAgent()
         }
     
     def get_agent(self, agent_name: str):
