@@ -47,17 +47,21 @@ const GradesView = () => {
     } catch (e) { console.error(e); } finally { setIsAnalyzing(false); }
   };
 
-  const handleGradeChange = (studentId: number, gradeType: string, value: string) => {
+  const handleGradeChange = async (studentId: number, gradeType: string, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 0 && numValue <= 10) {
-      gradesService.updateGrade({
-        studentId,
-        subjectId: selectedSubjectId,
-        gradeType: gradeType as any,
-        value: numValue,
-        semester: "2024-1", // Could be dynamic
-        academicYear: "2024"
-      });
+      try {
+        await gradesService.updateGrade({
+          studentId,
+          subjectId: selectedSubjectId,
+          gradeType: gradeType as any,
+          value: numValue,
+          semester: "2024-1", // Could be dynamic
+          academicYear: "2024"
+        });
+      } catch (error) {
+        console.error('Failed to update grade:', error);
+      }
     }
   };
 

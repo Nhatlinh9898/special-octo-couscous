@@ -232,6 +232,7 @@ model Student {
   parentId      Int?         @map("parent_id")
   avatarUrl     String?      @map("avatar_url") @db.VarChar(500)
   emergencyContact Json?     @map("emergency_contact")
+  roomId       Int?         @map("room_id")
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -249,6 +250,9 @@ model Student {
   // Club and Course Relations
   clubMemberships     ClubMember[]
   courseEnrollments   CourseEnrollment[]
+  
+  // KTX Relations
+  ktxRoom             KtxRoom? @relation("StudentKtxRoom", fields: [roomId], references: [id])
   
   // Exam Relations
   examSubmissions     ExamSubmission[] @relation("StudentExamSubmission")
@@ -743,20 +747,26 @@ model Grade {
   subjectId        Int       @map("subject_id")
   classId          Int       @map("class_id")
   type             GradeType
-  score            Decimal
-  maxScore         Decimal   @map("max_score")
-  percentage       Decimal
+  oral             Decimal?  @map("oral")
+  quiz1            Decimal?  @map("quiz1")
+  quiz2            Decimal?  @map("quiz2")
+  oneHour          Decimal?  @map("one_hour")
+  midterm          Decimal?  @map("midterm")
+  final            Decimal?  @map("final")
+  average          Decimal   @default(0) @map("average")
+  maxScore         Decimal   @default(10) @map("max_score")
+  percentage       Decimal?
   letterGrade      String?   @map("letter_grade") @db.VarChar(5)
   gpa              Decimal?  @default(0)
   examScore        Decimal?  @map("exam_score")
   examMaxScore     Decimal?  @map("exam_max_score")
-  examPercentage   Decimal? @map("exam_percentage")
+  examPercentage   Decimal?  @map("exam_percentage")
   assignmentScore  Decimal?  @map("assignment_score")
-  assignmentMaxScore Decimal? @map("assignment_max_score")
-  assignmentPercentage Decimal? @map("assignment_percentage")
-  participationScore Decimal? @map("participation_score")
-  participationMaxScore Decimal? @map("participation_max_score")
-  participationPercentage Decimal? @map("participation_percentage")
+  assignmentMaxScore Decimal?  @map("assignment_max_score")
+  assignmentPercentage Decimal?  @map("assignment_percentage")
+  participationScore Decimal?  @map("participation_score")
+  participationMaxScore Decimal?  @map("participation_max_score")
+  participationPercentage Decimal?  @map("participation_percentage")
   semester         String    @db.VarChar(20)
   academicYear     String    @map("academic_year") @db.VarChar(20)
   comments         String?   @db.Text
@@ -798,7 +808,7 @@ model KtxRoom {
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relations
-  students          Student[]
+  students          Student[] @relation("StudentKtxRoom")
   utilityBills      UtilityBill[]
   maintenanceRecords MaintenanceRecord[]
 

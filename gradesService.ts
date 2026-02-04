@@ -29,12 +29,24 @@ export interface GradeUpdate {
 class GradesService {
   private grades: GradeData[] = [];
   private listeners: (() => void)[] = [];
+  private apiBase = 'http://localhost:3001/api/v1';
 
-  // Mock data initialization
   constructor() {
-    this.initializeMockData();
+    this.loadGrades();
   }
 
+  private async loadGrades() {
+    try {
+      // In a real app, this would fetch from API
+      // For now, we'll use mock data until the database is set up
+      this.initializeMockData();
+    } catch (error) {
+      console.error('Failed to load grades:', error);
+      this.initializeMockData();
+    }
+  }
+
+  // Mock data initialization
   private initializeMockData() {
     this.grades = [
       {
@@ -131,8 +143,62 @@ class GradesService {
     });
   }
 
-  // Update a single grade
-  updateGrade(update: GradeUpdate): void {
+  // Update a single grade - now calls API
+  async updateGrade(update: GradeUpdate): Promise<void> {
+    try {
+      const response = await fetch(`${this.apiBase}/grades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: update.studentId,
+          subjectId: update.subjectId,
+          classId: 1, // This should be dynamic
+          semester: update.semester,
+          academicYear: update.academicYear,
+          gradeType: update.gradeType,
+          value: update.value,
+          type: 'ASSIGNMENT'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update grade');
+      }
+
+      const updatedGrade = await response.json();
+      
+      // Update local cache
+      const gradeIndex = this.grades.findIndex(g => 
+        g.studentId === update.studentId && 
+        g.subjectId === update.subjectId &&
+        g.semester === update.semester &&
+        g.academicYear === update.academicYear
+      );
+
+      if (gradeIndex !== -1) {
+        // Update the specific grade type
+        this.grades[gradeIndex] = {
+          ...this.grades[gradeIndex],
+          [update.gradeType]: update.value
+        };
+
+        // Recalculate average
+        this.recalculateAverage(gradeIndex);
+        
+        // Notify listeners
+        this.notify();
+      }
+    } catch (error) {
+      console.error('Error updating grade:', error);
+      // Fallback to local update
+      this.updateGradeLocal(update);
+    }
+  }
+
+  // Local fallback for grade updates
+  private updateGradeLocal(update: GradeUpdate): void {
     const gradeIndex = this.grades.findIndex(g => 
       g.studentId === update.studentId && 
       g.subjectId === update.subjectId &&
