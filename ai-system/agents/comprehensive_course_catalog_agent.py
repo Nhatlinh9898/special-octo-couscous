@@ -48,6 +48,11 @@ class ComprehensiveCourseCatalogAgent(BaseAgent):
         }
         
         self.academic_fields = {
+            "k12_education": {
+                "specializations": ["elementary", "middle_school", "high_school", "stem", "languages", "arts"],
+                "total_courses": 60,
+                "grade_levels": ["grade_1", "grade_2", "grade_3", "grade_4", "grade_5", "grade_6", "grade_7", "grade_8", "grade_9", "grade_10", "grade_11", "grade_12"]
+            },
             "computer_science": {
                 "specializations": ["ai_ml", "software_engineering", "cybersecurity", "data_science", "systems"],
                 "total_courses": 40
@@ -130,7 +135,274 @@ class ComprehensiveCourseCatalogAgent(BaseAgent):
     async def generate_courses_for_field_and_level(self, field: str, level: str) -> List[Course]:
         courses = []
         
-        if field == "computer_science":
+        if field == "k12_education":
+            if level == "basic":
+                courses = [
+                    # Elementary School (Grades 1-5)
+                    Course("K12_MATH101", "Toán Lớp 1 - Số đếm và phép cộng cơ bản", "basic", 2, 16, [],
+                           "Giới thiệu số đếm, nhận biết số và phép cộng cơ bản cho học sinh lớp 1",
+                           ["Đếm số từ 1-100", "Phép cộng trong phạm vi 10", "Nhận biết hình dạng cơ bản"],
+                           ["Bài tập tập đếm", "Thực hành phép cộng", "Vẽ hình học", "Kiểm tra nhỏ"],
+                           ["Số và đếm", "Phép cộng cơ bản", "Hình học cơ bản", "Đo lường đơn giản"],
+                           ["Tư duy toán học", "Kỹ năng đếm", "Vận động tinh", "Logic cơ bản"],
+                           lecture_hours=3, project_based=True),
+                    Course("K12_VIET101", "Tiếng Việt Lớp 1 - Nhận biết chữ và đọc cơ bản", "basic", 3, 16, [],
+                           "Học nhận biết chữ cái, luyện đọc và viết cơ bản cho học sinh lớp 1",
+                           ["Đọc thành thạo 29 chữ cái", "Viết đúng nét chữ", "Tập làm văn ngắn"],
+                           ["Thực hành đọc", "Luyện viết chữ", "Tập kể chuyện", "Kiểm tra đọc viết"],
+                           ["Bảng chữ cái", "Nguyên âm và phụ âm", "Từ vựng cơ bản", "Câu đơn"],
+                           ["Kỹ năng đọc viết", "Từ vựng", "Ngữ pháp cơ bản", "Kể chuyện"],
+                           lecture_hours=4, project_based=True),
+                    Course("K12_SCI101", "Tự nhiên Xã hội Lớp 1 - Thế giới xung quanh", "basic", 2, 16, [],
+                           "Khám phá thế giới tự nhiên và xã hội gần gũi",
+                           ["Nhận biết các loài cây, con", "Hiểu về gia đình, trường học", "Bảo vệ môi trường"],
+                           ["Quan sát thực tế", "Vẽ tranh minh họa", "Thảo luận nhóm", "Dự án nhỏ"],
+                           ["Cây cỏ, hoa lá", "Động vật quen thuộc", "Gia đình và bạn bè", "Trường lớp", "Vệ sinh cá nhân"],
+                           ["Tư duy quan sát", "Yêu thiên nhiên", "Ý thức cộng đồng", "Kỹ năng tự phục vụ"],
+                           lecture_hours=2, project_based=True),
+                    
+                    Course("K12_MATH102", "Toán Lớp 2 - Phép trừ và nhân cơ bản", "basic", 2, 16, ["K12_MATH101"],
+                           "Phép trừ, phép nhân và các bài toán đố đơn giản",
+                           ["Phép trừ trong phạm vi 100", "Bảng cửu chương", "Giải bài toán đố"],
+                           ["Thực hành tính toán", "Giải bài tập", "Học trò chơi toán học", "Kiểm tra định kỳ"],
+                           ["Phép trừ", "Bảng cửu chương", "Bài toán đố", "Đo lường"],
+                           ["Tính nhẩm", "Giải quyết vấn đề", "Logic toán học", "Tư duy phản biện"],
+                           lecture_hours=3),
+                    Course("K12_VIET102", "Tiếng Việt Lớp 2 - Đọc hiểu và tập làm văn", "basic", 3, 16, ["K12_VIET101"],
+                           "Phát triển kỹ năng đọc hiểu và tập làm văn ngắn",
+                           ["Đọc hiểu truyện ngắn", "Viết đoạn văn 3-5 câu", "Tập viết thư"],
+                           ["Thực hành đọc", "Luyện viết đoạn văn", "Tập kể chuyện", "Sáng tác nhỏ"],
+                           ["Từ loại văn học", "Cấu trúc đoạn văn", "Dấu câu", "Từ vựng mở rộng"],
+                           ["Kỹ năng đọc hiểu", "Viết sáng tác", "Ngữ pháp", "Diễn đạt"],
+                           lecture_hours=4),
+                    
+                    Course("K12_MATH103", "Toán Lớp 3 - Phép chia và phân số cơ bản", "basic", 3, 16, ["K12_MATH102"],
+                           "Phép chia, phân số và các phép toán phức tạp hơn",
+                           ["Phép chia có dư", "Phân số cơ bản", "Các bài toán về thời gian"],
+                           ["Thực hành phép chia", "Học phân số", "Giải bài toán thực tế", "Đồ án toán học"],
+                           ["Phép chia", "Phân số", "Thời gian và lịch", "Diện tích cơ bản", "Số thập phân"],
+                           ["Tư duy toán học", "Giải quyết vấn đề", "Tính toán chính xác", "Logic"],
+                           lecture_hours=3),
+                    Course("K12_VIET103", "Tiếng Việt Lớp 3 - Tập làm văn và ngữ pháp", "basic", 3, 16, ["K12_VIET102"],
+                           "Hoàn thiện kỹ năng viết và học ngữ pháp cơ bản",
+                           ["Viết văn tả", "Ngữ pháp câu", "Tập viết thơ", "Thuyết trình"],
+                           ["Thực hành viết văn", "Học ngữ pháp", "Tập sáng tác", "Thuyết trình lớp"],
+                           ["Các thể loại văn bản", "Ngữ pháp nâng cao", "Từ vựng phong phú", "Biểu đạt"],
+                           ["Viết sáng tác", "Ngữ pháp", "Kỹ năng thuyết trình", "Tư duy văn học"],
+                           lecture_hours=4),
+                    
+                    Course("K12_MATH104", "Toán Lớp 4 - Hình học và đại số cơ bản", "basic", 3, 16, ["K12_MATH103"],
+                           "Hình học phẳng, đại số cơ bản và các bài toán phức tạp",
+                           ["Hình học tam giác, hình chữ nhật", "Phương trình đơn giản", "Tính diện tích, thể tích"],
+                           ["Vẽ hình học", "Giải phương trình", "Thực hành đo lường", "Dự án hình học"],
+                           ["Hình học phẳng", "Phương trình đại số", "Diện tích và chu vi", "Thể tích", "Tỷ lệ"],
+                           ["Tư duy không gian", "Giải quyết vấn đề", "Logic hình học", "Tính toán"],
+                           lecture_hours=3),
+                    Course("K12_VIET104", "Tiếng Việt Lớp 4 - Văn học và sáng tác", "basic", 3, 16, ["K12_VIET103"],
+                           "Phân tích văn học và kỹ năng sáng tác văn bản",
+                           ["Phân tích tác phẩm văn học", "Sáng tác truyện ngắn", "Viết báo cáo"],
+                           ["Đọc và phân tích", "Thực hành sáng tác", "Thảo luận văn học", "Dự án đọc"],
+                           ["Văn học Việt Nam", "Các thể loại sáng tác", "Phân tích tác phẩm", "Viết báo cáo"],
+                           ["Phân tích văn học", "Sáng tác", "Tư duy phê bình", "Kỹ năng nghiên cứu"],
+                           lecture_hours=4),
+                    
+                    Course("K12_MATH105", "Toán Lớp 5 - Ôn tập và nâng cao", "basic", 3, 16, ["K12_MATH104"],
+                           "Ôn tập kiến thức toán tiểu học và chuẩn bị chuyển cấp",
+                           ["Ôn tập toàn chương toán tiểu học", "Các bài toán tổng hợp", "Luyện thi chuyển cấp"],
+                           ["Giải bài tập tổng hợp", "Luyện thi", "Dự án toán học", "Kiểm tra cuối kỳ"],
+                           ["Tổng quan toán tiểu học", "Bài toán ứng dụng", "Lý thuyết số", "Hình học tổng hợp"],
+                           ["Tư duy toán học tổng hợp", "Giải quyết vấn đề phức tạp", "Ôn tập và hệ thống hóa", "Tự tin"],
+                           lecture_hours=3),
+                    Course("K12_VIET105", "Tiếng Việt Lớp 5 - Văn học và chuẩn bị THCS", "basic", 3, 16, ["K12_VIET104"],
+                           "Củng cố văn học và kỹ năng chuẩn bị cho trung học cơ sở",
+                           ["Tổng quan văn học tiểu học", "Kỹ năng viết luận", "Thuyết trình nâng cao"],
+                           ["Ôn tập văn học", "Thực hành viết luận", "Thuyết trình", "Dự án văn học"],
+                           ["Tổng quan văn học", "Viết luận cơ bản", "Kỹ năng thuyết trình", "Ngữ pháp nâng cao"],
+                           ["Phân tích văn học", "Viết luận", "Thuyết trình tự tin", "Sẵn sàng chuyển cấp"],
+                           lecture_hours=4)
+                ]
+            
+            elif level == "intermediate":
+                courses = [
+                    # Middle School (Grades 6-8)
+                    Course("K12_MATH201", "Toán Lớp 6 - Số học và đại số", "intermediate", 3, 16, ["K12_MATH105"],
+                           "Số học, tập hợp và đại số cơ bản trung học cơ sở",
+                           ["Số học cơ bản", "Tập hợp", "Phương trình bậc nhất", "Hệ phương trình"],
+                           ["Thực hành tính toán", "Giải phương trình", "Làm bài tập nhóm", "Kiểm tra định kỳ"],
+                           ["Số tự nhiên và số nguyên", "Tập hợp và phép toán", "Phương trình bậc nhất", "Hệ phương trình bậc nhất", "Bất phương trình"],
+                           ["Tư duy đại số", "Giải quyết vấn đề", "Logic toán học", "Kỹ năng tính toán"],
+                           lecture_hours=3),
+                    Course("K12_LIT201", "Ngữ văn Lớp 6 - Văn học trung học cơ sở", "intermediate", 3, 16, ["K12_VIET105"],
+                           "Giới thiệu văn học trung học cơ sở và kỹ năng đọc hiểu văn bản",
+                           ["Phân tích tác phẩm văn học", "Viết văn nghị luận", "Tìm hiểu thể loại"],
+                           ["Đọc và phân tích", "Thực hành viết văn", "Thảo luận nhóm", "Dự án văn học"],
+                           ["Văn học trung học cơ sở", "Các thể loại văn học", "Phân tích tác phẩm", "Viết nghị luận xã hội", "Viết nghị luận văn học"],
+                           ["Phân tích văn học", "Viết nghị luận", "Tư duy phê bình", "Kỹ năng diễn đạt"],
+                           lecture_hours=4),
+                    Course("K12_PHY201", "Vật lý Lớp 6 - Cơ học cơ bản", "intermediate", 3, 16, [],
+                           "Giới thiệu vật lý cơ học và các định luật cơ bản",
+                           ["Định luật Newton", "Lực và chuyển động", "Công và công suất", "Năng lượng"],
+                           ["Thí nghiệm vật lý", "Giải bài tập cơ học", "Làm đồ án khoa học", "Báo cáo thực nghiệm"],
+                           ["Chuyển động và lực", "Định luật Newton", "Công và năng lượng", "Động lượng và động năng", "Đàn hồi và sóng cơ"],
+                           ["Tư duy khoa học", "Kỹ năng thực nghiệm", "Giải quyết vấn đề", "Logic vật lý"],
+                           lab_hours=2, lecture_hours=3),
+                    Course("K12_CHEM201", "Hóa học Lớp 6 - Hóa học cơ bản", "intermediate", 3, 16, [],
+                           "Giới thiệu hóa học và các phản ứng hóa học cơ bản",
+                           ["Cấu trúc nguyên tử", "Phản ứng hóa học", "Các hợp chất cơ bản"],
+                           ["Thí nghiệm hóa học", "Luyện tập phản ứng", "Viết báo cáo", "Dự án hóa học"],
+                           ["Nguyên tử và phân tử", "Biểu tượng hóa học", "Phản ứng hóa học", "Các hợp chất quan trọng", "Hóa học và đời sống"],
+                           ["Tư duy hóa học", "Kỹ năng thí nghiệm", "An toàn hóa học", "Ứng dụng thực tế"],
+                           lab_hours=2, lecture_hours=3),
+                    Course("K12_BIO201", "Sinh học Lớp 6 - Sinh học cơ bản", "intermediate", 3, 16, [],
+                           "Giới thiệu sinh học và các quá trình sống cơ bản",
+                           ["Tế bào và cấu trúc", "Các quá trình sống", "Phân loại sinh vật"],
+                           ["Quan sát dưới kính hiển vi", "Thí nghiệm sinh học", "Lập biểu đồ", "Dự án sinh học"],
+                           ["Tế bào", "Các quá trình sống", "Đa dạng sinh học", "Sinh thái học cơ bản", "Di truyền học cơ bản"],
+                           ["Tư duy sinh học", "Kỹ năng quan sát", "Phân loại và hệ thống", "Ý thức môi trường"],
+                           lab_hours=2, lecture_hours=3),
+                    
+                    Course("K12_MATH202", "Toán Lớp 7 - Hình học và thống kê", "intermediate", 3, 16, ["K12_MATH201"],
+                           "Hình học phẳng, không gian và thống kê cơ bản",
+                           ["Hình học phẳng nâng cao", "Hình học không gian", "Thống kê cơ bản"],
+                           ["Vẽ hình học", "Thực hành thống kê", "Giải bài tập hình học", "Dự án thống kê"],
+                           ["Hình học phẳng", "Hình học không gian", "Thống kê và xác suất", "Tọa độ", "Đo lường"],
+                           ["Tư duy không gian", "Phân tích dữ liệu", "Logic hình học", "Thống kê"],
+                           lecture_hours=3),
+                    Course("K12_LIT202", "Ngữ văn Lớp 7 - Văn học Việt Nam hiện đại", "intermediate", 3, 16, ["K12_LIT201"],
+                           "Văn học Việt Nam hiện đại và các tác phẩm tiêu biểu",
+                           ["Văn học Việt Nam hiện đại", "Phân tích tác phẩm", "Viết văn sáng tạo"],
+                           ["Đọc và phân tích", "Thực hành viết văn", "Thảo luận tác phẩm", "Dự án sáng tạo"],
+                           ["Văn học Việt Nam hiện đại", "Các tác giả tiêu biểu", "Phân tích tác phẩm", "Viết sáng tạo", "Văn học và đời sống"],
+                           ["Phân tích văn học", "Sáng tác", "Tư duy phản biện", "Hiểu biết văn hóa"],
+                           lecture_hours=4),
+                    Course("K12_PHY202", "Vật lý Lớp 7 - Nhiệt học và quang học", "intermediate", 3, 16, ["K12_PHY201"],
+                           "Nhiệt học, quang học và các hiện tượng vật lý khác",
+                           ["Nhiệt học và nhiệt động học", "Quang học cơ bản", "Điện học cơ bản"],
+                           ["Thí nghiệm nhiệt học", "Thực hành quang học", "Lắp mạch điện cơ bản", "Báo cáo thực nghiệm"],
+                           ["Nhiệt và nhiệt độ", "Định luật nhiệt động học", "Ánh sáng và phản xạ", "Khúc xạ và lăng kính", "Điện học cơ bản"],
+                           ["Tư duy vật lý", "Kỹ năng thí nghiệm", "Ứng dụng thực tế", "Giải quyết vấn đề"],
+                           lab_hours=2, lecture_hours=3),
+                    
+                    Course("K12_MATH203", "Toán Lớp 8 - Đại số và hình học nâng cao", "intermediate", 3, 16, ["K12_MATH202"],
+                           "Đại số nâng cao và hình học phân tích cơ bản",
+                           ["Đa thức và phương trình bậc hai", "Hình học phân tích", "Hàm số cơ bản"],
+                           ["Giải phương trình bậc hai", "Vẽ đồ thị", "Hệ thống hóa kiến thức", "Luyện thi"],
+                           ["Đa thức", "Phương trình bậc hai", "Hình học phân tích", "Hàm số", "Lượng giác cơ bản"],
+                           ["Tư duy đại số", "Phân tích đồ thị", "Logic toán học", "Giải quyết vấn đề phức tạp"],
+                           lecture_hours=3),
+                    Course("K12_LIT203", "Ngữ văn Lớp 8 - Văn học nước ngoài và sáng tác", "intermediate", 3, 16, ["K12_LIT202"],
+                           "Văn học nước ngoài và kỹ năng sáng tác văn học",
+                           ["Văn học nước ngoài", "Sáng tác văn học", "Phê bình văn học"],
+                           ["Đọc và phân tích", "Thực hành sáng tác", "Viết phê bình", "Dự án văn học"],
+                           ["Văn học nước ngoài", "Các thể loại văn học quốc tế", "Sáng tác văn học", "Phê bình và bình luận", "Văn học so sánh"],
+                           ["Hiểu biết văn hóa thế giới", "Sáng tác", "Phê bình văn học", "Tư duy toàn cầu"],
+                           lecture_hours=4)
+                ]
+            
+            elif level == "advanced":
+                courses = [
+                    # High School (Grades 9-10)
+                    Course("K12_MATH301", "Toán Lớp 9 - Đại số nâng cao và lượng giác", "advanced", 3, 16, ["K12_MATH203"],
+                           "Đại số nâng cao, lượng giác và chuẩn bị thi chuyển cấp",
+                           ["Đại số nâng cao", "Lượng giác", "Hình học không gian", "Chuẩn bị thi"],
+                           ["Giải bài tập nâng cao", "Luyện thi", "Dự án toán học", "Kiểm tra tổng hợp"],
+                           ["Đa thức nâng cao", "Lượng giác", "Hình học không gian", "Tổ hợp và xác suất", "Chuẩn bị thi THPT"],
+                           ["Tư duy toán học nâng cao", "Giải quyết vấn đề phức tạp", "Logic toán học", "Sẵn sàng thi cử"],
+                           lecture_hours=3),
+                    Course("K12_LIT301", "Ngữ văn Lớp 9 - Văn học và xã hội", "advanced", 3, 16, ["K12_LIT203"],
+                           "Văn học và các vấn đề xã hội, chuẩn bị thi chuyển cấp",
+                           ["Văn học và xã hội", "Phân tích tác phẩm sâu", "Viết luận nâng cao"],
+                           ["Phân tích tác phẩm", "Thảo luận xã hội", "Viết luận nâng cao", "Dự án văn học"],
+                           ["Văn học và xã hội", "Phân tích tác phẩm sâu", "Viết luận xã hội", "Văn học đương đại", "Chuẩn bị thi THPT"],
+                           ["Tư duy phê bình sâu", "Hiểu biết xã hội", "Viết luận nâng cao", "Nhận thức văn học"],
+                           lecture_hours=4),
+                    Course("K12_PHY301", "Vật lý Lớp 9 - Điện học và từ học", "advanced", 3, 16, ["K12_PHY202"],
+                           "Điện học, từ học và các ứng dụng trong đời sống",
+                           ["Điện học nâng cao", "Từ học", "Điện từ học", "Ứng dụng điện"],
+                           ["Thí nghiệm điện học", "Lắp mạch phức tạp", "Nghiên cứu ứng dụng", "Báo cáo khoa học"],
+                           ["Điện trường và dòng điện", "Định luật Ohm", "Từ trường", "Điện từ cảm ứng", "Ứng dụng điện tử"],
+                           ["Tư duy vật lý nâng cao", "Kỹ năng thí nghiệm", "Ứng dụng công nghệ", "Giải quyết vấn đề"],
+                           lab_hours=2, lecture_hours=3),
+                    Course("K12_CHEM301", "Hóa học Lớp 9 - Hóa học hữu cơ", "advanced", 3, 16, ["K12_CHEM201"],
+                           "Hóa học hữu cơ và các phản ứng hóa học phức tạp",
+                           ["Hóa học hữu cơ cơ bản", "Các phản ứng quan trọng", "Polyme và nhựa"],
+                           ["Thí nghiệm hóa hữu cơ", "Tổng hợp chất hữu cơ", "Nghiên cứu polyme", "Báo cáo hóa học"],
+                           ["Hóa học hữu cơ", "Cacbon và hợp chất", "Các phản ứng quan trọng", "Polyme", "Hóa học và môi trường"],
+                           ["Tư duy hóa học nâng cao", "Kỹ năng thí nghiệm", "Ý thức môi trường", "Ứng dụng thực tế"],
+                           lab_hours=2, lecture_hours=3),
+                    
+                    Course("K12_MATH401", "Toán Lớp 10 - Giải tích và hình học", "advanced", 3, 16, ["K12_MATH301"],
+                           "Giải tích cơ bản và hình học nâng cao",
+                           ["Giải tích cơ bản", "Hình học phân tích", "Xác suất thống kê"],
+                           ["Giải bài tập giải tích", "Vẽ đồ thị phức tạp", "Thống kê ứng dụng", "Dự án toán học"],
+                           ["Giải tích cơ bản", "Đạo hàm", "Tích phân", "Hình học phân tích", "Xác suất nâng cao"],
+                           ["Tư duy giải tích", "Phân tích toán học", "Ứng dụng thống kê", "Logic toán học cao cấp"],
+                           lecture_hours=3),
+                    Course("K12_LIT401", "Ngữ văn Lớp 10 - Văn học so sánh và lý luận", "advanced", 3, 16, ["K12_LIT301"],
+                           "Văn học so sánh, lý luận văn học và chuẩn bị đại học",
+                           ["Văn học so sánh", "Lý luận văn học", "Chuẩn bị đại học"],
+                           ["So sánh tác phẩm", "Nghiên cứu lý luận", "Viết luận văn học", "Dự án nghiên cứu"],
+                           ["Văn học so sánh", "Lý luận văn học", "Các trường phái văn học", "Nghiên cứu văn học", "Chuẩn bị đại học"],
+                           ["Tư duy so sánh", "Nghiên cứu văn học", "Lý luận phê bình", "Sẵn sàng đại học"],
+                           lecture_hours=4),
+                    Course("K12_PHY401", "Vật lý Lớp 10 - Cơ học lượng tử và hiện đại", "advanced", 3, 16, ["K12_PHY301"],
+                           "Cơ học lượng tử, vật lý hiện đại và các lý thuyết mới",
+                           ["Cơ học lượng tử cơ bản", "Vật lý hiện đại", "Thuyết tương đối"],
+                           ["Nghiên cứu lý thuyết", "Thí nghiệm hiện đại", "Báo cáo khoa học", "Dự án nghiên cứu"],
+                           ["Cơ học lượng tử", "Thuyết tương đối", "Vật lý hạt nhân", "Vật lý thiên văn", "Vật lý hiện đại"],
+                           ["Tư duy khoa học hiện đại", "Nghiên cứu lý thuyết", "Hiểu biết vũ trụ", "Sẵn sàng đại học"],
+                           lab_hours=2, lecture_hours=3)
+                ]
+            
+            elif level == "expert":
+                courses = [
+                    # High School Advanced (Grades 11-12)
+                    Course("K12_MATH501", "Toán Lớp 11 - Giải tích nâng cao", "expert", 3, 16, ["K12_MATH401"],
+                           "Giải tích nâng cao và chuẩn bị đại học",
+                           ["Giải tích nâng cao", "Phương trình vi phân", "Tối ưu hóa"],
+                           ["Giải bài tập nâng cao", "Nghiên cứu ứng dụng", "Dự án toán học", "Chuẩn bị thi đại học"],
+                           ["Giải tích đa biến", "Phương trình vi phân", "Tối ưu hóa", "Giải tích số", "Chuẩn bị đại học"],
+                           ["Tư duy toán học cao cấp", "Nghiên cứu độc lập", "Giải quyết vấn đề phức tạp", "Sẵn sàng đại học"],
+                           lecture_hours=3),
+                    Course("K12_LIT501", "Ngữ văn Lớp 11 - Văn học chuyên sâu", "expert", 3, 16, ["K12_LIT401"],
+                           "Văn học chuyên sâu và nghiên cứu tác phẩm",
+                           ["Văn học chuyên sâu", "Nghiên cứu tác phẩm", "Lý luận phê bình"],
+                           ["Nghiên cứu chuyên sâu", "Viết luận văn học", "Thảo luận học thuật", "Dự án nghiên cứu"],
+                           ["Văn học chuyên sâu", "Các tác giả kinh điển", "Lý luận phê bình", "Nghiên cứu tác phẩm", "Chuẩn bị đại học"],
+                           ["Nghiên cứu văn học", "Tư duy phê bình sâu", "Kỹ năng học thuật", "Sẵn sàng đại học"],
+                           lecture_hours=4),
+                    Course("K12_SCI501", "Khoa học Lớp 11 - Nghiên cứu khoa học", "expert", 3, 16, ["K12_PHY401", "K12_CHEM301"],
+                           "Nghiên cứu khoa học và các dự án thực tế",
+                           ["Phương pháp nghiên cứu", "Dự án khoa học", "Thống kê khoa học"],
+                           ["Thực hiện dự án", "Thống kê dữ liệu", "Viết báo cáo khoa học", "Thuyết trình nghiên cứu"],
+                           ["Phương pháp nghiên cứu", "Thiết kế thực nghiệm", "Thống kê khoa học", "Đạo đức khoa học", "Ứng dụng thực tế"],
+                           ["Nghiên cứu khoa học", "Tư duy phản biện", "Kỹ năng thực nghiệm", "Sẵn sàng đại học"],
+                           lab_hours=3, lecture_hours=2, project_based=True),
+                    
+                    Course("K12_MATH601", "Toán Lớp 12 - Ôn tập và thi đại học", "expert", 3, 16, ["K12_MATH501"],
+                           "Ôn tập toàn diện và chuẩn bị thi đại học",
+                           ["Ôn tập toàn diện", "Luyện thi đại học", "Giải quyết vấn đề"],
+                           ["Luyện thi", "Giải đề thi", "Ôn tập chuyên sâu", "Kiểm tra mô phỏng"],
+                           ["Ôn tập toàn diện", "Các dạng bài toán thi", "Giải quyết vấn đề", "Chuẩn bị tâm lý thi", "Kỹ năng làm bài"],
+                           ["Sẵn sàng thi cử", "Giải quyết vấn đề dưới áp lực", "Tư duy toán học tổng hợp", "Tự tin"],
+                           lecture_hours=3),
+                    Course("K12_LIT601", "Ngữ văn Lớp 12 - Ôn tập và thi đại học", "expert", 3, 16, ["K12_LIT501"],
+                           "Ôn tập văn học và chuẩn bị thi đại học",
+                           ["Ôn tập toàn diện", "Luyện thi đại học", "Viết luận thi"],
+                           ["Luyện viết luận", "Ôn tập tác phẩm", "Giải đề thi", "Thảo luận chiến lược thi"],
+                           ["Ôn tập toàn diện", "Các dạng đề thi", "Viết luận thi", "Chiến lược làm bài", "Chuẩn bị tâm lý"],
+                           ["Sẵn sàng thi cử", "Viết luận dưới áp lực", "Phân tích nhanh", "Tự tin"],
+                           lecture_hours=4),
+                    Course("K12_SCI601", "Khoa học Lớp 12 - Dự án nghiên cứu cuối cấp", "expert", 3, 16, ["K12_SCI501"],
+                           "Dự án nghiên cứu khoa học cuối cấp",
+                           ["Dự án nghiên cứu cá nhân", "Thực hiện nghiên cứu", "Báo cáo khoa học"],
+                           ["Thực hiện dự án", "Thu thập dữ liệu", "Phân tích kết quả", "Bảo vệ dự án"],
+                           ["Nghiên cứu độc lập", "Thiết kế nghiên cứu", "Thống kê nâng cao", "Báo cáo khoa học", "Chuẩn bị đại học"],
+                           ["Nghiên cứu độc lập", "Tư duy khoa học", "Kỹ năng báo cáo", "Sẵn sàng đại học"],
+                           lab_hours=3, lecture_hours=2, project_based=True)
+                ]
+        
+        elif field == "computer_science":
             if level == "basic":
                 courses = [
                     Course("CS101", "Introduction to Computer Science", "basic", 3, 16, [],
@@ -395,7 +667,47 @@ class ComprehensiveCourseCatalogAgent(BaseAgent):
     async def create_degree_programs_for_field(self, field: str) -> Dict[str, Any]:
         programs = {}
         
-        if field == "computer_science":
+        if field == "k12_education":
+            programs = {
+                "elementary_program": {
+                    "name": "Chương trình Tiểu học (Lớp 1-5)",
+                    "duration_years": 5,
+                    "total_credits": 50,
+                    "grade_levels": ["grade_1", "grade_2", "grade_3", "grade_4", "grade_5"],
+                    "core_courses": ["K12_MATH101", "K12_VIET101", "K12_SCI101", "K12_MATH102", "K12_VIET102", "K12_MATH103", "K12_VIET103", "K12_MATH104", "K12_VIET104", "K12_MATH105", "K12_VIET105"],
+                    "specializations": {
+                        "math_focus": ["K12_MATH101", "K12_MATH102", "K12_MATH103", "K12_MATH104", "K12_MATH105"],
+                        "language_focus": ["K12_VIET101", "K12_VIET102", "K12_VIET103", "K12_VIET104", "K12_VIET105"],
+                        "science_focus": ["K12_SCI101", "K12_MATH103", "K12_MATH104", "K12_MATH105"]
+                    }
+                },
+                "middle_school_program": {
+                    "name": "Chương trình Trung học cơ sở (Lớp 6-8)",
+                    "duration_years": 3,
+                    "total_credits": 36,
+                    "grade_levels": ["grade_6", "grade_7", "grade_8"],
+                    "core_courses": ["K12_MATH201", "K12_LIT201", "K12_PHY201", "K12_CHEM201", "K12_BIO201", "K12_MATH202", "K12_LIT202", "K12_MATH203", "K12_LIT203"],
+                    "specializations": {
+                        "stem_focus": ["K12_MATH201", "K12_PHY201", "K12_CHEM201", "K12_BIO201", "K12_MATH202", "K12_MATH203"],
+                        "literature_focus": ["K12_LIT201", "K12_LIT202", "K12_LIT203"],
+                        "comprehensive": ["K12_MATH201", "K12_LIT201", "K12_PHY201", "K12_CHEM201", "K12_BIO201", "K12_MATH202", "K12_LIT202", "K12_MATH203", "K12_LIT203"]
+                    }
+                },
+                "high_school_program": {
+                    "name": "Chương trình Trung học phổ thông (Lớp 9-12)",
+                    "duration_years": 4,
+                    "total_credits": 48,
+                    "grade_levels": ["grade_9", "grade_10", "grade_11", "grade_12"],
+                    "core_courses": ["K12_MATH301", "K12_LIT301", "K12_PHY301", "K12_CHEM301", "K12_MATH401", "K12_LIT401", "K12_PHY401", "K12_MATH501", "K12_LIT501", "K12_MATH601", "K12_LIT601"],
+                    "specializations": {
+                        "science_track": ["K12_MATH301", "K12_PHY301", "K12_CHEM301", "K12_MATH401", "K12_PHY401", "K12_MATH501", "K12_MATH601"],
+                        "literature_track": ["K12_LIT301", "K12_MATH301", "K12_LIT401", "K12_LIT501", "K12_LIT601"],
+                        "comprehensive_track": ["K12_MATH301", "K12_LIT301", "K12_PHY301", "K12_CHEM301", "K12_MATH401", "K12_LIT401", "K12_PHY401", "K12_MATH501", "K12_LIT501", "K12_MATH601", "K12_LIT601"]
+                    }
+                }
+            }
+        
+        elif field == "computer_science":
             programs = {
                 "bachelor_cs": {
                     "name": "Bachelor of Computer Science",
@@ -442,6 +754,14 @@ class ComprehensiveCourseCatalogAgent(BaseAgent):
     
     async def create_career_mappings(self) -> Dict[str, Any]:
         return {
+            "k12_education": {
+                "elementary_teacher": ["K12_MATH101", "K12_VIET101", "K12_SCI101", "K12_MATH102", "K12_VIET102", "K12_MATH103", "K12_VIET103", "K12_MATH104", "K12_VIET104", "K12_MATH105", "K12_VIET105"],
+                "middle_school_teacher": ["K12_MATH201", "K12_LIT201", "K12_PHY201", "K12_CHEM201", "K12_BIO201", "K12_MATH202", "K12_LIT202", "K12_MATH203", "K12_LIT203"],
+                "high_school_teacher": ["K12_MATH301", "K12_LIT301", "K12_PHY301", "K12_CHEM301", "K12_MATH401", "K12_LIT401", "K12_PHY401", "K12_MATH501", "K12_LIT501", "K12_MATH601", "K12_LIT601"],
+                "education_administrator": ["K12_LIT201", "K12_LIT301", "K12_LIT401", "K12_LIT501", "K12_LIT601"],
+                "curriculum_developer": ["K12_MATH201", "K12_LIT201", "K12_PHY201", "K12_CHEM201", "K12_BIO201", "K12_MATH301", "K12_LIT301"],
+                "education_consultant": ["K12_MATH401", "K12_LIT401", "K12_MATH501", "K12_LIT501", "K12_MATH601", "K12_LIT601"]
+            },
             "computer_science": {
                 "software_developer": ["CS102", "CS202", "CS302"],
                 "data_scientist": ["CS203", "CS301", "Data Mining"],
