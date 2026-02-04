@@ -254,6 +254,89 @@ class DataReaderAgent(BaseAgent):
             format_counts[format_type] = format_counts.get(format_type, 0) + 1
         
         return format_counts
+    
+    async def batch_read(self, sources: List[str], batch_size: int = 10) -> List[Dict[str, Any]]:
+        """Đọc dữ liệu theo batch"""
+        results = []
+        
+        for i in range(0, len(sources), batch_size):
+            batch = sources[i:i + batch_size]
+            batch_results = await self.parallel_read(batch, max_concurrent=batch_size)
+            results.extend(batch_results)
+        
+        return results
+    
+    async def streaming_read(self, sources: List[str]) -> List[Dict[str, Any]]:
+        """Đọc dữ liệu theo streaming"""
+        results = []
+        
+        for source in sources:
+            try:
+                result = await self.read_single_source(source)
+                results.append(result)
+            except Exception as e:
+                results.append({
+                    "source": source,
+                    "status": "error",
+                    "error": str(e),
+                    "read_at": time.time()
+                })
+        
+        return results
+    
+    async def parallel_read(self, sources: List[str], max_concurrent: int = 5) -> List[Dict[str, Any]]:
+        """Đọc dữ liệu song song"""
+        import asyncio
+        
+        semaphore = asyncio.Semaphore(max_concurrent)
+        
+        async def limited_read(source: str):
+            async with semaphore:
+                return await self.read_single_source(source)
+        
+        tasks = [limited_read(source) for source in sources]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        return [r for r in results if isinstance(r, dict)]
+    
+    async def read_single_source(self, source: str) -> Dict[str, Any]:
+        """Đọc từ một nguồn dữ liệu"""
+        try:
+            # Simulate reading from source
+            if source.startswith("http"):
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(source)
+                    if response.status_code == 200:
+                        return {
+                            "source": source,
+                            "status": "success",
+                            "content": response.text,
+                            "size": len(response.content),
+                            "read_at": time.time()
+                        }
+                    else:
+                        return {
+                            "source": source,
+                            "status": "error",
+                            "error": f"HTTP {response.status_code}",
+                            "read_at": time.time()
+                        }
+            else:
+                # Simulate file reading
+                return {
+                    "source": source,
+                    "status": "success",
+                    "content": f"Simulated content from {source}",
+                    "size": 100,
+                    "read_at": time.time()
+                }
+        except Exception as e:
+            return {
+                "source": source,
+                "status": "error",
+                "error": str(e),
+                "read_at": time.time()
+            }
 
 class DataFilterAgent(BaseAgent):
     """Agent chuyên lọc dữ liệu dựa trên criteria"""
