@@ -11,6 +11,7 @@ import studentRoutes from './routes/students-real';
 import classRoutes from './routes/classes-real';
 import subjectRoutes from './routes/subjects-real';
 import gradesRoutes from './routes/grades';
+import aiRoutes from './routes/ai';
 
 // Load environment variables
 dotenv.config();
@@ -56,6 +57,9 @@ app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/classes', classRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
 app.use('/api/v1/grades', gradesRoutes);
+
+// AI System Integration Routes
+app.use('/api/ai', aiRoutes);
 
 // API Routes
 app.get('/api/v1/test', (_req, res) => {
