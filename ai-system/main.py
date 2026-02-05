@@ -43,6 +43,10 @@ from agents.specialized_agents import DataReaderAgent, DataFilterAgent, DataDedu
 from agents.advanced_agents import VerificationAgent, EvaluationAgent, StorageAgent, UtilizationAgent
 from agents.higher_education_agents import CurriculumDesignAgent, FacultyManagementAgent, ExpertiseDevelopmentAgent
 from agents.comprehensive_course_catalog_agent import ComprehensiveCourseCatalogAgent
+from agents.education_data_agent import EducationDataAgent
+
+# Import ServiceNexus integration
+from integration.service_nexus_adapter import ServiceNexusAdapter, ServiceNexusConfig
 
 # Request/Response models
 class AIRequest(BaseModel):
@@ -61,6 +65,9 @@ class AIResponse(BaseModel):
 # Agent Manager
 class AgentManager:
     def __init__(self):
+        # Initialize ServiceNexus adapter
+        self.service_nexus_adapter = ServiceNexusAdapter(ServiceNexusConfig())
+        
         self.agents = {
             # Core educational agents
             "academic": AcademicAgent(),
@@ -92,14 +99,40 @@ class AgentManager:
             "expertise_development": ExpertiseDevelopmentAgent(),
             
             # Course catalog agent
-            "course_catalog": ComprehensiveCourseCatalogAgent()
+            "course_catalog": ComprehensiveCourseCatalogAgent(),
+            
+            # ServiceNexus integrated agents
+            "education_data": EducationDataAgent(),
+            
+            # ServiceNexus adapter
+            "service_nexus": self.service_nexus_adapter
         }
+    
+    async def initialize(self):
+        """Initialize all agents and integrations"""
+        try:
+            # Initialize ServiceNexus adapter
+            nexus_init = await self.service_nexus_adapter.initialize()
+            if not nexus_init["success"]:
+                print(f"Warning: ServiceNexus integration failed: {nexus_init.get('error')}")
+            
+            print("Agent Manager initialized successfully")
+            return True
+            
+        except Exception as e:
+            print(f"Failed to initialize Agent Manager: {str(e)}")
+            return False
     
     def get_agent(self, agent_name: str):
         return self.agents.get(agent_name)
 
 # Initialize agent manager
 agent_manager = AgentManager()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    await agent_manager.initialize()
 
 @app.get("/")
 async def root():
@@ -217,6 +250,155 @@ async def download_model(model_name: str):
                 raise HTTPException(status_code=500, detail="Failed to download model")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error downloading model: {str(e)}")
+
+# ServiceNexus Integration Endpoints
+@app.post("/api/v1/education/data-analysis")
+async def education_data_analysis(request: AIRequest):
+    """Process education data using ServiceNexus agents"""
+    try:
+        agent = agent_manager.get_agent("service_nexus")
+        if not agent:
+            raise HTTPException(status_code=404, detail="ServiceNexus adapter not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process_education_data(request.task, request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="service_nexus",
+            task=request.task,
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error processing education data: {str(e)}"
+        )
+
+@app.post("/api/v1/education/workflow")
+async def education_workflow(request: AIRequest):
+    """Execute education workflow using ServiceNexus orchestrator"""
+    try:
+        agent = agent_manager.get_agent("service_nexus")
+        if not agent:
+            raise HTTPException(status_code=404, detail="ServiceNexus adapter not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.orchestrate_education_workflow(request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="service_nexus",
+            task="workflow_orchestration",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error executing workflow: {str(e)}"
+        )
+
+@app.post("/api/v1/education/visualization")
+async def education_visualization(request: AIRequest):
+    """Generate education visualizations using ServiceNexus"""
+    try:
+        agent = agent_manager.get_agent("service_nexus")
+        if not agent:
+            raise HTTPException(status_code=404, detail="ServiceNexus adapter not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.generate_education_visualizations(request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="service_nexus",
+            task="visualization_generation",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error generating visualizations: {str(e)}"
+        )
+
+@app.post("/api/v1/education/big-data")
+async def education_big_data(request: AIRequest):
+    """Process big education data using ServiceNexus"""
+    try:
+        agent = agent_manager.get_agent("service_nexus")
+        if not agent:
+            raise HTTPException(status_code=404, detail="ServiceNexus adapter not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process_big_education_data(request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="service_nexus",
+            task="big_data_processing",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error processing big data: {str(e)}"
+        )
+
+@app.get("/api/v1/integration/status")
+async def integration_status():
+    """Get ServiceNexus integration status"""
+    try:
+        agent = agent_manager.get_agent("service_nexus")
+        if not agent:
+            raise HTTPException(status_code=404, detail="ServiceNexus adapter not found")
+        
+        return {
+            "service_nexus": {
+                "status": "active",
+                "loaded_agents": list(agent.service_nexus_agents.keys()),
+                "integration_status": agent.integration_status,
+                "config": {
+                    "enable_big_data": agent.config.enable_big_data,
+                    "enable_visualization": agent.config.enable_visualization,
+                    "enable_orchestration": agent.config.enable_orchestration,
+                    "max_concurrent_tasks": agent.config.max_concurrent_tasks
+                }
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error getting integration status: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn
