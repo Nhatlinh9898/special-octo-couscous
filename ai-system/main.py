@@ -635,6 +635,11 @@ from agents.advanced_student_agent import AdvancedStudentAgent
 from agents.advanced_teacher_agent import AdvancedTeacherAgent
 from agents.enhanced_skills_agent import EnhancedSkillsAgent
 from agents.universal_skills_integration_agent import UniversalSkillsIntegrationAgent
+from agents.ai_training_system import AITrainingSystem
+from agents.ai_training_pipeline import AITrainingPipeline
+from agents.web_search_agent import WebSearchAgent
+from agents.knowledge_integration_agent import KnowledgeIntegrationAgent
+from agents.multi_tier_system_manager import MultiTierAgentSystemManager
 
 # Initialize agents
 academic_agent = AcademicAgent()
@@ -671,6 +676,17 @@ enhanced_skills_agent = EnhancedSkillsAgent()
 # Initialize universal skills integration agent
 universal_skills_agent = UniversalSkillsIntegrationAgent()
 
+# Initialize AI training system
+ai_training_system = AITrainingSystem()
+ai_training_pipeline = AITrainingPipeline()
+
+# Initialize web search and knowledge integration agents
+web_search_agent = WebSearchAgent()
+knowledge_integration_agent = KnowledgeIntegrationAgent()
+
+# Initialize Multi-Tier System Manager
+multi_tier_manager = MultiTierAgentSystemManager()
+
 @app.post("/api/v1/chat")
 async def chat_endpoint(request: AIRequest):
     """Enhanced chat endpoint that uses actual AI agents"""
@@ -692,6 +708,10 @@ Xin chào! Tôi là hệ thống AI giáo dục đa tác vụ nâng cao với c�
 - **Advanced Teacher Agent**: Tối ưu giảng dạy, phân tích sư phạm, phát triển chuyên môn
 - **Enhanced Skills Agent**: Tích hợp 634+ kỹ năng nâng cao từ antigravity-awesome-skills
 - **Universal Skills Integration Agent**: Tích hợp toàn diện kỹ năng vào hệ thống giáo dục
+- **AI Training System**: Huấn luyện AI với reinforcement learning, fine-tuning
+- **AI Training Pipeline**: Pipeline huấn luyện tự động với monitoring và optimization
+- **Web Search Agent**: Tìm kiếm thông tin giáo dục từ internet
+- **Knowledge Integration Agent**: Tích hợp kiến thức web vào AI training
 - **Content Generation Agent**: Tạo nội dung giáo dục chất lượng cao
 - **Library Agent**: Quản lý thư viện thông minh
 - **Analytics Agent**: Phân tích dữ liệu lớn, báo cáo chuyên sâu
@@ -702,6 +722,11 @@ Xin chào! Tôi là hệ thống AI giáo dục đa tác vụ nâng cao với c�
 - **Cá nhân hóa AI**: Personalized learning paths, adaptive interventions
 - **634+ Kỹ năng chuyên sâu**: Content creation, data analysis, automation, development
 - **Tích hợp toàn diện**: Universal skill integration cho giáo dục
+- **Huấn luyện AI nâng cao**: Reinforcement learning, fine-tuning, continuous learning
+- **Pipeline tự động**: Automated training với monitoring và optimization
+- **Tìm kiếm web**: Web search cho thông tin giáo dục mới nhất
+- **Tích hợp kiến thức**: Knowledge integration từ internet sources
+- **Học tập real-time**: Real-time learning với web data
 - **Hỗ trợ toàn diện**: Mental health, social-emotional learning, career guidance
 - **Nghiên cứu giáo dục**: Research assistance, collaboration facilitation
 
@@ -714,6 +739,11 @@ Xin chào! Tôi là hệ thống AI giáo dục đa tác vụ nâng cao với c�
 6. "Tích hợp kỹ năng content creation vào giáo dục"
 7. "Đề xuất kỹ năng phù hợp cho giáo viên"
 8. "Tích hợp toàn diện 634+ kỹ năng vào hệ thống"
+9. "Huấn luyện AI với reinforcement learning"
+10. "Thiết lập pipeline huấn luyện tự động"
+11. "Tìm kiếm thông tin về AI trong giáo dục"
+12. "Cập nhật kiến thức về machine learning"
+13. "Huấn luyện AI với web về personalized learning"
 
 Bạn cần hỗ trợ với kỹ năng nâng cao nào?"""
         
@@ -785,7 +815,122 @@ Bạn cần hỗ trợ với kỹ năng nâng cao nào?"""
             else:
                 response = f"❌ Lỗi tạo giáo trình: {result.get('error', 'Lỗi không xác định')}"
         
-        elif any(keyword in message_lower for keyword in ["tích hợp toàn diện", "universal integration", "tất cả kỹ năng", "all skills"]):
+        elif any(keyword in message_lower for keyword in ["huấn luyện ai", "ai training", "reinforcement learning", "fine-tuning"]):
+            # Use AI Training System
+            result = await ai_training_system.process("reinforcement_learning_training", {
+                "agent_type": "educational_assistant",
+                "environment": "educational_simulation",
+                "algorithm": "PPO",
+                "training_episodes": 1000,
+                "reward_function": "student_success"
+            })
+            
+            if result.get("success"):
+                training = result.get("training_plan", "")
+                response = f"""🧠 **HUẤN LUYỆN AI REINFORCEMENT LEARNING!**
+
+🎯 **Kế hoạch huấn luyện RL:**
+{training}
+
+📊 **Cấu hình huấn luyện:**
+- Agent Type: {result.get('agent_type', 'educational_assistant')}
+- Algorithm: {result.get('training_config', {}).get('algorithm', 'PPO')}
+- Episodes: {result.get('training_config', {}).get('episodes', 1000)}
+- Environment: {result.get('training_config', {}).get('environment', 'educational_simulation')}
+
+⏱️ **Thời gian dự kiến:** {result.get('estimated_duration', '2000 minutes')}
+🤖 **Agent sử dụng:** AI Training System
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi huấn luyện AI: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["pipeline huấn luyện", "training pipeline", "automated training"]):
+            # Use AI Training Pipeline
+            result = await ai_training_pipeline.process("automated_training_pipeline", {
+                "training_type": "reinforcement_learning",
+                "target_agents": ["advanced_academic", "advanced_student"],
+                "training_duration": "24_hours",
+                "auto_scaling": True
+            })
+            
+            if result.get("success"):
+                pipeline = result.get("pipeline_design", "")
+                response = f"""🔄 **PIPELINE HUẤN LUYỆN TỰ ĐỘNG!**
+
+🚀 **Thiết kế pipeline:**
+{pipeline}
+
+📊 **Cấu hình pipeline:**
+- Training Type: {result.get('training_type', 'reinforcement_learning')}
+- Target Agents: {result.get('pipeline_config', {}).get('target_agents', [])}
+- Duration: {result.get('estimated_completion', '24_hours')}
+- Auto Scaling: {result.get('pipeline_config', {}).get('auto_scaling', True)}
+
+🎯 **Các giai đoạn:** {', '.join(result.get('pipeline_config', {}).get('stages', []))}
+🤖 **Agent sử dụng:** AI Training Pipeline
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi pipeline: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["fine-tuning", "supervised training", "model tuning"]):
+            # Use AI Training System for fine-tuning
+            result = await ai_training_system.process("supervised_fine_tuning", {
+                "base_model": "llama3:8b",
+                "training_data": "educational_conversations",
+                "epochs": 10,
+                "batch_size": 32,
+                "learning_rate": 2e-5
+            })
+            
+            if result.get("success"):
+                fine_tuning = result.get("fine_tuning_plan", "")
+                response = f"""⚙️ **FINE-TUNING MODEL CÓ GIÁM SÁT!**
+
+🎯 **Kế hoạch fine-tuning:**
+{fine_tuning}
+
+📊 **Cấu hình fine-tuning:**
+- Base Model: {result.get('base_model', 'llama3:8b')}
+- Epochs: {result.get('fine_tuning_config', {}).get('epochs', 10)}
+- Batch Size: {result.get('fine_tuning_config', {}).get('batch_size', 32)}
+- Learning Rate: {result.get('fine_tuning_config', {}).get('learning_rate', 2e-5)}
+
+⏱️ **Thời gian dự kiến:** {result.get('estimated_duration', '300 minutes')}
+🤖 **Agent sử dụng:** AI Training System
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi fine-tuning: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["học liên tục", "continuous learning", "adaptive learning"]):
+            # Use AI Training System for continuous learning
+            result = await ai_training_system.process("continuous_learning", {
+                "learning_strategy": "online_learning",
+                "update_frequency": "daily",
+                "data_sources": ["user_interactions", "feedback", "performance"],
+                "adaptation_rate": 0.1
+            })
+            
+            if result.get("success"):
+                learning = result.get("learning_plan", "")
+                response = f"""🔄 **HỌC TẬP LIÊN TỤC - ADAPTIVE AI!**
+
+🎯 **Kế hoạch học tập liên tục:**
+{learning}
+
+📊 **Cấu hình học tập:**
+- Strategy: {result.get('learning_strategy', 'online_learning')}
+- Update Frequency: {result.get('update_schedule', 'daily')}
+- Data Sources: {result.get('continuous_config', {}).get('data_sources', [])}
+- Adaptation Rate: {result.get('continuous_config', {}).get('adaptation_rate', 0.1)}
+
+🤖 **Agent sử dụng:** AI Training System
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi học tập liên tục: {result.get('error', 'Lỗi không xác định')}"
             # Use Universal Skills Integration Agent
             result = await universal_skills_agent.process("universal_skill_integration", {
                 "integration_scope": "comprehensive",
@@ -1274,35 +1419,200 @@ Tôi sẽ:
 
 **Vấn đề của bạn là gì? Hãy chia sẻ để tôi giúp đỡ!**"""
         
-        else:
-            response = f"""Tôi đã nhận được tin nhắn: "{message}"
+        elif any(keyword in message_lower for keyword in ["hệ thống đa tầng", "multi-tier", "xử lý nâng cao", "leann", "vector search"]):
+            # Use Multi-Tier System Manager
+            result = await multi_tier_manager.process_query(message, {"context": context})
+            
+            if result.get("success"):
+                final_response = result.get("final_response", "")
+                quality_scores = result.get("quality_scores", {})
+                processing_time = result.get("processing_time", 0)
+                
+                response = f"""🏗️ **HỆ THỐNG MULTI-TIER AGENTS VỚI LEANN!**
 
-Tôi là AI trợ lý giáo dục chuyên sâu, có thể giúp bạn với các vấn đề cụ thể về:
+🔍 **Query gốc:** {message}
 
-🎓 **Giảng dạy và học tập:**
-- Tạo nội dung bài học chi tiết
-- Soạn bài tập đa dạng
-- Thiết kế đề thi chất lượng
-- Phân tích kết quả học tập
+📋 **Kết quả xử lý đa tầng:**
+{final_response}
 
-🔍 **Tư vấn giáo dục:**
-- Phương pháp giảng dạy hiệu quả
-- Giải quyết vấn đề lớp học
-- Tối ưu thời khóa biểu
-- Quản lý học sinh hiệu quả
+⏱️ **Thời gian xử lý:** {processing_time:.2f}s
+📊 **Điểm chất lượng:** {quality_scores.get('overall', 0):.1%}
 
-📚 **Kiến thức chuyên môn:**
-- Toán học, Vật lý, Hóa học
-- Ngữ văn, Lịch sử, Địa lý
-- Tiếng Anh, Tin học, Sinh học
+🏗️ **Các tầng đã xử lý:**
+✅ Input Analysis - Phân tích prompt và keywords
+✅ Skill Routing - Routing đến agents phù hợp  
+✅ Processing - Xử lý thông tin từ agents
+✅ Filtering - Sàng lọc và phân loại
+✅ Synthesis - Tổng hợp thông tin
+✅ Evaluation - Đánh giá chất lượng
+✅ Response - Tạo phản hồi cuối cùng
 
-💡 **Hãy thử hỏi tôi về:**
-- "Tạo bài học [chủ đề] môn [tên môn]"
-- "Bài tập về [nội dung] lớp [lớp]"
-- "Phân tích vấn đề [mô tả chi tiết]"
-- "Đề thi [môn học] giữa kỳ"
+🤖 **Pipeline ID:** {result.get('pipeline_id', 'N/A')}
+📈 **Confidence:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi hệ thống multi-tier: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["tìm kiếm", "search", "tìm thông tin", "research", "web search"]):
+            # Use Web Search Agent
+            search_query = message.replace("tìm kiếm", "").replace("search", "").replace("tìm thông tin", "").strip()
+            result = await web_search_agent.web_search({
+                "query": search_query,
+                "search_type": "educational",
+                "max_results": 10
+            })
+            
+            if result.get("success"):
+                search_content = result.get("synthesized_content", "")
+                response = f"""🌐 **TÌM KIẾM THÔNG TIN WEB!**
 
-Tôi sẵn sàng phân tích và đưa ra giải pháp chi tiết cho vấn đề của bạn!"""
+🔍 **Kết quả tìm kiếm cho:** {search_query}
+
+📋 **Nội dung tìm thấy:**
+{search_content}
+
+📊 **Thống kê tìm kiếm:**
+- Tổng kết quả: {result.get('total_results', 0)}
+- Loại tìm kiếm: {result.get('search_type', 'educational')}
+- Độ tin cậy: {result.get('confidence', 0):.1%}
+
+🤖 **Agent sử dụng:** Web Search Agent
+📈 **Thời gian tìm kiếm:** {result.get('search_timestamp', 'N/A')}
+"""
+            else:
+                response = f"❌ Lỗi tìm kiếm: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["cập nhật kiến thức", "knowledge update", "học từ internet", "internet learning", "real-time learning"]):
+            # Use Knowledge Integration Agent
+            learning_topic = message.replace("cập nhật kiến thức", "").replace("knowledge update", "").replace("học từ internet", "").strip()
+            result = await knowledge_integration_agent.integrate_knowledge({
+                "topic": learning_topic,
+                "scope": "comprehensive",
+                "types": ["theoretical", "practical", "research"]
+            })
+            
+            if result.get("success"):
+                integrated_content = result.get("integrated_knowledge", "")
+                response = f"""🧠 **CẬP NHẬT KIẾN THỨC TỪ INTERNET!**
+
+📚 **Chủ đề:** {learning_topic}
+
+🔥 **Kiến thức tích hợp:**
+{integrated_content}
+
+📊 **Thống kê tích hợp:**
+- Số nguồn: {result.get('sources_count', 0)}
+- Độ tin cậy: {result.get('credibility_score', 0):.1%}
+- Phạm vi: {result.get('integration_scope', 'comprehensive')}
+
+🤖 **Agent sử dụng:** Knowledge Integration Agent
+📈 **Thời gian cập nhật:** {result.get('integration_timestamp', 'N/A')}
+"""
+            else:
+                response = f"❌ Lỗi cập nhật kiến thức: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["huấn luyện với internet", "web enhanced training", "ai training with web", "online learning"]):
+            # Use Knowledge Integration Agent for web enhanced training
+            training_topic = message.replace("huấn luyện với internet", "").replace("web enhanced training", "").replace("ai training with web", "").strip()
+            result = await knowledge_integration_agent.web_enhanced_training({
+                "topic": training_topic,
+                "method": "reinforcement_learning",
+                "level": "comprehensive"
+            })
+            
+            if result.get("success"):
+                enhanced_plan = result.get("enhanced_training_plan", "")
+                response = f"""🚀 **HUẤN LUYỆN AI TĂNG CƯỜNG WEB!**
+
+🎯 **Chủ đề huấn luyện:** {training_topic}
+
+📈 **Kế hoạch tăng cường:**
+{enhanced_plan}
+
+📊 **Thông tin tăng cường:**
+- Phương pháp: {result.get('training_method', 'reinforcement_learning')}
+- Nguồn kiến thức: {result.get('knowledge_sources', 0)}
+- Mức độ tăng cường: {result.get('enhancement_level', 'comprehensive')}
+
+🤖 **Agent sử dụng:** Knowledge Integration Agent
+📈 **Thời gian tạo:** {result.get('enhancement_timestamp', 'N/A')}
+"""
+            else:
+                response = f"❌ Lỗi huấn luyện tăng cường: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["hệ thống đa tầng", "multi-tier", "xử lý nâng cao", "leann", "vector search"]):
+            # Use Multi-Tier System Manager
+            result = await multi_tier_manager.process_query(message, {"context": context})
+            
+            if result.get("success"):
+                final_response = result.get("final_response", "")
+                quality_scores = result.get("quality_scores", {})
+                processing_time = result.get("processing_time", 0)
+                
+                response = f"""🏗️ **HỆ THỐNG MULTI-TIER AGENTS VỚI LEANN!**
+
+🔍 **Query gốc:** {message}
+
+📋 **Kết quả xử lý đa tầng:**
+{final_response}
+
+⏱️ **Thời gian xử lý:** {processing_time:.2f}s
+📊 **Điểm chất lượng:** {quality_scores.get('overall', 0):.1%}
+
+🏗️ **Các tầng đã xử lý:**
+✅ Input Analysis - Phân tích prompt và keywords
+✅ Skill Routing - Routing đến agents phù hợp  
+✅ Processing - Xử lý thông tin từ agents
+✅ Filtering - Sàng lọc và phân loại
+✅ Synthesis - Tổng hợp thông tin
+✅ Evaluation - Đánh giá chất lượng
+✅ Response - Tạo phản hồi cuối cùng
+"""
+            else:
+                response = f"""Tôi đã nhận được tin nhắn: "{message}"
+
+Tôi la AI tro ly giao duc chuyen sau, co the giup ban voi cac van de cu the ve:
+
+**Giang day va hoc tap:**
+- Tao noi dung bai hoc chi tiet
+- Soan bai tap da dang
+- Thiet ke de thi chat luong
+- Phan tich ket qua hoc tap
+
+**Tu van giao duc:**
+- Phuong phap giang day hieu qua
+- Giai quyet van de lop hoc
+- Toi uu thoi khoa bieu
+- Quan ly hoc sinh hieu qua
+
+**Kien thuc chuyen mon:**
+- Toan hoc, Vat ly, Hoa hoc
+- Ngu van, Lich su, Dia ly
+- Tieng Anh, Tin hoc, Sinh hoc
+
+**Tim kiem va hoc tap tu internet:**
+- Tim kiem thong tin giao duc moi nhat
+- Cap nhat kien thuc tu nguon online
+- Huan luyen AI tang cuong voi web data
+- Hoc tap real-time tu internet
+
+**He thong Multi-Tier Agents:**
+- Xu ly da tang voi LEANN integration
+- Phan tich prompt va routing thong minh
+- Sang loc va tong hop thong tin
+- Danh gia chat luong tu dong
+- Vector search va semantic indexing
+
+**Hay thu hoi toi ve:**
+- "Tao bai hoc [chu de] mon [ten mon]"
+- "Bai tap ve [noi dung] lop [lop]"
+- "Tim kiem thong tin ve [chu de]"
+- "Cap nhat kien thuc ve [chu de]"
+- "Huan luyen AI voi web ve [chu de]"
+- "He thong da tang xu ly [yeu cau phuc tap]"
+- "LEANN vector search cho [tai lieu]"
+
+Toi san sang phan tich va dua ra giai phap chi tiet cho van de cua ban!"""
         
         return {
             "success": True,
@@ -1317,6 +1627,22 @@ Tôi sẵn sàng phân tích và đưa ra giải pháp chi tiết cho vấn đ�
         raise HTTPException(
             status_code=500, 
             detail=f"Chat error: {str(e)}"
+        )
+
+@app.get("/api/v1/multi-tier-status")
+async def get_multi_tier_status():
+    """Get Multi-Tier System status"""
+    try:
+        status = multi_tier_manager.get_system_status()
+        return {
+            "success": True,
+            "system_status": status,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Status error: {str(e)}"
         )
 
 if __name__ == "__main__":

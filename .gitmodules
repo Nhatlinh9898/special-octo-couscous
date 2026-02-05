@@ -1,0 +1,3 @@
+[submodule "LEANN"]
+	path = LEANN
+	url = https://github.com/yichuan-w/LEANN.git
