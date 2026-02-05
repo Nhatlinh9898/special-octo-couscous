@@ -44,6 +44,7 @@ from agents.advanced_agents import VerificationAgent, EvaluationAgent, StorageAg
 from agents.higher_education_agents import CurriculumDesignAgent, FacultyManagementAgent, ExpertiseDevelopmentAgent
 from agents.comprehensive_course_catalog_agent import ComprehensiveCourseCatalogAgent
 from agents.education_data_agent import EducationDataAgent
+from agents.content_generation_agent import ContentGenerationAgent
 
 # Import ServiceNexus integration
 from integration.service_nexus_adapter import ServiceNexusAdapter, ServiceNexusConfig
@@ -103,6 +104,7 @@ class AgentManager:
             
             # ServiceNexus integrated agents
             "education_data": EducationDataAgent(),
+            "content_generation": ContentGenerationAgent(),
             
             # ServiceNexus adapter
             "service_nexus": self.service_nexus_adapter
@@ -398,6 +400,220 @@ async def integration_status():
         raise HTTPException(
             status_code=500, 
             detail=f"Error getting integration status: {str(e)}"
+        )
+
+# Content Generation Endpoints
+@app.post("/api/v1/content/generate/lesson")
+async def generate_lesson(request: AIRequest):
+    """Generate lesson content using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("generate_lesson", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="generate_lesson",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error generating lesson: {str(e)}"
+        )
+
+@app.post("/api/v1/content/generate/exercise")
+async def generate_exercise(request: AIRequest):
+    """Generate exercise content using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("generate_exercise", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="generate_exercise",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error generating exercise: {str(e)}"
+        )
+
+@app.post("/api/v1/content/generate/exam")
+async def generate_exam(request: AIRequest):
+    """Generate exam content using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("generate_exam", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="generate_exam",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error generating exam: {str(e)}"
+        )
+
+@app.post("/api/v1/content/generate/quiz")
+async def generate_quiz(request: AIRequest):
+    """Generate quiz content using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("generate_quiz", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="generate_quiz",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error generating quiz: {str(e)}"
+        )
+
+@app.post("/api/v1/content/personalize")
+async def personalize_content(request: AIRequest):
+    """Personalize content using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("personalize_content", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="personalize_content",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error personalizing content: {str(e)}"
+        )
+
+@app.post("/api/v1/content/assess-quality")
+async def assess_content_quality(request: AIRequest):
+    """Assess content quality using AI"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        import time
+        start_time = time.time()
+        
+        result = await agent.process("assess_quality", request.data)
+        
+        processing_time = time.time() - start_time
+        
+        return AIResponse(
+            agent="content_generation",
+            task="assess_quality",
+            response=result,
+            confidence=result.get("confidence", 0.8),
+            processing_time=processing_time,
+            suggestions=result.get("suggestions", [])
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error assessing content quality: {str(e)}"
+        )
+
+@app.get("/api/v1/content/templates")
+async def get_content_templates():
+    """Get available content templates"""
+    try:
+        agent = agent_manager.get_agent("content_generation")
+        if not agent:
+            raise HTTPException(status_code=404, detail="Content generation agent not found")
+        
+        templates = list(agent.templates.values())
+        
+        return {
+            "success": True,
+            "templates": [
+                {
+                    "id": template.id,
+                    "name": template.name,
+                    "type": template.type,
+                    "subject": template.subject,
+                    "level": template.level,
+                    "structure": template.structure,
+                    "metadata": template.metadata
+                }
+                for template in templates
+            ],
+            "count": len(templates)
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error getting templates: {str(e)}"
         )
 
 if __name__ == "__main__":
