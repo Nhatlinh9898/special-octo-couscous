@@ -3,9 +3,18 @@
  * Bridge service để giao tiếp với EduManager AI System
  */
 
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import * as axios from 'axios';
 import { logger } from '../utils/logger';
 import { config } from '../config/config';
+
+type AxiosInstance = ReturnType<typeof axios.create>;
+interface AxiosResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: any;
+  config: any;
+}
 
 export interface AIRequest {
   task: string;
@@ -168,10 +177,7 @@ class AIBridgeService {
     try {
       const response: AxiosResponse = await this.aiClient.post(
         '/api/v1/content/generate/lesson',
-        {
-          task: 'generate_lesson',
-          data: request
-        }
+        request
       );
 
       return response.data;

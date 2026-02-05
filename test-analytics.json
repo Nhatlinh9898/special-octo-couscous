@@ -1,0 +1,7 @@
+{
+  "task": "chat",
+  "data": {
+    "message": "phân tích kết quả học tập môn toán lớp 10",
+    "context": "education_management"
+  }
+}

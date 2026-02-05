@@ -1,0 +1,7 @@
+{
+  "task": "chat",
+  "data": {
+    "message": "tạo bài học chi tiết về phương trình bậc 2 cho lớp 10, chủ đề phương trình bậc 2, thời lượng 45 phút, mục tiêu học sinh hiểu được công thức delta và cách giải phương trình",
+    "context": "education_management"
+  }
+}

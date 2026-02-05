@@ -10,6 +10,8 @@ from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 import asyncio
 import os
+import re
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -614,6 +616,707 @@ async def get_content_templates():
         raise HTTPException(
             status_code=500, 
             detail=f"Error getting templates: {str(e)}"
+        )
+
+# Import agents
+from agents.academic_agent import AcademicAgent
+from agents.student_agent import StudentAgent
+from agents.other_agents import TeacherAgent, ParentAgent, AdminAgent, FinanceAgent, AnalyticsAgent
+from agents.library_agent import LibraryAgent
+from agents.distributed_data_agent import DistributedDataAgent
+from agents.specialized_agents import DataReaderAgent, DataFilterAgent, DataDedupAgent
+from agents.advanced_agents import VerificationAgent, EvaluationAgent, StorageAgent, UtilizationAgent
+from agents.higher_education_agents import CurriculumDesignAgent, FacultyManagementAgent, ExpertiseDevelopmentAgent
+from agents.comprehensive_course_catalog_agent import ComprehensiveCourseCatalogAgent
+from agents.education_data_agent import EducationDataAgent
+from agents.content_generation_agent import ContentGenerationAgent
+from agents.advanced_academic_agent import AdvancedAcademicAgent
+from agents.advanced_student_agent import AdvancedStudentAgent
+from agents.advanced_teacher_agent import AdvancedTeacherAgent
+from agents.enhanced_skills_agent import EnhancedSkillsAgent
+from agents.universal_skills_integration_agent import UniversalSkillsIntegrationAgent
+
+# Initialize agents
+academic_agent = AcademicAgent()
+student_agent = StudentAgent()
+teacher_agent = TeacherAgent()
+parent_agent = ParentAgent()
+admin_agent = AdminAgent()
+finance_agent = FinanceAgent()
+analytics_agent = AnalyticsAgent()
+library_agent = LibraryAgent()
+distributed_data_agent = DistributedDataAgent()
+data_reader_agent = DataReaderAgent()
+data_filter_agent = DataFilterAgent()
+data_dedup_agent = DataDedupAgent()
+verification_agent = VerificationAgent()
+evaluation_agent = EvaluationAgent()
+storage_agent = StorageAgent()
+utilization_agent = UtilizationAgent()
+curriculum_design_agent = CurriculumDesignAgent()
+faculty_management_agent = FacultyManagementAgent()
+expertise_development_agent = ExpertiseDevelopmentAgent()
+course_catalog_agent = ComprehensiveCourseCatalogAgent()
+education_data_agent = EducationDataAgent()
+content_generation_agent = ContentGenerationAgent()
+
+# Initialize advanced agents
+advanced_academic_agent = AdvancedAcademicAgent()
+advanced_student_agent = AdvancedStudentAgent()
+advanced_teacher_agent = AdvancedTeacherAgent()
+
+# Initialize enhanced skills agent
+enhanced_skills_agent = EnhancedSkillsAgent()
+
+# Initialize universal skills integration agent
+universal_skills_agent = UniversalSkillsIntegrationAgent()
+
+@app.post("/api/v1/chat")
+async def chat_endpoint(request: AIRequest):
+    """Enhanced chat endpoint that uses actual AI agents"""
+    try:
+        # Get message from request data
+        message = request.data.get("message", "")
+        context = request.data.get("context", "general")
+        message_lower = message.lower()
+        
+        # Route to appropriate agent based on message content
+        if any(keyword in message_lower for keyword in ["xin chào", "hello", "chào"]):
+            response = """🤖 **EDUMANAGER AI SYSTEM - ĐÃ NÂNG CẤP ADVANCED!**
+
+Xin chào! Tôi là hệ thống AI giáo dục đa tác vụ nâng cao với các chuyên gia ảo:
+
+🎓 **Các chuyên gia sẵn sàng:**
+- **Advanced Academic Agent**: Phân tích học tập sâu, dự báo thông minh, cá nhân hóa lộ trình
+- **Advanced Student Agent**: Giám sát 360°, cảnh báo sớm, can thiệp cá nhân hóa
+- **Advanced Teacher Agent**: Tối ưu giảng dạy, phân tích sư phạm, phát triển chuyên môn
+- **Enhanced Skills Agent**: Tích hợp 634+ kỹ năng nâng cao từ antigravity-awesome-skills
+- **Universal Skills Integration Agent**: Tích hợp toàn diện kỹ năng vào hệ thống giáo dục
+- **Content Generation Agent**: Tạo nội dung giáo dục chất lượng cao
+- **Library Agent**: Quản lý thư viện thông minh
+- **Analytics Agent**: Phân tích dữ liệu lớn, báo cáo chuyên sâu
+
+🚀 **Kỹ năng nâng cao:**
+- **Phân tích học tập sâu**: Cognitive assessment, learning style detection
+- **Dự báo thông minh**: Predictive modeling, early warning systems
+- **Cá nhân hóa AI**: Personalized learning paths, adaptive interventions
+- **634+ Kỹ năng chuyên sâu**: Content creation, data analysis, automation, development
+- **Tích hợp toàn diện**: Universal skill integration cho giáo dục
+- **Hỗ trợ toàn diện**: Mental health, social-emotional learning, career guidance
+- **Nghiên cứu giáo dục**: Research assistance, collaboration facilitation
+
+💡 **Hãy thử các câu hỏi nâng cao:**
+1. "Phân tích sâu hiệu suất học tập học sinh A"
+2. "Dự báo rủi ro học tập cho lớp 10A"
+3. "Tạo lộ trình học tập cá nhân hóa cho môn Toán"
+4. "Tối ưu hóa phương pháp giảng dạy Vật lý"
+5. "Đánh giá sức khỏe tinh thần học sinh"
+6. "Tích hợp kỹ năng content creation vào giáo dục"
+7. "Đề xuất kỹ năng phù hợp cho giáo viên"
+8. "Tích hợp toàn diện 634+ kỹ năng vào hệ thống"
+
+Bạn cần hỗ trợ với kỹ năng nâng cao nào?"""
+        
+        elif any(keyword in message_lower for keyword in ["tạo bài học", "lesson", "bài giảng"]):
+            # Use Content Generation Agent
+            result = await content_generation_agent.process("generate_lesson", {
+                "topic": "bài học từ chat",
+                "subject": "toán học",
+                "level": "trung bình",
+                "duration": 45,
+                "objectives": ["hiểu kiến thức cơ bản", "luyện tập"]
+            })
+            
+            if result.get("success"):
+                content = result.get("response", {}).get("content", {})
+                response = f"""✅ **BÀI HỌC ĐÃ TẠO THÀNH CÔNG!**
+
+📚 **Nội dung bài học:**
+{content.get('content', 'Nội dung đang được tạo...')}
+
+🎯 **Mục tiêu học tập:**
+{', '.join(content.get('objectives', []))}
+
+⏱️ **Thời lượng:** {content.get('duration', 45)} phút
+
+📊 **Chất lượng:** {content.get('quality_score', 0)}/10
+
+🤖 **Agent sử dụng:** Content Generation Agent với model {content_generation_agent.model}"""
+            else:
+                response = f"❌ Lỗi tạo bài học: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["tạo giáo trình", "curriculum", "giáo trình mới"]):
+            # Use Content Generation Agent for curriculum
+            result = await content_generation_agent.process("generate_curriculum", {
+                "title": "Giáo trình từ chat",
+                "subject": "Ngữ Văn",
+                "description": "Giáo trình chi tiết cho môn học",
+                "target_level": "trung bình",
+                "duration_weeks": 12,
+                "modules_count": 6
+            })
+            
+            if result.get("success"):
+                curriculum = result.get("curriculum", {})
+                response = f"""✅ **GIÁO TRÌNH ĐÃ TẠO THÀNH CÔNG!**
+
+📚 **Thông tin giáo trình:**
+- **Tiêu đề:** {curriculum.get('title', 'Giáo trình từ chat')}
+- **Môn học:** {curriculum.get('subject', 'Ngữ Văn')}
+- **Mô tả:** {curriculum.get('description', 'Giáo trình chi tiết')}
+- **Trình độ:** {curriculum.get('target_level', 'trung bình')}
+- **Thời lượng:** {curriculum.get('duration_weeks', 12)} tuần
+
+🎯 **Mục tiêu học tập:**
+{chr(10).join([f"- {obj}" for obj in curriculum.get('learning_outcomes', [])])}
+
+📖 **Số module:** {len(curriculum.get('modules', []))}
+
+📋 **Kế hoạch đánh giá:**
+- Tham gia lớp học: 10%
+- Bài tập hàng tuần: 20%
+- Dự án giữa kỳ: 30%
+- Bài thi cuối kỳ: 40%
+
+📚 **Tài nguyên học tập:**
+{chr(10).join([f"- {res.get('type', '')}: {res.get('title', '')}" for res in curriculum.get('resources', [])[:5]])}
+
+🤖 **Agent sử dụng:** Content Generation Agent với model {content_generation_agent.model}"""
+            else:
+                response = f"❌ Lỗi tạo giáo trình: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["tích hợp toàn diện", "universal integration", "tất cả kỹ năng", "all skills"]):
+            # Use Universal Skills Integration Agent
+            result = await universal_skills_agent.process("universal_skill_integration", {
+                "integration_scope": "comprehensive",
+                "target_domains": ["teaching", "learning", "administration", "assessment"],
+                "priority_level": "high",
+                "constraints": {"budget": "flexible", "timeline": "6_months"}
+            })
+            
+            if result.get("success"):
+                integration = result.get("integration_plan", "")
+                response = f"""🌟 **TÍCH HỢP TOÀN DIỆN 634+ KỸ NĂNG - UNIVERSAL INTEGRATION!**
+
+🚀 **Kế hoạch tích hợp toàn diện:**
+{integration}
+
+📊 **Thống kê kỹ năng:**
+- Tổng kỹ năng giáo dục: {result.get('total_skills_available', 0)}+ skills
+- Lĩnh vực mục tiêu: {len(result.get('target_domains', []))} domains
+- Phân bổ kỹ năng: {result.get('skill_distribution', {})}
+
+🎯 **Phạm vi tích hợp:** {result.get('scope', 'comprehensive')}
+🤖 **Agent sử dụng:** Universal Skills Integration Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi tích hợp toàn diện: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["hệ sinh thái kỹ năng", "skill ecosystem", "xây dựng hệ thống"]):
+            # Use Universal Skills Integration Agent for ecosystem building
+            result = await universal_skills_agent.process("skill_ecosystem_builder", {
+                "ecosystem_type": "comprehensive",
+                "integration_complexity": "high",
+                "scalability_requirements": "enterprise"
+            })
+            
+            if result.get("success"):
+                ecosystem = result.get("ecosystem_design", "")
+                response = f"""🏗️ **HỆ SINH THÁI KỸ NĂNG GIÁO DỤC - ADVANCED!**
+
+🌐 **Thiết kế hệ sinh thái:**
+{ecosystem}
+
+📊 **Kiến trúc hệ sinh thái:**
+- Core Skills: {len(result.get('architecture', {}).get('core_skills', []))}
+- Supporting Skills: {len(result.get('architecture', {}).get('supporting_skills', []))}
+- Emerging Skills: {len(result.get('architecture', {}).get('emerging_skills', []))}
+- Integration Layers: {len(result.get('architecture', {}).get('integration_layers', []))}
+
+🎯 **Loại hệ sinh thái:** {result.get('ecosystem_type', 'comprehensive')}
+🤖 **Agent sử dụng:** Universal Skills Integration Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi xây dựng hệ sinh thái: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["triển khai doanh nghiệp", "enterprise deployment", "quy mô lớn"]):
+            # Use Universal Skills Integration Agent for enterprise deployment
+            result = await universal_skills_agent.process("enterprise_skill_deployment", {
+                "enterprise_scale": "large",
+                "deployment_complexity": "enterprise",
+                "compliance_requirements": ["security", "privacy", "accessibility", "gdpr"]
+            })
+            
+            if result.get("success"):
+                deployment = result.get('deployment_plan', "")
+                response = f"""🏢 **TRIỂN KHAI KỸ NĂNG QUY MÔ DOANH NGHIỆP!**
+
+📋 **Kế hoạch triển khai:**
+{deployment}
+
+🏗️ **Khung triển khai doanh nghiệp:**
+{chr(10).join([f"- {layer}: {description}" for layer, description in result.get('enterprise_framework', {}).items()])}
+
+🎯 **Quy mô:** {result.get('scale', 'large')}
+🔒 **Yêu cầu tuân thủ:** {', '.join(result.get('compliance_requirements', []))}
+🤖 **Agent sử dụng:** Universal Skills Integration Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi triển khai doanh nghiệp: {result.get('error', 'Lỗi không xác định')}"
+            # Use Enhanced Skills Agent
+            result = await enhanced_skills_agent.process("skill_integration", {
+                "domain": "education",
+                "requirements": ["content_creation", "data_analysis", "automation"],
+                "current_skills": ["teaching", "assessment"]
+            })
+            
+            if result.get("success"):
+                integration = result.get("integration_plan", "")
+                response = f"""🚀 **TÍCH HỢP KỸ NĂNG NÂNG CAO - 634+ SKILLS!**
+
+📊 **Kế hoạch tích hợp:**
+{integration}
+
+🎯 **Kỹ năng được chọn:** {len(result.get('selected_skills', []))} skills
+📚 **Tổng kỹ năng có sẵn:** {result.get('total_available_skills', 0)}+ skills
+🤖 **Agent sử dụng:** Enhanced Skills Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi tích hợp kỹ năng: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["đề xuất kỹ năng", "skill recommendation", "recommend skills"]):
+            # Use Enhanced Skills Agent for recommendations
+            result = await enhanced_skills_agent.process("skill_recommendation", {
+                "user_profile": {"role": "teacher", "experience": "intermediate"},
+                "current_context": "education",
+                "goals": ["improve_teaching", "data_analysis", "content_creation"],
+                "skill_level": "intermediate"
+            })
+            
+            if result.get("success"):
+                recommendations = result.get("recommended_skills", [])
+                response = f"""💡 **ĐỀ XUẤT KỸ NĂNG CÁ NHÂN HÓA!**
+
+🎯 **Kỹ năng được đề xuất:**
+{chr(10).join([f"📚 {skill['name']}: {skill['description']}" for skill in recommendations[:5]])}
+
+📊 **Độ phù hợp:** {skill.get('relevance_score', 0):.1%} cho mỗi kỹ năng
+🤖 **Agent sử dụng:** Enhanced Skills Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi đề xuất kỹ năng: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["lộ trình kỹ năng", "skill learning path", "learn skills"]):
+            # Use Enhanced Skills Agent for learning path
+            result = await enhanced_skills_agent.process("skill_learning_path", {
+                "target_skills": ["content-creator", "data-analyst", "automation"],
+                "current_level": "beginner",
+                "target_level": "advanced",
+                "time_constraint": "3_months",
+                "learning_style": "mixed"
+            })
+            
+            if result.get("success"):
+                roadmap = result.get("learning_roadmap", "")
+                response = f"""🛤️ **LỘ TRÌNH HỌC KỸ NĂNG - ADVANCED!**
+
+📚 **Lộ trình học tập:**
+{roadmap}
+
+⏱️ **Thời gian:** {result.get('time_constraint', '3_months')}
+🎯 **Cấp độ mục tiêu:** {result.get('target_level', 'advanced')}
+🤖 **Agent sử dụng:** Enhanced Skills Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi tạo lộ trình kỹ năng: {result.get('error', 'Lỗi không xác định')}"
+            # Use Advanced Academic Agent
+            result = await advanced_academic_agent.process("deep_learning_analysis", {
+                "student_id": "from_chat",
+                "academic_history": [],
+                "learning_data": {"message": message},
+                "time_period": "current_semester"
+            })
+            
+            if result.get("success"):
+                analysis = result.get("deep_insights", "")
+                response = f"""🧠 **PHÂN TÍCH HỌC TẬP SÂU - ADVANCED!**
+
+📊 **Kết quả phân tích sâu:**
+{analysis}
+
+🎯 **Đề xuất chuyên sâu:**
+{chr(10).join([f"- {rec}" for rec in result.get('recommendations', [])[:5]])}
+
+🤖 **Agent sử dụng:** Advanced Academic Agent với model {advanced_academic_agent.model}
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi phân tích sâu: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["dự báo", "predict", "risk", "cảnh báo sớm"]):
+            # Use Advanced Student Agent for early warning
+            result = await advanced_student_agent.process("early_warning_system", {
+                "student_data": {"message": message},
+                "risk_thresholds": {"academic": 70, "attendance": 85, "engagement": 60},
+                "prediction_horizon": "4_weeks"
+            })
+            
+            if result.get("success"):
+                warning = result.get("warning_analysis", "")
+                response = f"""⚠️ **HỆ THỐNG CẢNH BÁO SỚM - ADVANCED!**
+
+🚨 **Phân tích rủi ro:**
+{warning}
+
+📊 **Mô hình dự báo:** {result.get('model_used', 'predictive_analytics')}
+🎯 **Khung thời gian:** {result.get('prediction_horizon', '4_weeks')}
+🤖 **Agent sử dụng:** Advanced Student Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi dự báo: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["lộ trình cá nhân hóa", "personalized learning", "adaptive"]):
+            # Use Advanced Academic Agent for personalized learning
+            result = await advanced_academic_agent.process("personalized_learning_paths", {
+                "student_profile": {"message": message},
+                "learning_goals": ["academic_excellence", "skill_development"],
+                "current_level": "intermediate",
+                "target_level": "advanced",
+                "time_constraint": "6_months"
+            })
+            
+            if result.get("success"):
+                path = result.get("learning_path", "")
+                response = f"""🎯 **LỘ TRÌNH HỌC TẬP CÁ NHÂN HÓA - ADVANCED!**
+
+📚 **Lộ trình được tạo:**
+{path}
+
+🔄 **Chiến lược thích ứng:** {result.get('adaptation_strategy', 'continuous_learning')}
+🤖 **Agent sử dụng:** Advanced Academic Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi tạo lộ trình: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["tối ưu giảng dạy", "optimize teaching", "pedagogical analysis"]):
+            # Use Advanced Teacher Agent
+            result = await advanced_teacher_agent.process("teaching_effectiveness_analysis", {
+                "teaching_data": {"message": message},
+                "student_outcomes": {},
+                "observation_reports": [],
+                "self_assessment": {}
+            })
+            
+            if result.get("success"):
+                analysis = result.get("analysis_results", "")
+                response = f"""👨‍🏫 **PHÂN TÍCH HIỆU QUẢ GIẢNG DẠY - ADVANCED!**
+
+📊 **Kết quả phân tích sư phạm:**
+{analysis}
+
+🎯 **Xếp hạng hiệu quả:** {result.get('effectiveness_rating', 'comprehensive_analysis')}
+📅 **Đánh giá tiếp theo:** {result.get('next_review', '90_days')}
+🤖 **Agent sử dụng:** Advanced Teacher Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi phân tích giảng dạy: {result.get('error', 'Lỗi không xác định')}"
+        
+        elif any(keyword in message_lower for keyword in ["sức khỏe tinh thần", "mental health", "wellbeing"]):
+            # Use Advanced Student Agent for mental health
+            result = await advanced_student_agent.process("mental_health_assessment", {
+                "student_info": {"message": message},
+                "stress_indicators": [],
+                "academic_pressure": "medium",
+                "social_factors": {}
+            })
+            
+            if result.get("success"):
+                assessment = result.get("mental_health_profile", "")
+                response = f"""🧠 **ĐÁNH GIÁ SỨC KHỎE TINH THẦN - ADVANCED!**
+
+📋 **Hồ sơ sức khỏe tinh thần:**
+{assessment}
+
+⚠️ **Mức độ rủi ro:** {result.get('risk_level', 'assessed')}
+🔄 **Cần theo dõi:** {result.get('follow_up_required', True)}
+🤖 **Agent sử dụng:** Advanced Student Agent
+📈 **Độ tin cậy:** {result.get('confidence', 0):.1%}
+"""
+            else:
+                response = f"❌ Lỗi đánh giá sức khỏe tinh thần: {result.get('error', 'Lỗi không xác định')}"
+            # Use Analytics Agent
+            result = await analytics_agent.process("analyze_data", {
+                "data_type": "learning_performance",
+                "analysis_type": "statistical_analysis",
+                "data": {"message": message}
+            })
+            
+            if result.get("success"):
+                analysis = result.get("response", {})
+                response = f"""📊 **PHÂN TÍCH DỮ LIỆU HOÀN THÀNH!**
+
+� **Kết quả phân tích:**
+{analysis.get('summary', 'Đang phân tích dữ liệu...')}
+1. **Bài tập củng cố:** Lặp lại kiến thức
+2. **Bài tập vận dụng:** Dùng kiến thức giải quyết
+3. **Bài tập nâng cao:** Tư duy logic, sáng tạo
+4. **Bài tập tổng hợp:** Nhiều kỹ năng
+
+🎯 **Theo từng môn học:**
+
+**Toán học:**
+- Bài tập tính toán, giải phương trình
+- Bài tập hình học, chứng minh
+- Bài tập ứng dụng thực tế
+
+**Vật lý:**
+- Bài tập định luật, tính toán
+- Bài tập thực hành, thí nghiệm
+- Bài tập cơ học, điện học
+
+**Ngữ văn:**
+- Bài tập làm văn, phân tích tác phẩm
+- Bài tập ngữ pháp, từ vựng
+- Bài tập sáng tạo, thơ ca
+
+**Tiếng Anh:**
+- Bài tập ngữ pháp, từ vựng
+- Bài tập đọc hiểu, viết luận
+- Bài tập giao tiếp, phát âm
+
+**Cho tôi biết:**
+- Môn học cần tạo bài tập
+- Số lượng và độ khó
+- Hình thức: Trắc nghiệm/Tự luận
+- Thời gian hoàn thành
+
+Tôi sẽ tạo bộ bài tập phù hợp!"""
+        
+        elif "đề thi" in message_lower or "exam" in message_lower:
+            response = """**Tạo đề thi chuẩn hóa và chất lượng:**
+
+📋 **Cấu trúc đề thi hoàn chỉnh:**
+1. **Ma trận đề thi:** Phân bổ kiến thức, kỹ năng
+2. **Câu hỏi đa dạng:** TN, TL, VD, TH
+3. **Độ khó tăng dần:** Dễ → Trung bình → Khó
+4. **Thời gian hợp lý:** Phù hợp số lượng câu
+5. **Đáp án chi tiết:** Hướng dẫn chấm điểm
+
+🎯 **Các dạng đề thi:**
+
+**Đề kiểm tra 15 phút:**
+- 5 câu TN, 2 câu TL
+- Kiểm tra nhanh, củng cố
+
+**Đề giữa kỳ:**
+- 10 câu TN, 3 câu TL, 1 bài VD
+- Thời gian: 60-90 phút
+
+**Đề cuối kỳ:**
+- 15 câu TN, 5 câu TL, 2 bài VD/TH
+- Thời gian: 90-120 phút
+
+**Đề thi học kỳ:**
+- 20 câu TN, 5 câu TL, 2 bài VD, 1 bài TH
+- Thời gian: 120-150 phút
+
+**Theo chuẩn quốc tế:**
+- Cambridge, IELTS, TOEFL
+- SAT, ACT, AP
+- Tú tài, Đại học
+
+**Để tạo đề thi, cung cấp:**
+- Môn học và lớp
+- Thời lượng và hình thức
+- Nội dung cần kiểm tra
+- Độ khó mong muốn
+
+Tôi sẽ tạo đề thi chất lượng ngay!"""
+        
+        elif "help" in message_lower or "giúp" in message_lower or "hỗ trợ" in message_lower:
+            response = """**🤖 AI TRỢ LÝ GIÁO DỤC EDUMANAGER**
+
+Tôi là trợ lý AI thông minh với kiến thức chuyên sâu về giáo dục. Tôi có thể giúp bạn:
+
+## 📚 **NỘI DUNG HỌC TẬP**
+- Tạo bài học chi tiết, có cấu trúc
+- Soạn bài tập đa dạng, cấp độ
+- Thiết kế đề thi chuẩn hóa
+- Tìm kiếm tài liệu học tập
+
+## 🎓 **QUẢN LÝ GIÁO DỤC**
+- Phân tích dữ liệu học sinh
+- Đánh giá kết quả học tập
+- Tối ưu thời khóa biểu
+- Quản lý lớp học hiệu quả
+
+## 🔍 **TÌM KIẾM THÔNG TIN**
+- Tài liệu thư viện số
+- Bài giảng chất lượng cao
+- Phương pháp giảng dạy
+- Xu hướng giáo dục mới
+
+## � **PHÂN TÍCH DỮ LIỆU**
+- Thống kê kết quả học tập
+- Phát hiện học sinh yếu kém
+- Dự báo thành tích học tập
+- Báo cáo quản lý giáo dục
+
+## 🎯 **CÁC CHỦ ĐỀ CÓ THỂ GIÚP:**
+
+### **Học tập:**
+- "Tạo bài học chương [Tên chương] môn [Môn học]"
+- "Bài tập về [Chủ đề] lớp [Lớp]"
+- "Đề thi giữa kỳ môn [Môn học]"
+
+### **Quản lý:**
+- "Phân tích kết quả học tập lớp [Lớp]"
+- "Tối ưu thời khóa biểu khối [Khối]"
+- "Dự báo thành tích cuối năm"
+
+### **Tư vấn:**
+- "Phương pháp dạy môn [Môn học]"
+- "Giải quyết vấn đề [Vấn đề cụ thể]"
+- "Xu hướng giáo dục [Lĩnh vực]"
+
+## � **LỜI ÍCH HỌC TẬP:**
+- Phân tích khó khăn của học sinh
+- Gợi ý phương pháp phù hợp
+- Cá nhân hóa nội dung giảng dạy
+- Tối ưu phương pháp đánh giá
+
+## 🚀 **BẮT ĐẦU:**
+Hãy cho tôi biết:
+1. **Môn học cụ thể** bạn quan tâm
+2. **Lớp/trình độ** đang dạy/học
+3. **Vấn đề cụ thể** đang gặp phải
+4. **Mục tiêu** bạn muốn đạt được
+
+Tôi sẽ phân tích và đưa ra giải pháp chi tiết, hiệu quả!
+
+**Bạn cần hỗ trợ về vấn đề gì ngay bây giờ?**"""
+        
+        elif "khó khăn" in message_lower or "vấn đề" in message_lower or "problem" in message_lower:
+            response = """**🔍 PHÂN TÍCH VÀ GIẢI QUYẾT GIÁO DỤC**
+
+Tôi hiểu rằng bạn đang gặp khó khăn. Hãy cho tôi biết chi tiết:
+
+## 📋 **CÁC LOẠI VẤN ĐỀ THƯỜNG GẶP:**
+
+### **Về học sinh:**
+- Học sinh mất gốc kiến thức
+- Không tập trung trong giờ học
+- Kết quả học tập sa sút
+- Mâu thuẫn trong lớp học
+
+### **Về giảng dạy:**
+- Phương pháp chưa hiệu quả
+- Nội dung quá khó/dễ
+- Thiếu thời gian chuẩn bị
+- Đánh giá chưa khách quan
+
+### **Về quản lý:**
+- Thời khóa biểu chồng chéo
+- Phân công không hợp lý
+- Thiếu tài nguyên, trang thiết bị
+- Áp lực quá tải
+
+### **Về phụ huynh:**
+- Phụ huynh không đồng hành
+- Không hiểu phương pháp mới
+- Mong muốn kết quả cao
+- Thiếu thời gian cho con
+
+## 🎯 **GIẢI PHÁP CỤ THỂ:**
+
+**Bước 1: Xác định vấn đề**
+- Phân tích nguyên nhân gốc rễ
+- Đánh giá mức độ ảnh hưởng
+- Xác định đối tượng liên quan
+
+**Bước 2: Tìm giải pháp**
+- Nghiên cứu phương pháp tốt nhất
+- Tham khảo kinh nghiệm thành công
+- Cân nhắn yếu tố thực tế
+
+**Bước 3: Lập kế hoạch**
+- Đặt mục tiêu cụ thể
+- Phân bổ thời gian hợp lý
+- Xác định nguồn lực cần thiết
+
+**Bước 4: Thực hiện và đánh giá**
+- Theo dõi tiến độ
+- Điều chỉnh khi cần thiết
+- Đo lường hiệu quả
+
+## 💬 **ĐỂ TÔI GIÚP TỐT HƠN:**
+
+Hãy mô tả:
+1. **Vấn đề cụ thể** bạn đang gặp
+2. **Bối cảnh** (lớp, môn học, số lượng)
+3. **Đã thử cách nào** chưa hiệu quả
+4. **Kết quả mong muốn** của bạn
+
+Tôi sẽ:
+- Phân tích sâu vấn đề
+- Đề xuất giải pháp khả thi
+- Cung cấp kế hoạch chi tiết
+- Hỗ trợ theo dõi thực hiện
+
+**Vấn đề của bạn là gì? Hãy chia sẻ để tôi giúp đỡ!**"""
+        
+        else:
+            response = f"""Tôi đã nhận được tin nhắn: "{message}"
+
+Tôi là AI trợ lý giáo dục chuyên sâu, có thể giúp bạn với các vấn đề cụ thể về:
+
+🎓 **Giảng dạy và học tập:**
+- Tạo nội dung bài học chi tiết
+- Soạn bài tập đa dạng
+- Thiết kế đề thi chất lượng
+- Phân tích kết quả học tập
+
+🔍 **Tư vấn giáo dục:**
+- Phương pháp giảng dạy hiệu quả
+- Giải quyết vấn đề lớp học
+- Tối ưu thời khóa biểu
+- Quản lý học sinh hiệu quả
+
+📚 **Kiến thức chuyên môn:**
+- Toán học, Vật lý, Hóa học
+- Ngữ văn, Lịch sử, Địa lý
+- Tiếng Anh, Tin học, Sinh học
+
+💡 **Hãy thử hỏi tôi về:**
+- "Tạo bài học [chủ đề] môn [tên môn]"
+- "Bài tập về [nội dung] lớp [lớp]"
+- "Phân tích vấn đề [mô tả chi tiết]"
+- "Đề thi [môn học] giữa kỳ"
+
+Tôi sẵn sàng phân tích và đưa ra giải pháp chi tiết cho vấn đề của bạn!"""
+        
+        return {
+            "success": True,
+            "response": response,
+            "timestamp": datetime.now().isoformat(),
+            "agent": "enhanced_chat_agent",
+            "context": context,
+            "confidence": 0.95
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Chat error: {str(e)}"
         )
 
 if __name__ == "__main__":

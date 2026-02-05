@@ -20,7 +20,8 @@ import userRoutes from '@/routes/users';
 import schoolRoutes from '@/routes/schools';
 import ktxRoutes from '@/routes/ktx';
 import hotelRoutes from '@/routes/hotel';
-import { classes, students, subjects, schedules, lms, exams, grades, attendance, finance, messages, notifications, ai } from '@/routes/placeholder';
+import { classes, students, subjects, schedules, lms, exams, grades, attendance, finance, messages, notifications } from '@/routes/placeholder';
+import aiRoutes from '@/routes/ai';
 
 // Load environment variables
 dotenv.config();
@@ -114,7 +115,7 @@ app.use('/api/v1/attendance', attendance);
 app.use('/api/v1/finance', finance);
 app.use('/api/v1/messages', messages);
 app.use('/api/v1/notifications', notifications);
-app.use('/api/v1/ai', ai);
+app.use('/api/v1/ai', aiRoutes);
 
 // Socket.IO connection handling
 io.on('connection', (socket: Socket) => {

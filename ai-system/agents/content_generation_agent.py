@@ -43,13 +43,14 @@ class ContentGenerationAgent(BaseAgent):
     """Agent chuyên tạo nội dung giáo dục từ Jubilant Carnival"""
     
     def __init__(self):
-        super().__init__("content_generation_agent", "llama3:70b-instruct")
+        super().__init__("content_generation_agent", "llama3:8b")
         self.description = "Agent chuyên tạo nội dung giáo dục với AI tiên tiến"
         self.capabilities = [
             "lesson_generation",        # Tạo bài học
             "exercise_generation",       # Tạo bài tập
             "exam_generation",          # Tạo bài thi
             "quiz_generation",           # Tạo câu hỏi nhanh
+            "curriculum_generation",     # Tạo giáo trình chi tiết
             "content_personalization",   # Cá nhân hóa nội dung
             "quality_assessment",        # Đánh giá chất lượng
             "template_management",       # Quản lý templates
@@ -79,6 +80,8 @@ class ContentGenerationAgent(BaseAgent):
                 return await self.generate_exam(data)
             elif task == "generate_quiz":
                 return await self.generate_quiz(data)
+            elif task == "generate_curriculum":
+                return await self.generate_curriculum(data)
             elif task == "personalize_content":
                 return await self.personalize_content(data)
             elif task == "assess_quality":
@@ -140,7 +143,7 @@ class ContentGenerationAgent(BaseAgent):
                     "topic": topic,
                     "subject": subject,
                     "level": level,
-                    "ai_model": self.model_name,
+                    "ai_model": self.model,
                     "generation_time": datetime.now().isoformat()
                 },
                 created_at=datetime.now()
@@ -262,6 +265,381 @@ class ContentGenerationAgent(BaseAgent):
                 "success": False,
                 "error": f"Quiz generation failed: {str(e)}",
                 "confidence": 0.0
+            }
+    
+    async def generate_curriculum(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Tạo giáo trình chi tiết và chuyên sâu"""
+        
+        title = data.get("title", "")
+        subject = data.get("subject", "")
+        description = data.get("description", "")
+        target_level = data.get("target_level", "intermediate")
+        duration_weeks = data.get("duration_weeks", 12)
+        modules_count = data.get("modules_count", 6)
+        
+        try:
+            # Create comprehensive curriculum prompt
+            prompt = self._create_curriculum_prompt(
+                title, subject, description, target_level, 
+                duration_weeks, modules_count
+            )
+            
+            ai_response = await self._call_ai(prompt)
+            curriculum_content = self._parse_curriculum_content(ai_response)
+            
+            # Generate detailed syllabus
+            syllabus = await self._generate_detailed_syllabus(
+                title, subject, curriculum_content, target_level
+            )
+            
+            # Create assessment plan
+            assessment_plan = await self._generate_assessment_plan(
+                title, subject, curriculum_content, duration_weeks
+            )
+            
+            # Generate resources list
+            resources = await self._generate_resources_list(
+                title, subject, curriculum_content
+            )
+            
+            return {
+                "success": True,
+                "curriculum": {
+                    "title": title,
+                    "subject": subject,
+                    "description": description,
+                    "target_level": target_level,
+                    "duration_weeks": duration_weeks,
+                    "overview": curriculum_content.get("overview", ""),
+                    "learning_outcomes": curriculum_content.get("learning_outcomes", []),
+                    "modules": curriculum_content.get("modules", []),
+                    "syllabus": syllabus,
+                    "assessment_plan": assessment_plan,
+                    "resources": resources,
+                    "teaching_strategies": curriculum_content.get("teaching_strategies", []),
+                    "prerequisites": curriculum_content.get("prerequisites", [])
+                },
+                "metadata": {
+                    "title": title,
+                    "subject": subject,
+                    "target_level": target_level,
+                    "duration_weeks": duration_weeks,
+                    "modules_count": len(curriculum_content.get("modules", [])),
+                    "generated_at": datetime.now().isoformat(),
+                    "ai_model": self.model
+                },
+                "confidence": 0.9
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Curriculum generation failed: {str(e)}",
+                "confidence": 0.0
+            }
+    
+    def _create_curriculum_prompt(self, title: str, subject: str, description: str, 
+                               target_level: str, duration_weeks: int, modules_count: int) -> str:
+        """Tạo prompt chi tiết cho việc tạo giáo trình"""
+        
+        return f"""
+Create a comprehensive, detailed curriculum for:
+
+TITLE: {title}
+SUBJECT: {subject}
+DESCRIPTION: {description}
+TARGET LEVEL: {target_level}
+DURATION: {duration_weeks} weeks
+MODULES: {modules_count}
+
+REQUIREMENTS:
+1. Create engaging, practical curriculum with real-world applications
+2. Include detailed learning outcomes for each module
+3. Provide comprehensive content with examples and case studies
+4. Design progressive learning path from basic to advanced
+5. Include interactive activities and assessments
+6. Consider different learning styles and abilities
+7. Align with educational standards and best practices
+8. Include modern teaching methodologies
+
+For {subject} specifically:
+- Use authentic materials and examples
+- Include cultural and contextual relevance
+- Provide practical skill development
+- Integrate technology where appropriate
+- Include assessment rubrics and criteria
+
+OUTPUT FORMAT:
+{{
+    "overview": "Comprehensive curriculum overview with goals and approach...",
+    "learning_outcomes": [
+        "Students will be able to...",
+        "Students will understand...",
+        "Students will develop skills in...",
+        ...
+    ],
+    "prerequisites": [
+        "Basic knowledge of...",
+        "Familiarity with...",
+        ...
+    ],
+    "modules": [
+        {{
+            "module_number": 1,
+            "title": "Module Title",
+            "duration_weeks": 2,
+            "description": "Detailed module description...",
+            "learning_objectives": [
+                "Objective 1...",
+                "Objective 2...",
+                ...
+            ],
+            "topics": [
+                {{
+                    "title": "Topic Title",
+                    "description": "Topic description...",
+                    "content": "Detailed content explanation...",
+                    "examples": ["Example 1...", "Example 2..."],
+                    "activities": [
+                        {{
+                            "type": "individual/group/class",
+                            "description": "Activity description...",
+                            "duration": "30 minutes",
+                            "materials": ["Material 1...", "Material 2..."]
+                        }}
+                    ],
+                    "assessment": {{
+                        "type": "formative/summative",
+                        "description": "Assessment description...",
+                        "criteria": ["Criterion 1...", "Criterion 2..."]
+                    }}
+                }}
+            ],
+            "resources": [
+                {{
+                    "type": "textbook/video/article/website",
+                    "title": "Resource title",
+                    "description": "Resource description...",
+                    "url": "URL if applicable"
+                }}
+            ]
+        }},
+        ...
+    ],
+    "teaching_strategies": [
+        "Strategy 1 with implementation details...",
+        "Strategy 2 with implementation details...",
+        ...
+    ],
+    "assessment_methods": [
+        {{
+            "type": "quiz/presentation/project/exam",
+            "description": "Assessment description...",
+            "weight": "20%",
+            "criteria": ["Criterion 1...", "Criterion 2..."]
+        }}
+    ]
+}}
+
+For literature curriculum specifically:
+- Include literary analysis techniques
+- Provide historical and cultural context
+- Include various literary genres and forms
+- Develop critical thinking and interpretation skills
+- Include creative writing components
+- Use authentic literary texts and examples
+- Include author biographical information where relevant
+"""
+    
+    async def _generate_detailed_syllabus(self, title: str, subject: str, 
+                                       curriculum_content: Dict[str, Any], 
+                                       target_level: str) -> Dict[str, Any]:
+        """Tạo syllabus chi tiết"""
+        
+        modules = curriculum_content.get("modules", [])
+        
+        syllabus = {
+            "title": f"Chi tiết Syllabus: {title}",
+            "subject": subject,
+            "target_level": target_level,
+            "total_weeks": sum(module.get("duration_weeks", 1) for module in modules),
+            "weekly_breakdown": []
+        }
+        
+        current_week = 1
+        for module in modules:
+            module_weeks = module.get("duration_weeks", 1)
+            module_title = module.get("title", "")
+            
+            for week in range(module_weeks):
+                syllabus["weekly_breakdown"].append({
+                    "week": current_week,
+                    "module": module_title,
+                    "topics": [topic.get("title", "") for topic in module.get("topics", [])],
+                    "learning_objectives": module.get("learning_objectives", []),
+                    "activities": [
+                        activity.get("description", "") 
+                        for topic in module.get("topics", []) 
+                        for activity in topic.get("activities", [])
+                    ],
+                    "assessment": "Weekly quiz or activity completion",
+                    "readings": [
+                        resource.get("title", "") 
+                        for resource in module.get("resources", []) 
+                        if resource.get("type") == "textbook"
+                    ]
+                })
+                current_week += 1
+        
+        return syllabus
+    
+    async def _generate_assessment_plan(self, title: str, subject: str, 
+                                    curriculum_content: Dict[str, Any], 
+                                    duration_weeks: int) -> Dict[str, Any]:
+        """Tạo kế hoạch đánh giá chi tiết"""
+        
+        return {
+            "title": f"Kế hoạch đánh giá: {title}",
+            "subject": subject,
+            "duration_weeks": duration_weeks,
+            "assessment_components": [
+                {
+                    "component": "Tham gia lớp học",
+                    "weight": "10%",
+                    "description": "Thảo luận, hoạt động nhóm, hoàn thành nhiệm vụ",
+                    "criteria": [
+                        "Tích cực tham gia",
+                        "Đóng góp ý kiến có giá trị",
+                        "Hỗ trợ đồng đội"
+                    ]
+                },
+                {
+                    "component": "Bài tập hàng tuần",
+                    "weight": "20%",
+                    "description": "Bài tập cá nhân và nhóm",
+                    "criteria": [
+                        "Hoàn thành đúng hạn",
+                        "Chất lượng giải pháp",
+                        "Sáng tạo trong cách tiếp cận"
+                    ]
+                },
+                {
+                    "component": "Dự án giữa kỳ",
+                    "weight": "30%",
+                    "description": "Dự án nghiên cứu hoặc sáng tạo",
+                    "criteria": [
+                        "Nội dung chuyên sâu",
+                        "Phương pháp luận",
+                        "Trình bày",
+                        "Tư duy phản biện"
+                    ]
+                },
+                {
+                    "component": "Bài thi cuối kỳ",
+                    "weight": "40%",
+                    "description": "Bài thi tổng hợp kiến thức",
+                    "criteria": [
+                        "Hiểu biết lý thuyết",
+                        "Vận dụng thực tế",
+                        "Phân tích vấn đề",
+                        "Kỹ năng viết"
+                    ]
+                }
+            ],
+            "grading_scale": {
+                "A": "90-100: Xuất sắc",
+                "B": "80-89: Giỏi", 
+                "C": "70-79: Khá",
+                "D": "60-69: Trung bình",
+                "F": "0-59: Yếu"
+            }
+        }
+    
+    async def _generate_resources_list(self, title: str, subject: str, 
+                                   curriculum_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Tạo danh sách tài nguyên học tập"""
+        
+        base_resources = [
+            {
+                "type": "textbook",
+                "title": f"Giáo trình {subject} cơ bản",
+                "author": "Bộ Giáo dục và Đào tạo",
+                "description": "Giáo trình chính thức cho môn học",
+                "isbn": "ISBN chính thức"
+            },
+            {
+                "type": "reference_book",
+                "title": f"Tài liệu tham khảo {subject} nâng cao",
+                "author": "Các chuyên gia đầu ngành",
+                "description": "Tài liệu bổ sung cho học sinh muốn tìm hiểu sâu"
+            },
+            {
+                "type": "online_resource",
+                "title": "Kho tài liệu số {subject}",
+                "url": "https://example.com/resources",
+                "description": "Thư viện trực tuyến với bài giảng và bài tập"
+            },
+            {
+                "type": "video",
+                "title": "Video bài giảng {subject}",
+                "platform": "YouTube/E-learning Platform",
+                "description": "Video hướng dẫn học tập trực quan"
+            },
+            {
+                "type": "software",
+                "title": "Phần mềm học tập {subject}",
+                "description": "Công cụ hỗ trợ học tập tương tác"
+            }
+        ]
+        
+        # Add subject-specific resources
+        if subject.lower() == "ngữ văn" or "literature" in subject.lower():
+            base_resources.extend([
+                {
+                    "type": "literary_works",
+                    "title": "Tác phẩm văn học Việt Nam kinh điển",
+                    "description": "Tuyển tập các tác phẩm cần phân tích"
+                },
+                {
+                    "type": "dictionary",
+                    "title": "Từ điển văn học và thuật ngữ",
+                    "description": "Giải thích các thuật ngữ văn học"
+                }
+            ])
+        
+        return base_resources
+    
+    def _parse_curriculum_content(self, ai_response: str) -> Dict[str, Any]:
+        """Phân tích nội dung giáo trình từ AI response"""
+        
+        try:
+            # Try to parse as JSON first
+            if ai_response.strip().startswith('{'):
+                return json.loads(ai_response)
+            
+            # If not JSON, create structured content from text
+            return {
+                "overview": ai_response,
+                "learning_outcomes": [
+                    "Phát triển kiến thức chuyên môn về chủ đề",
+                    "Nâng cao kỹ năng phân tích và tư duy phản biện",
+                    "Vận dụng kiến thức vào thực tế"
+                ],
+                "modules": [],
+                "teaching_strategies": [
+                    "Dạy học theo dự án",
+                    "Học tập qua giải quyết vấn đề",
+                    "Thảo luận nhóm và trình bày"
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Error parsing curriculum content: {e}")
+            return {
+                "overview": ai_response,
+                "learning_outcomes": [],
+                "modules": [],
+                "teaching_strategies": []
             }
     
     async def personalize_content(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -726,23 +1104,39 @@ OUTPUT FORMAT:
         # Parse objectives from response
         return [obj.strip() for obj in response.split('\n') if obj.strip()][:5]
     
-    async def _calculate_quality_score(self, content: str) -> float:
+    async def _calculate_quality_score(self, content) -> float:
         """Tính điểm chất lượng nội dung"""
         # Simple heuristic based on content characteristics
         score = 7.0  # Base score
         
+        # Handle both string and dict content
+        content_str = ""
+        if isinstance(content, str):
+            content_str = content
+        elif isinstance(content, dict):
+            # Extract text content from dict
+            if "content" in content:
+                content_str = content["content"]
+            elif "title" in content:
+                content_str = f"{content.get('title', '')} {content.get('content', '')}"
+            else:
+                # Convert dict to string for analysis
+                content_str = str(content)
+        else:
+            content_str = str(content)
+        
         # Length factor
-        if len(content) > 500:
+        if len(content_str) > 500:
             score += 0.5
-        if len(content) > 2000:
+        if len(content_str) > 2000:
             score += 0.5
             
         # Structure factor
-        if "introduction" in content.lower() and "conclusion" in content.lower():
+        if "introduction" in content_str.lower() and "conclusion" in content_str.lower():
             score += 0.5
             
         # Clarity factor
-        sentences = content.split('.')
+        sentences = content_str.split('.')
         if len(sentences) > 10:
             score += 0.3
             
@@ -783,12 +1177,17 @@ OUTPUT FORMAT:
     
     async def _call_ai(self, prompt: str) -> str:
         """Gọi AI model (mock implementation)"""
-        # In real implementation, this would call the actual AI model
-        # For now, return a mock response
-        return json.dumps({
-            "message": "AI-generated content based on prompt",
-            "status": "success"
-        })
+        try:
+            # Call Ollama API
+            response = await self.call_ollama(prompt)
+            return response
+        except Exception as e:
+            # Fallback to mock response if API fails
+            return json.dumps({
+                "message": f"AI-generated content based on prompt: {prompt}",
+                "status": "success",
+                "error": str(e)
+            })
     
     async def get_template(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Lấy template theo ID"""

@@ -59,7 +59,7 @@ app.use('/api/v1/subjects', subjectRoutes);
 app.use('/api/v1/grades', gradesRoutes);
 
 // AI System Integration Routes
-app.use('/api/ai', aiRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 // API Routes
 app.get('/api/v1/test', (_req, res) => {

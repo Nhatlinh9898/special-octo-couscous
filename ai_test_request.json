@@ -1,0 +1,9 @@
+{
+  "task": "generate_lesson",
+  "data": {
+    "topic": "Introduction to Python",
+    "subject": "Computer Science",
+    "level": "beginner",
+    "duration": 45
+  }
+}

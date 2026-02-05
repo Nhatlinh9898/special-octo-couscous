@@ -1,0 +1,9 @@
+{
+  "task": "generate_lesson",
+  "data": {
+    "topic": "Toan hoc",
+    "subject": "Toan",
+    "level": "Lop 10",
+    "duration": 45
+  }
+}

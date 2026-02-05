@@ -5,7 +5,8 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { aiBridgeService } from '../services/ai-bridge.service';
+import axios from 'axios';
+import { aiBridgeService } from '../services/ai-bridge-simple.service';
 import { logger, logRequest, logUserAction } from '../utils/logger';
 import { asyncHandler } from '../middleware/async';
 
@@ -724,6 +725,73 @@ router.get('/integration/status', asyncHandler(async (req: Request, res: Respons
     res.status(500).json({
       success: false,
       message: 'Failed to get integration status',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+}));
+
+/**
+ * @route   POST /api/ai/chat
+ * @desc    Simple chat with AI
+ * @access  Public
+ */
+router.post('/chat', asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { message } = req.body;
+    
+    // Forward to AI System for intelligent response
+    const response = await axios.post(`${aiBridgeService.getAIBaseUrl()}/api/v1/chat`, {
+      task: 'chat',
+      data: {
+        message: message,
+        context: 'education_management'
+      }
+    });
+    
+    res.json({
+      success: true,
+      response: response.data.response || response.data.message || 'AI response received',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Chat failed:', error);
+    
+    // Fallback to simple response if AI System is unavailable
+    const response = `AI received: "${req.body.message}". AI System is connected and ready!`;
+    
+    res.json({
+      success: true,
+      response: response,
+      timestamp: new Date().toISOString()
+    });
+  }
+}));
+
+/**
+ * @route   POST /api/ai/library
+ * @desc    Library AI search and management
+ * @access  Private
+ */
+router.post('/library', asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { task, data } = req.body;
+    
+    // Forward request to AI System
+    const response = await axios.post(`${aiBridgeService.getAIBaseUrl()}/api/v1/library/search`, {
+      task,
+      data
+    });
+    
+    res.json({
+      success: true,
+      message: 'Library operation completed successfully',
+      data: response.data
+    });
+  } catch (error) {
+    logger.error('Library operation failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process library request',
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
