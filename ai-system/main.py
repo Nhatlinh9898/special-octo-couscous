@@ -1247,45 +1247,112 @@ Bạn cần hỗ trợ với kỹ năng nâng cao nào?"""
 Tôi sẽ tạo bộ bài tập phù hợp!"""
         
         elif "đề thi" in message_lower or "exam" in message_lower:
-            response = """**Tạo đề thi chuẩn hóa và chất lượng:**
+            # Use Content Generation Agent to create real exam
+            try:
+                # Extract exam parameters from message
+                subject = "Vật lý"  # Default
+                if "vật lý" in message_lower: subject = "Vật lý"
+                elif "hóa học" in message_lower: subject = "Hóa học"
+                elif "sinh học" in message_lower: subject = "Sinh học"
+                elif "toán" in message_lower: subject = "Toán học"
+                elif "ngữ văn" in message_lower: subject = "Ngữ văn"
+                elif "lịch sử" in message_lower: subject = "Lịch sử"
+                elif "địa lý" in message_lower: subject = "Địa lý"
+                elif "tiếng anh" in message_lower: subject = "Tiếng Anh"
+                
+                # Extract duration
+                duration = 60  # Default minutes
+                if "15 phút" in message_lower: duration = 15
+                elif "30 phút" in message_lower: duration = 30
+                elif "45 phút" in message_lower: duration = 45
+                elif "60 phút" in message_lower: duration = 60
+                elif "90 phút" in message_lower: duration = 90
+                elif "120 phút" in message_lower: duration = 120
+                
+                # Extract question counts
+                tn_count = 10  # Default multiple choice
+                tl_count = 3   # Default essay
+                if "5 câu" in message_lower: tn_count = 5
+                elif "10 câu" in message_lower: tn_count = 10
+                elif "15 câu" in message_lower: tn_count = 15
+                elif "20 câu" in message_lower: tn_count = 20
+                
+                if "2 câu" in message_lower: tl_count = 2
+                elif "3 câu" in message_lower: tl_count = 3
+                elif "5 câu" in message_lower: tl_count = 5
+                
+                # Call Content Generation Agent
+                result = await content_generation_agent.process("generate_exam", {
+                    "subject": subject,
+                    "grade_level": "10",
+                    "duration": duration,
+                    "question_types": ["multiple_choice", "essay"],
+                    "question_counts": {
+                        "multiple_choice": tn_count,
+                        "essay": tl_count
+                    },
+                    "difficulty": "medium",
+                    "topics": ["general"]
+                })
+                
+                if result.get("success"):
+                    exam_content = result.get("response", {}).get("exam", {})
+                    questions = exam_content.get("questions", [])
+                    
+                    response = f"""✅ **ĐỀ THI ĐÃ TẠO THÀNH CÔNG!**
 
-📋 **Cấu trúc đề thi hoàn chỉnh:**
-1. **Ma trận đề thi:** Phân bổ kiến thức, kỹ năng
-2. **Câu hỏi đa dạng:** TN, TL, VD, TH
-3. **Độ khó tăng dần:** Dễ → Trung bình → Khó
-4. **Thời gian hợp lý:** Phù hợp số lượng câu
-5. **Đáp án chi tiết:** Hướng dẫn chấm điểm
+📚 **Thông tin đề thi:**
+- **Môn học:** {subject}
+- **Lớp:** 10
+- **Thời gian:** {duration} phút
+- **Số câu hỏi:** {len(questions)} câu
 
-🎯 **Các dạng đề thi:**
+📝 **Nội dung đề thi:**
+"""
+                    
+                    # Add questions to response
+                    for i, question in enumerate(questions[:5], 1):  # Show first 5 questions
+                        q_type = question.get("type", "multiple_choice")
+                        q_text = question.get("question", f"Câu hỏi {i}")
+                        q_options = question.get("options", [])
+                        q_answer = question.get("answer", "")
+                        
+                        response += f"\n**Câu {i} ({q_type}):** {q_text}\n"
+                        
+                        if q_type == "multiple_choice" and q_options:
+                            for j, option in enumerate(q_options, 1):
+                                response += f"  {chr(64+j)}. {option}\n"
+                            response += f"  **Đáp án:** {q_answer}\n"
+                        else:
+                            response += f"  **Đáp án:** {q_answer}\n"
+                    
+                    if len(questions) > 5:
+                        response += f"\n... và {len(questions) - 5} câu hỏi khác\n"
+                    
+                    response += f"""
+🤖 **Agent sử dụng:** Content Generation Agent với model {content_generation_agent.model}
+📊 **Chất lượng:** {exam_content.get('quality_score', 0)}/10
+⏱️ **Thời gian tạo:** {result.get('processing_time', 0):.2f}s"""
+                    
+                else:
+                    # Fallback to Ollama directly
+                    ollama_prompt = f"Tạo đề thi {subject} lớp 10, thời gian {duration} phút, gồm {tn_count} câu trắc nghiệm và {tl_count} câu tự luận. Đề thi phải có độ khó tăng dần và đáp án chi tiết."
+                    
+                    ollama_response = await content_generation_agent.call_ollama(ollama_prompt)
+                    
+                    response = f"""✅ **ĐỀ THI ĐÃ TẠO BẰNG AI!**
 
-**Đề kiểm tra 15 phút:**
-- 5 câu TN, 2 câu TL
-- Kiểm tra nhanh, củng cố
+🤖 **Nội dung do Ollama tạo:**
+{ollama_response}
 
-**Đề giữa kỳ:**
-- 10 câu TN, 3 câu TL, 1 bài VD
-- Thời gian: 60-90 phút
-
-**Đề cuối kỳ:**
-- 15 câu TN, 5 câu TL, 2 bài VD/TH
-- Thời gian: 90-120 phút
-
-**Đề thi học kỳ:**
-- 20 câu TN, 5 câu TL, 2 bài VD, 1 bài TH
-- Thời gian: 120-150 phút
-
-**Theo chuẩn quốc tế:**
-- Cambridge, IELTS, TOEFL
-- SAT, ACT, AP
-- Tú tài, Đại học
-
-**Để tạo đề thi, cung cấp:**
-- Môn học và lớp
-- Thời lượng và hình thức
-- Nội dung cần kiểm tra
-- Độ khó mong muốn
-
-Tôi sẽ tạo đề thi chất lượng ngay!"""
+📚 **Thông tin:**
+- Môn: {subject}
+- Thời gian: {duration} phút
+- Số câu: {tn_count} TN + {tl_count} TL
+- Model: {content_generation_agent.model}"""
+                    
+            except Exception as e:
+                response = f"❌ Lỗi tạo đề thi: {str(e)}"
         
         elif "help" in message_lower or "giúp" in message_lower or "hỗ trợ" in message_lower:
             response = """**🤖 AI TRỢ LÝ GIÁO DỤC EDUMANAGER**
@@ -1572,6 +1639,53 @@ Tôi sẽ:
                 response = f"""Tôi đã nhận được tin nhắn: "{message}"
 
 Tôi la AI tro ly giao duc chuyen sau, co the giup ban voi cac van de cu the ve:
+
+**Giang day va hoc tap:**
+- Tao noi dung bai hoc chi tiet
+- Soan bai tap da dang
+- Thiet ke de thi chat luong
+- Phan tich ket qua hoc tap
+
+**Tu van giao duc:**
+- Phuong phap giang day hieu qua
+- Giai quyet van de lop hoc
+- Toi uu thoi khoa bieu
+- Quan ly hoc sinh hieu qua
+
+**Kien thuc chuyen mon:**
+- Toan hoc, Vat ly, Hoa hoc
+- Ngu van, Lich su, Dia ly
+- Tieng Anh, Tin hoc, Sinh hoc
+
+**Tim kiem va hoc tap tu internet:**
+- Tim kiem thong tin giao duc moi nhat
+- Cap nhat kien thuc tu nguon online
+- Huan luyen AI tang cuong voi web data
+- Hoc tap real-time tu internet
+
+**He thong Multi-Tier Agents:**
+- Xu ly da tang voi LEANN integration
+- Phan tich prompt va routing thong minh
+- Sang loc va tong hop thong tin
+- Danh gia chat luong tu dong
+- Vector search va semantic indexing
+
+**Hay thu hoi toi ve:**
+- "Tao bai hoc [chu de] mon [ten mon]"
+- "Bai tap ve [noi dung] lop [lop]"
+- "Tim kiem thong tin ve [chu de]"
+- "Cap nhat kien thuc ve [chu de]"
+- "Huan luyen AI voi web ve [chu de]"
+- "He thong da tang xu ly [yeu cau phuc tap]"
+- "LEANN vector search cho [tai lieu]"
+
+Toi san sang phan tich va dua ra giai phap chi tiet cho van de cua ban!"""
+        
+        else:
+            # Default response for unmatched messages
+            response = f"""Tôi đã nhận được tin nhắn: "{message}"
+
+Tôi là AI trợ lý giáo dục chuyên sâu, có thể giúp bạn với các vấn đề cụ thể về:
 
 **Giang day va hoc tap:**
 - Tao noi dung bai hoc chi tiet

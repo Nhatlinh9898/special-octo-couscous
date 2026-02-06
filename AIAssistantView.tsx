@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Send, Sparkles, BookOpen, HelpCircle, Loader2 } from 'lucide-react';
 import { api } from './data';
-import { realAIService } from './realAIService'; // Use real AI service
+import { directAIService } from './directAIService'; // Use direct AI service
 import { AIMessage } from './types';
 import { Button } from './components';
 
@@ -35,7 +35,7 @@ const AIAssistantView = () => {
 
     try {
        // Call the AI Server
-       const responseText = await realAIService.chat(textToSend);
+       const responseText = await directAIService.chat(textToSend);
        
        const aiMsg: AIMessage = {
           id: Date.now() + 1,

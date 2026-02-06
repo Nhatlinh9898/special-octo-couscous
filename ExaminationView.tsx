@@ -4,7 +4,7 @@ import { api, MOCK_SUBJECTS } from './data';
 import { Exam, AIAnalysisResult } from './types';
 import { Button, Modal } from './components';
 import { AppContext } from './context';
-import { aiService } from './aiService';
+import { realAIService } from './realAIService';
 
 const ExaminationView = () => {
   const { user } = useContext(AppContext);
@@ -45,7 +45,7 @@ const ExaminationView = () => {
   const handleAIAnalyze = async () => {
     setIsAnalyzing(true);
     try {
-      const result = await aiService.exam.analyzeExamDifficulty();
+      const result = await realAIService.analyzeExamDifficulty();
       setExamResult(result);
       setShowExamModal(true);
     } catch (e) {

@@ -111,6 +111,53 @@ export const realAIService = {
     }
   },
 
+  // Generate exam
+  async generateExam(params: {
+    subject: string;
+    topics: string[];
+    duration: number;
+    question_types: string[];
+    total_points: number;
+  }) {
+    try {
+      const response = await fetch(`${API_BASE}/content/exam`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Generate Exam Error:', error);
+      return { success: false, error: 'Failed to generate exam' };
+    }
+  },
+
+  // Analyze exam difficulty
+  async analyzeExamDifficulty() {
+    try {
+      const response = await fetch(`${API_BASE}/education/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data_type: 'exam',
+          data: { analysis_type: 'difficulty' },
+          analysis_type: 'exam_difficulty'
+        })
+      });
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Analyze Exam Error:', error);
+      return { 
+        title: "Phân tích Độ khó Đề thi", 
+        summary: "Không thể phân tích do lỗi kết nối", 
+        recommendations: ["Kiểm tra kết nối AI"],
+        dataPoints: [{label: 'Trạng thái', value: 'Lỗi'}] 
+      };
+    }
+  },
+
   // Get AI status
   async getStatus() {
     try {
