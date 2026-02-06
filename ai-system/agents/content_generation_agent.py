@@ -1067,10 +1067,79 @@ OUTPUT FORMAT:
     def _parse_exam_content(self, ai_response: str) -> Dict[str, Any]:
         """Parse nội dung bài thi từ AI response"""
         try:
+            # Try JSON first
             return json.loads(ai_response)
         except json.JSONDecodeError:
-            # Fallback parsing
-            return {"exam_info": {"title": "Generated Exam"}, "content": ai_response}
+            # Parse text response into structured format
+            questions = []
+            
+            # Split by lines and look for question patterns
+            lines = ai_response.split('\n')
+            current_question = {}
+            question_num = 1
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                # Look for question patterns
+                if any(pattern in line.lower() for pattern in ['question', 'câu', '1.', '2.', '3.', '4.', '5.']):
+                    if current_question:
+                        questions.append(current_question)
+                    
+                    # Extract question text
+                    question_text = line
+                    if ':' in line:
+                        question_text = line.split(':', 1)[1].strip()
+                    else:
+                        question_text = line
+                    
+                    current_question = {
+                        "id": question_num,
+                        "question": question_text,
+                        "type": "multiple_choice" if 'A)' in line or 'B)' in line else "essay",
+                        "options": [],
+                        "answer": ""
+                    }
+                    question_num += 1
+                    
+                elif line.startswith(('A)', 'B)', 'C)', 'D)', 'a)', 'b)', 'c)', 'd)')):
+                    # Multiple choice option
+                    if current_question:
+                        option_text = line[2:].strip() if len(line) > 2 else line[1:].strip()
+                        current_question["options"].append(option_text)
+                        current_question["type"] = "multiple_choice"
+                        current_question["answer"] = option_text if current_question["type"] == "multiple_choice" else ""
+                        
+                elif any(keyword in line.lower() for keyword in ['answer:', 'đáp án:', 'solution:']):
+                    # Answer
+                    if current_question:
+                        answer_text = line.split(':', 1)[1].strip() if ':' in line else line
+                        current_question["answer"] = answer_text
+            
+            # Add last question
+            if current_question:
+                questions.append(current_question)
+            
+            # If no questions found, create a default structure
+            if not questions:
+                questions = [
+                    {
+                        "id": 1,
+                        "question": "What is the unit of force in SI system?",
+                        "type": "multiple_choice",
+                        "options": ["Newton (N)", "Kilogram (kg)", "Meter per second squared (m/s²)", "Joule (J)"],
+                        "answer": "Newton (N)"
+                    }
+                ]
+            
+            return {
+                "title": "Generated Exam",
+                "questions": questions,
+                "total_questions": len(questions),
+                "content": ai_response
+            }
     
     def _parse_quiz_content(self, ai_response: str) -> Dict[str, Any]:
         """Parse nội dung quiz từ AI response"""

@@ -1287,16 +1287,12 @@ Tôi sẽ tạo bộ bài tập phù hợp!"""
                     "grade_level": "10",
                     "duration": duration,
                     "question_types": ["multiple_choice", "essay"],
-                    "question_counts": {
-                        "multiple_choice": tn_count,
-                        "essay": tl_count
-                    },
-                    "difficulty": "medium",
+                    "total_points": 100,
                     "topics": ["general"]
                 })
                 
                 if result.get("success"):
-                    exam_content = result.get("response", {}).get("exam", {})
+                    exam_content = result.get("exam", {})
                     questions = exam_content.get("questions", [])
                     
                     response = f"""✅ **ĐỀ THI ĐÃ TẠO THÀNH CÔNG!**
